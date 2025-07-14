@@ -1,0 +1,26 @@
+name: IdentityPrvd Build and Tests
+run-name: Scan for Commit ${{ github.sha }} by ${{github.actor}}
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    # Preparation
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 9.0.x
+
+    # Build
+    - name: Build Solution
+      run: dotnet build src/${{ secrets.SLN_NAME }}
+
+    # Run Test
+    - name: Run Tests and Collect Coverage
+      run: dotnet test src/${{ secrets.SLN_NAME }}  --collect:"XPlat Code Coverage;Format=opencover" --logger "trx;LogFileName=test_results.xml" --results-directory "test_results"

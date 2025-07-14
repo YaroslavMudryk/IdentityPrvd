@@ -1,0 +1,29 @@
+signup
+{
+  "userName": "Chepushyla",
+  "login": "admin@mail.com",
+  "password": "Password1!"
+}
+
+signin
+{
+  "login": "admin@mail.com",
+  "password": "Password1!",
+  "language": "uk",
+  "clientId": "1jjd-Pt0B-QFdk-x3Vw",
+  "clientSecret": "lTiv0Fn0PcWqAsjQGmHrBfsrEZuSfvMjDlST6311QjEfEolUl8qjOPCEUX0JJhXMCaJFJr",
+  "appVersion": "0.0.1",
+  "client": {
+    "device": {
+      "brand": "Samsung",
+      "model": "Galaxy S24 Ultra",
+      "type": "mobile",
+      "vendorModel": "SM-S928B"
+    },
+    "os": {
+      "name": "Android",
+      "version": "15",
+      "platform": "arm64"
+    }
+  }
+}
