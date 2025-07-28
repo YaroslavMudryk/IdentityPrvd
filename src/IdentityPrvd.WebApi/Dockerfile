@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["IdentityPrvd.WebApi/IdentityPrvd.WebApi.csproj", "IdentityPrvd.WebApi/"]
-RUN dotnet restore "./IdentityPrvd.WebApi/IdentityPrvd.WebApi.csproj"
+COPY ["IdentityPrvd/IdentityPrvd.csproj", "IdentityPrvd/"]
+RUN dotnet restore "./IdentityPrvd/IdentityPrvd.csproj"
 COPY . .
-WORKDIR "/src/IdentityPrvd.WebApi"
-RUN dotnet build "./IdentityPrvd.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/IdentityPrvd"
+RUN dotnet build "./IdentityPrvd.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./IdentityPrvd.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./IdentityPrvd.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "IdentityPrvd.WebApi.dll"]
+ENTRYPOINT ["dotnet", "IdentityPrvd.dll"]

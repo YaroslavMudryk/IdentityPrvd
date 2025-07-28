@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.4.0" />
+    <PackageReference Include="AspNet.Security.OAuth.Twitter" Version="9.4.0" />
+    <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
+    <PackageReference Include="Extensions.DeviceDetector" Version="1.0.3" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Graph" Version="5.87.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Otp.NET" Version="1.4.0" />
+    <PackageReference Include="Redis.OM" Version="1.0.1" />
+    <PackageReference Include="Redis.OM.Identity" Version="0.1.2" />
+    <PackageReference Include="Redis.OM.Vectorizers" Version="1.0.1" />
+    <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
+    <PackageReference Include="Ulid" Version="1.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Factories\" />
+    <Folder Include="Features\Authorization\Permissions\" />
+    <Folder Include="Features\Shared\Dtos\" />
+    <Folder Include="Features\Shared\Services\" />
+    <Folder Include="Features\Shared\Validators\" />
+    <Folder Include="Infrastructure\Authentication\JwtBearer\" />
+    <Folder Include="Infrastructure\Authentication\Session\" />
+    <Folder Include="Infrastructure\Authentication\OAuth\" />
+  </ItemGroup>
+
+</Project>

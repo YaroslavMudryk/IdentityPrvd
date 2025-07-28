@@ -1,11 +1,10 @@
-using IdentityPrvd.WebApi.Extensions;
-using IdentityPrvd.WebApi.Seeding;
+using IdentityPrvd.Infrastructure.Database.Seeding;
 
 namespace IdentityPrvd.WebApi;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddEndpointsApiExplorer();
@@ -20,7 +19,7 @@ public class Program
 
         if (app.Environment.IsDevelopment())
         {
-            SeedData.InitializeAsync(app.Services).GetAwaiter().GetResult();
+            await SeedData.InitializeAsync(app.Services);
         }
 
         app.UseSwagger();
