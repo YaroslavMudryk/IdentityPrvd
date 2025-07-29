@@ -17,12 +17,12 @@ services:
     restart: always
 
   postgres:
-    image: postgres:17
+    image: postgres:18
     container_name: postgres
     environment:
       POSTGRES_USER: admin_identity
       POSTGRES_PASSWORD: admin_identity_123
-      POSTGRES_DB: identityDb
+      POSTGRES_DB: IdentityDb
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

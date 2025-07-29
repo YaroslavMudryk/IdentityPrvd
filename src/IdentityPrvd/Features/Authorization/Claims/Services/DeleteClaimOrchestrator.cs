@@ -1,11 +1,13 @@
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 
 namespace IdentityPrvd.Features.Authorization.Claims.Services;
 
 public class DeleteClaimOrchestrator(
     IUserContext userContext,
+    ITransactionManager transactionManager,
     IClaimStore repo)
 {
     public async Task DeleteClaimAsync(Ulid claimId)
@@ -15,13 +17,13 @@ public class DeleteClaimOrchestrator(
             IdentityClaims.Types.Claims, IdentityClaims.Values.Delete,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
-        //await using var transaction = await repo.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         await DeleteClaimReferencesAsync(claimId);
         var claim = await repo.GetAsync(claimId);
         await repo.DeleteAsync(claim);
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
     }
 
     private async Task DeleteClaimReferencesAsync(Ulid claimId)

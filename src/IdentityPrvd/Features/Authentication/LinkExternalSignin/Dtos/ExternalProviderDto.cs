@@ -1,6 +1,6 @@
 ﻿namespace IdentityPrvd.Features.Authentication.LinkExternalSignin.Dtos;
 
-public class ExternalSigninDto
+public class ExternalProviderDto
 {
     public string Provider { get; set; }
     public string Picture { get; set; }

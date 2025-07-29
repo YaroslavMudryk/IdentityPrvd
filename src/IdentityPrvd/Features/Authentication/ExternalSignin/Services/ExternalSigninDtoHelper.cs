@@ -28,58 +28,60 @@ public static class ExternalSigninDtoHelper
     {
         if (dto.Provider != null)
             items.Add(ProviderKey, dto.Provider);
-        
+
         if (dto.ReturnUrl != null)
             items.Add(ReturnUrlKey, dto.ReturnUrl);
-        
+
+        InsertDataToItems(items, dto);
+
         if (dto.Language != null)
             items.Add(LanguageKey, dto.Language);
-        
+
         if (dto.ClientId != null)
             items.Add(ClientIdKey, dto.ClientId);
-        
+
         if (dto.ClientSecret != null)
             items.Add(ClientSecretKey, dto.ClientSecret);
-        
+
         if (dto.AppVersion != null)
             items.Add(AppVersionKey, dto.AppVersion);
-        
+
         if (dto.DeviceId != null)
             items.Add(DeviceIdKey, dto.DeviceId);
-        
+
         if (dto.DeviceBrand != null)
             items.Add(DeviceBrandKey, dto.DeviceBrand);
-        
+
         if (dto.DeviceModel != null)
             items.Add(DeviceModelKey, dto.DeviceModel);
-        
+
         if (dto.DeviceType != null)
             items.Add(DeviceTypeKey, dto.DeviceType);
-        
+
         if (dto.DeviceVendorModel != null)
             items.Add(DeviceVendorModelKey, dto.DeviceVendorModel);
-        
+
         if (dto.OsName != null)
             items.Add(OsNameKey, dto.OsName);
-        
+
         if (dto.OsVersion != null)
             items.Add(OsVersionKey, dto.OsVersion);
-        
+
         if (dto.OsPlatform != null)
             items.Add(OsPlatformKey, dto.OsPlatform);
-        
+
         if (dto.BrowserName != null)
             items.Add(BrowserNameKey, dto.BrowserName);
-        
+
         if (dto.BrowserVersion != null)
             items.Add(BrowserVersionKey, dto.BrowserVersion);
-        
+
         if (dto.BrowserType != null)
             items.Add(BrowserTypeKey, dto.BrowserType);
-        
+
         if (dto.BrowserEngine != null)
             items.Add(BrowserEngineKey, dto.BrowserEngine);
-        
+
         if (dto.BrowserEngineVersion != null)
             items.Add(BrowserEngineVersionKey, dto.BrowserEngineVersion);
     }
@@ -87,7 +89,7 @@ public static class ExternalSigninDtoHelper
     public static ExternalSigninDto GetDtoFromItems(this IDictionary<string, string> items)
     {
         string unknown = string.Empty;
-        return new ExternalSigninDto
+        var dto = new ExternalSigninDto
         {
             Provider = items.TryGetValue(ProviderKey, out var provider) ? provider : unknown,
             ReturnUrl = items.TryGetValue(ReturnUrlKey, out var returnUrl) ? returnUrl : unknown,
@@ -109,5 +111,35 @@ public static class ExternalSigninDtoHelper
             BrowserEngine = items.TryGetValue(BrowserEngineKey, out var browserEngine) ? browserEngine : unknown,
             BrowserEngineVersion = items.TryGetValue(BrowserEngineVersionKey, out var browserEngineVersion) ? browserEngineVersion : unknown,
         };
+
+        GetDataFromItems(items, dto);
+
+        return dto;
+    }
+
+    private static void InsertDataToItems(IDictionary<string, string> items, ExternalSigninDto dto)
+    {
+        if (dto.Data != null && dto.Data.Length != 0)
+            foreach (var dataItem in dto.Data)
+            {
+                var item = dataItem.Split(':');
+                items.Add($"data:{item[0]}", item[1]);
+            }
+    }
+
+    private static void GetDataFromItems(IDictionary<string, string> items, ExternalSigninDto dto)
+    {
+        if (items.Keys.Any(s => s.StartsWith("data:")))
+        {
+            var allKeys = items.Keys.Where(s => s.StartsWith("data:"));
+            var values = new List<string>();
+            foreach (var key in allKeys)
+            {
+                var regularKey = key.Split(":")[1];
+                var value = items[key];
+                values.Add($"{regularKey}:{value}");
+            }
+            dto.Data = [.. values];
+        }
     }
 }

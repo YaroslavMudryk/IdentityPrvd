@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Services.ServerSideSessions;
 
@@ -14,6 +15,7 @@ public class RevokeSessionsOrchestrator(
     SessionRevocationValidator revocationValidator,
     ISessionStore sessionStore,
     IRefreshTokenStore refreshTokenStore,
+    ITransactionManager transactionManager,
     TimeProvider timeProvider)
 {
     public async Task<int> RevokeSessionsAsync(Ulid[] sessionIds)
@@ -23,7 +25,7 @@ public class RevokeSessionsOrchestrator(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
-        //await using var transaction = await sessionStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var sessionsToRevoke = await sessionStore.GetActiveSessionsByIdsAsync(sessionIds);
         if (sessionsToRevoke.Count < sessionIds.Length)
@@ -48,7 +50,7 @@ public class RevokeSessionsOrchestrator(
         await refreshTokenStore.UpdateRangeAsync(refreshTokens);
 
         await sessionManager.DeleteSessionsByIdsAsync(sessionsToRevoke.Select(s => s.Id.GetIdAsString()), currentUser.UserId);
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
 
         return sessionsToRevoke.Count;
     }

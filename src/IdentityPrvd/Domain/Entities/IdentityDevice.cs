@@ -2,7 +2,7 @@
 
 public class IdentityDevice : BaseModel
 {
-    public string DeviceIdentifier { get; set; }
+    public string Identifier { get; set; }
     public string Brand { get; set; }
     public string Model { get; set; }
     public string VendorModel { get; set; }
@@ -18,8 +18,15 @@ public class IdentityDevice : BaseModel
     public string BrowserEngine { get; set; }
     public string BrowserEngineVersion { get; set; }
 
-    public DateTime? TrustedAt { get; set; }
-    public Ulid? TrustedBySessionId { get; set; }
+    public bool Verified { get; set; }
+    public DateTime? VerifiedAt { get; set; }
+    public string VerifiedBySessionId { get; set; }
+
+    public DateTime? UnverifiedAt { get; set; }
+    public string UnverifiedBySessionId { get; set; }
+
+    public Ulid UserId { get; set; }
+    public IdentityUser User { get; set; }
 
     public List<IdentitySession> Sessions { get; set; } = [];
 }

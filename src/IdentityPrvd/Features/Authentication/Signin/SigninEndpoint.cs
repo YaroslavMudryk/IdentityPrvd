@@ -21,3 +21,16 @@ public class SigninEndpoint : IEndpoint
             }).WithTags("Signin");
     }
 }
+
+public class SigninMfa : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/identity/signin-mfa",
+            [AllowAnonymous] async (SigninMfaRequestDto dto, SigninMfaOrchestrator orc) =>
+            {
+                var result = await orc.SinginMfaAsync(dto);
+                return Results.Ok(result.MapToResponse());
+            }).WithTags("Signin");
+    }
+}

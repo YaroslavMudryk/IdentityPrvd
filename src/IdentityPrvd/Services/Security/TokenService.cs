@@ -1,6 +1,6 @@
 ﻿using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Extensions;
-using IdentityPrvd.Features.Authentication.Signin.Dtos;
+using IdentityPrvd.Features.Shared.Dtos;
 using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

@@ -4,6 +4,7 @@ using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Features.Security.Mfa.EnableMfa.Dtos;
@@ -21,6 +22,7 @@ public class EnableMfaOrchestrator(
     IMfaStore mfaStore,
     AppOptions appOptions,
     IMfaService mfaService,
+    ITransactionManager transactionManager,
     IUserContext userContext)
 {
     public async Task<MfaResponse> EnableMfaAsync(MfaDto dto)
@@ -31,7 +33,7 @@ public class EnableMfaOrchestrator(
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
         var userId = Ulid.Parse(currentUser.UserId);
-        //await using var transaction = await mfaStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         MfaResponse response = null;
         if (string.IsNullOrWhiteSpace(dto.Totp))
@@ -43,7 +45,7 @@ public class EnableMfaOrchestrator(
             response = await HandleConfirmMfaAsync(dto.Totp, userId, currentUser.SessionId);
         }
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
 
         return response;
     }

@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Endpoints;
 using IdentityPrvd.Features.Authentication.ChangeLogin;
 using IdentityPrvd.Features.Authentication.ChangePassword;
@@ -14,6 +15,8 @@ using IdentityPrvd.Features.Authentication.Signout;
 using IdentityPrvd.Features.Authentication.Signup;
 using IdentityPrvd.Features.Authorization.Claims;
 using IdentityPrvd.Features.Authorization.Roles;
+using IdentityPrvd.Features.Personal.Contacts;
+using IdentityPrvd.Features.Personal.Devices;
 using IdentityPrvd.Features.Security.Mfa.DisableMfa;
 using IdentityPrvd.Features.Security.Mfa.EnableMfa;
 using IdentityPrvd.Features.Security.RefreshToken;
@@ -21,6 +24,7 @@ using IdentityPrvd.Features.Security.Sessions.GetSessions;
 using IdentityPrvd.Features.Security.Sessions.RevokeSessions;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
+using IdentityPrvd.Infrastructure.Database.Transactions;
 using IdentityPrvd.Infrastructure.Middleware;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;
@@ -56,10 +60,12 @@ public static class ServicesCollectionExtensions
             options.UseNpgsql(identityPrvdSection["Connections:Db"])
                 .UseSnakeCaseNamingConvention());
         services.AddScoped<IRedisConnectionProvider>(_ =>
-        {
-            var connString = identityPrvdSection["Connections:Redis"];
-            return new RedisConnectionProvider(connString);
-        });
+            new RedisConnectionProvider(identityPrvdSection["Connections:Redis"]));
+
+        services.AddScoped<ITransactionManager, EfCoreTransactionManager>();
+        //services.AddScoped<ITransactionScope, EfCoreTransactionScope>();
+
+
 
         //middlewares
         services.AddTransient<CorrelationContextMiddleware>();
@@ -82,6 +88,8 @@ public static class ServicesCollectionExtensions
         services.AddChangeLoginDependencies();
         services.AddChangePasswordDependencies();
         services.AddRestorePasswordDependencies();
+        services.AddContactsDependencies();
+        services.AddDevicesDependencies();
 
         //protection
         services.AddScopedConfiguration<AppOptions>(identityPrvdSection, "App");
@@ -186,8 +194,10 @@ public static class ServicesCollectionExtensions
         services.AddScoped<IRefreshTokensQuery, EfRefreshTokensQuery>();
         services.AddScoped<IRolesQuery, EfRolesQuery>();
         services.AddScoped<ISessionsQuery, EfSessionsQuery>();
-        services.AddScoped<IUserLoginQuery, EfUserLoginQuery>();
+        services.AddScoped<IUserLoginsQuery, EfUserLoginsQuery>();
         services.AddScoped<IUsersQuery, EfUsersQuery>();
+        services.AddScoped<IContactsQuery, EfContactsQuery>();
+        services.AddScoped<IDevicesQuery, EfDevicesQuery>();
 
         services.AddScoped<IClaimStore, EfClaimStore>();
         services.AddScoped<IConfirmStore, EfConfirmStore>();
@@ -200,6 +210,8 @@ public static class ServicesCollectionExtensions
         services.AddScoped<IUserLoginStore, EfUserLoginStore>();
         services.AddScoped<IUserRoleStore, EfUserRoleStore>();
         services.AddScoped<IUserStore, EfUserStore>();
+        services.AddScoped<IContactStore, EfContactStore>();
+        services.AddScoped<IDeviceStore, EfDeviceStore>();
 
         return services;
     }

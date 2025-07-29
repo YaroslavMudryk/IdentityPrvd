@@ -10,6 +10,7 @@ namespace IdentityPrvd.Data.Stores;
 public interface IMfaStore
 {
     Task<IdentityUser> GetUserAsync(Ulid userId);
+    Task<IdentityMfa> GetByUserIdAsync(Ulid userId);
     Task<IdentityMfa> GetUserMfaTotpNullableAsync(Ulid userId);
     Task<IdentityMfa> GetUserActiveMfaNullableAsync(Ulid userId);
     Task<IdentityMfa> AddAsync(IdentityMfa mfa);
@@ -66,4 +67,7 @@ public class EfMfaStore(IdentityPrvdContext dbContext) : IMfaStore
         dbContext.MfaRecoveryCodes.HardRemove(recoveryCodes);
         await dbContext.SaveChangesAsync();
     }
+
+    public async Task<IdentityMfa> GetByUserIdAsync(Ulid userId) =>
+        await dbContext.Mfas.FirstOrDefaultAsync(s => s.UserId == userId);
 }

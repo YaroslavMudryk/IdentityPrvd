@@ -127,6 +127,6 @@ public class DefaultReturnUriEndpoint : IEndpoint
                     type = s.Type,
                     value = s.Value
                 }).ToList().MapToResponse());
-            }).WithName("DefaultReturnUri");
+            }).WithName("DefaultReturnUri").WithTags("Sso");
     }
 }

@@ -24,5 +24,9 @@ public class SessionConfiguration : IEntityTypeConfiguration<IdentitySession>
         builder.Property(s => s.Client).HasConversion(
             v => v.ToJson(),
             v => v.FromJson<ClientInfo>());
+
+        builder.Property(s => s.Data).HasConversion(
+            v => v.ToJson(),
+            v => v.FromJson<Dictionary<string, string>>());
     }
 }

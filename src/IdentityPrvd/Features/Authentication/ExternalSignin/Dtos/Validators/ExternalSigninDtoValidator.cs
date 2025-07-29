@@ -11,10 +11,29 @@ public class ExternalSigninDtoValidator : AbstractValidator<ExternalSigninDto>
         TimeProvider timeProvider)
     {
         RuleFor(s => s.Provider)
-            .NotEmpty().WithMessage("Provider is empty");
+            .NotEmpty().WithMessage("Provider can`t be empty");
 
         RuleFor(s => s.ClientId)
-            .NotEmpty().WithMessage("ClientId is empty");
+            .NotEmpty().WithMessage("ClientId can`t be empty");
+
+        RuleFor(s => s.Data)
+            .Must((data) =>
+            {
+                if (data != null)
+                {
+                    if (!data.All(s => s.Contains(':')))
+                    {
+                        throw new BadRequestException("Not valid imcoming data. Should be \"fcmToken:u4wijrevg5g2iuk9\"");
+                    }
+
+                    if (data.Length > 10)
+                    {
+                        throw new BadRequestException("Too much items. There should be no more than 10 items");
+                    }
+                }
+
+                return true;
+            });
 
         RuleFor(s => s)
             .MustAsync(async (dto, token) =>

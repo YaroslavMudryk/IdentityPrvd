@@ -2,6 +2,7 @@
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Services.ServerSideSessions;
 
@@ -11,6 +12,7 @@ public class SignoutOrchestrator(
     IUserContext userContext,
     ISessionStore sessionStore,
     IRefreshTokenStore refreshTokenStore,
+    ITransactionManager transactionManager,
     TimeProvider timeProvider,
     ISessionManager sessionManager)
 {
@@ -21,7 +23,7 @@ public class SignoutOrchestrator(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
-        //await using var transaction = await sessionStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         if (!everywhere)
         {
@@ -32,7 +34,7 @@ public class SignoutOrchestrator(
             await HandleSignoutEverywhereAsync(currentUser);
         }
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
     }
 
     public async Task HandleSignoutEverywhereAsync(BasicAuthenticatedUser currentUser)

@@ -1,5 +1,6 @@
 ﻿using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Features.Authentication.RestorePassword.Dtos;
 using IdentityPrvd.Services.Security;
@@ -11,11 +12,12 @@ public class RestorePasswordOrchestrator(
     IConfirmStore confirmStore,
     IPasswordStore passwordStore,
     IUserStore userStore,
+    ITransactionManager transactionManager,
     IHasher hasher)
 {
     public async Task RestorePasswordAsync(RestorePasswordDto dto)
     {
-        //await using var transaction = await confirmStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -34,7 +36,7 @@ public class RestorePasswordOrchestrator(
 
         await CreateNewPasswordAsync(userId, passwordHash, dto.Hint, utcNow);
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
     }
 
     private async Task<IdentityConfirm> GetVerifyAsync(RestorePasswordDto dto, DateTime utcNow)

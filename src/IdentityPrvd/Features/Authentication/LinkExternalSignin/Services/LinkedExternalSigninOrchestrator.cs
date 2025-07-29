@@ -7,9 +7,9 @@ namespace IdentityPrvd.Features.Authentication.LinkExternalSignin.Services;
 
 public class LinkedExternalSigninOrchestrator(
     IUserContext userContext,
-    IUserLoginQuery userLoginsQuery)
+    IUserLoginsQuery userLoginsQuery)
 {
-    public async Task<List<ExternalSigninDto>> GetLinkedExternalSigninsAsync()
+    public async Task<List<ExternalProviderDto>> GetLinkedExternalSigninsAsync()
     {
         var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         var userLogins = await userLoginsQuery.GetUserLoginsAsync(currentUser.UserId.GetIdAsUlid());
@@ -18,7 +18,7 @@ public class LinkedExternalSigninOrchestrator(
         {
             var isLinked = userLogins.FirstOrDefault(s => s.Provider == provider.Key);
 
-            return new ExternalSigninDto
+            return new ExternalProviderDto
             {
                 Provider = provider.Key,
                 Picture = provider.Value,

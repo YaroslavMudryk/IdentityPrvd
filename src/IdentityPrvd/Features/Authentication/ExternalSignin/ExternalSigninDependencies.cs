@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos.Validators;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Services;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 
 namespace IdentityPrvd.Features.Authentication.ExternalSignin;
 

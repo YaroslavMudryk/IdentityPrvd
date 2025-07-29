@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 
@@ -9,6 +9,8 @@ public class ExternalSigninDto
     [FromQuery(Name = "returnUrl")]
     public string ReturnUrl { get; set; }
 
+    [FromQuery(Name = "data[]")]
+    public string[] Data { get; set; } = [];
     [FromQuery(Name = "language")]
     public string Language { get; set; }
     [FromQuery(Name = "clientId")]
@@ -18,7 +20,6 @@ public class ExternalSigninDto
     [FromQuery(Name = "appVersion")]
     public string AppVersion { get; set; }
 
-    
     [FromQuery(Name = "deviceId")]
     public string DeviceId { get; set; }
     [FromQuery(Name = "deviceBrand")]
@@ -30,14 +31,12 @@ public class ExternalSigninDto
     [FromQuery(Name = "deviceVendorModel")]
     public string DeviceVendorModel { get; set; }
 
-
     [FromQuery(Name = "osName")]
     public string OsName { get; set; }
     [FromQuery(Name = "osVersion")]
     public string OsVersion { get; set; }
     [FromQuery(Name = "osPlatform")]
     public string OsPlatform { get; set; }
-
 
     [FromQuery(Name = "browserName")]
     public string BrowserName { get; set; }

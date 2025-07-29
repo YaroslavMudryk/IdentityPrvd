@@ -1,4 +1,4 @@
-﻿namespace IdentityPrvd.Features.Authentication.Signin.Dtos;
+namespace IdentityPrvd.Features.Shared.Dtos;
 
 public class JwtToken
 {

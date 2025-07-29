@@ -3,7 +3,6 @@ using AspNet.Security.OAuth.Twitter;
 using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Endpoints;
-using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 
 namespace IdentityPrvd.Features.Authentication.ExternalSignin;
 
@@ -53,7 +53,7 @@ public class ExternalSigninCallbackEndpoint : IEndpoint
             {
                 var responseDto = await orc.SigninExternalProviderAsync(await AuthenticateByProviderAsync(context, provider));
                 return Results.Redirect($"{returnUrl}?accessToken={responseDto.AccessToken}&refreshToken={responseDto.RefreshToken}&expiredIn={responseDto.ExpiredIn}");
-            }).WithTags("External signin").WithName("SigninExternalCallback");
+            }).WithTags("External signin", "IdentityPrvd").WithName("SigninExternalCallback");
     }
 
     private static async Task<AuthenticateResult> AuthenticateByProviderAsync(HttpContext context, string provider)

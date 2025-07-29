@@ -17,7 +17,7 @@ public class StartRestorePasswordEndpoint : IEndpoint
             {
                 var startedRestoreDto = await orc.StartRestorePasswordAsync(dto);
                 return Results.Ok(startedRestoreDto.MapToResponse());
-            });
+            }).WithTags("Restore password");
     }
 }
 
@@ -30,6 +30,6 @@ public class RestorePasswordEndpoint : IEndpoint
             {
                 await orc.RestorePasswordAsync(dto);
                 return Results.NoContent();
-            });
+            }).WithTags("Restore password");
     }
 }

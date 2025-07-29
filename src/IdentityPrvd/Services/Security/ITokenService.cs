@@ -1,4 +1,4 @@
-﻿using IdentityPrvd.Features.Authentication.Signin.Dtos;
+﻿using IdentityPrvd.Features.Shared.Dtos;
 
 namespace IdentityPrvd.Services.Security;
 

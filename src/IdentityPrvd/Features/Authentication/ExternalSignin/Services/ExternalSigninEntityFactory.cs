@@ -1,3 +1,4 @@
+using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
@@ -73,12 +74,13 @@ public static class ExternalSigninEntityFactory
             UserId = userId,
             Client = dto.MapToClientInfo(),
             App = client.MapToAppInfo(dto.AppVersion),
+            Data = dto.Data.MapToSessionData(),
             Location = location,
             Language = dto.Language,
             Status = SessionStatus.Active,
             Type = SessionType.ExternalProvider,
             ExpireAt = expireAt,
-            ViaMFA = false,
+            ViaMfa = false,
             Tokens = [refreshToken]
         };
     }

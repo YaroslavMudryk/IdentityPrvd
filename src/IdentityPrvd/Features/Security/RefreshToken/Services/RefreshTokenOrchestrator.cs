@@ -3,9 +3,10 @@ using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
-using IdentityPrvd.Features.Authentication.Signin.Dtos;
 using IdentityPrvd.Features.Security.RefreshToken.Dtos;
+using IdentityPrvd.Features.Shared.Dtos;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Security;
 
@@ -17,6 +18,7 @@ public class RefreshTokenOrchestrator(
     TokenOptions tokenOptions,
     IRefreshTokenStore refreshTokenRepo,
     ITokenService tokenService,
+    ITransactionManager transactionManager,
     IRefreshTokensQuery refreshTokensQuery)
 {
     public async Task<SigninResponseDto> SigninByRefreshTokenAsync(RefreshTokenDto dto)
@@ -25,7 +27,7 @@ public class RefreshTokenOrchestrator(
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
-        //await using var transaction = await refreshTokenRepo.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var oldRefreshToken = await refreshTokensQuery.GetRefreshTokenWithSessionNullableAsync(dto.Token);
         oldRefreshToken.UsedAt = utcNow;
@@ -40,7 +42,7 @@ public class RefreshTokenOrchestrator(
         await refreshTokenRepo.AddAsync(newRefreshToken);
 
         var jwtToken = await tokenService.GetUserTokenAsync(oldRefreshToken.Session.UserId, oldRefreshToken.SessionId.GetIdAsString());
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
 
         return new SigninResponseDto
         {

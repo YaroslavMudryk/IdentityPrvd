@@ -22,4 +22,16 @@ public static class CollectionExtensions
             .DistinctBy(distinctBy)
             .GroupBy(groupBy)
             .ToDictionary(g => g.Key, g => g.Select(select).Distinct().ToList());
+
+    public static Dictionary<string, string> MapToSessionData(this string[] data)
+    {
+        if (data == null || data.Length == 0)
+            return [];
+
+        return data.Select(s =>
+        {
+            var item = s.Split(':');
+            return new { Key = item[0], Value = item[1] };
+        }).ToDictionary(s => s.Key, s => s.Value);
+    }
 }

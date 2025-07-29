@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Features.Authorization.Roles.Dtos;
 
@@ -12,6 +13,7 @@ public class CreateRoleOrchestrator(
     IUserContext userContext,
     IRolesQuery query,
     IRoleStore roleRepo,
+    ITransactionManager transactionManager,
     DefaultRoleService defaultRoleService,
     IRoleClaimStore roleClaimRepo,
     IValidator<CreateRoleDto> validator)
@@ -24,7 +26,7 @@ public class CreateRoleOrchestrator(
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
         await validator.ValidateAndThrowAsync(dto);
-        //await using var transaction = await roleRepo.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
         var newRole = new IdentityRole
         {
             Name = dto.Name,
@@ -45,7 +47,7 @@ public class CreateRoleOrchestrator(
             IsActive = true
         });
         await roleClaimRepo.AddRangeAsync(newRoleClaims);
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
 
         return await query.GetRoleAsync(newRole.Id);
     }

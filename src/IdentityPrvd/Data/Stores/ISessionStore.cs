@@ -9,6 +9,7 @@ namespace IdentityPrvd.Data.Stores;
 public interface ISessionStore
 {
     Task<IdentitySession> GetAsync(Ulid sessionId);
+    Task<IdentitySession> GetSessionByVerificationIdAsync(string verificationId);
     Task<List<IdentitySession>> GetActiveSessionsByUserIdAsync(Ulid userId);
     Task<List<IdentitySession>> GetActiveSessionsByIdsAsync(Ulid[] sessionIds);
     Task<IdentitySession> AddAsync(IdentitySession session);
@@ -26,6 +27,9 @@ public class EfSessionStore(IdentityPrvdContext dbContext) : ISessionStore
 
     public async Task<List<IdentitySession>> GetActiveSessionsByUserIdAsync(Ulid userId) =>
         await dbContext.Sessions.Where(s => s.UserId == userId && s.Status != SessionStatus.Close).ToListAsync();
+
+    public async Task<IdentitySession> GetSessionByVerificationIdAsync(string verificationId) =>
+        await dbContext.Sessions.FirstOrDefaultAsync(s => s.VerificationId == verificationId);
 
     public async Task<IdentitySession> AddAsync(IdentitySession session)
     {

@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.Data.Queries;
 
-public interface IUserLoginQuery
+public interface IUserLoginsQuery
 {
     Task<List<IdentityUserLogin>> GetUserLoginsAsync(Ulid userId);
     Task<IdentityUserLogin> GetUserLoginByProviderAsync(string userId, string provider);
+    Task<IdentityUserLogin> GetUserLoginByProviderWithUserAsync(string userId, string provider);
 }
 
-public class EfUserLoginQuery(IdentityPrvdContext dbContext) : IUserLoginQuery
+public class EfUserLoginsQuery(IdentityPrvdContext dbContext) : IUserLoginsQuery
 {
     public async Task<List<IdentityUserLogin>> GetUserLoginsAsync(Ulid userId) =>
         await dbContext.UserLogins
@@ -21,5 +22,11 @@ public class EfUserLoginQuery(IdentityPrvdContext dbContext) : IUserLoginQuery
     public async Task<IdentityUserLogin> GetUserLoginByProviderAsync(string userId, string provider) =>
         await dbContext.UserLogins
         .AsNoTracking()
+        .FirstOrDefaultAsync(s => s.Provider == provider && s.ProviderUserId == userId);
+
+    public async Task<IdentityUserLogin> GetUserLoginByProviderWithUserAsync(string userId, string provider) =>
+        await dbContext.UserLogins
+        .AsNoTracking()
+        .Include(s => s.User)
         .FirstOrDefaultAsync(s => s.Provider == provider && s.ProviderUserId == userId);
 }

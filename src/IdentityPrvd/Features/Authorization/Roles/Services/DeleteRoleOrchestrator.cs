@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 
 namespace IdentityPrvd.Features.Authorization.Roles.Services;
@@ -11,6 +12,7 @@ public class DeleteRoleOrchestrator(
     IRoleStore roleStore,
     IRoleClaimStore roleClaimStore,
     IRolesQuery rolesQuery,
+    ITransactionManager transactionManager,
     IUserContext userContext)
 {
     public async Task DeleteRoleAsync(Ulid roleId)
@@ -20,7 +22,7 @@ public class DeleteRoleOrchestrator(
              IdentityClaims.Types.Role, IdentityClaims.Values.Delete,
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
-        //await using var transaction = await roleStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var roleToDelete = await roleStore.GetAsync(roleId);
         await EnsureThatRoleCanBeDeletedAsync(roleToDelete);
@@ -29,7 +31,7 @@ public class DeleteRoleOrchestrator(
         var roleClaimsToDelete = await roleClaimStore.GetRoleClaimsByRoleIdAsync(roleId);
         await roleClaimStore.DeleteRangeAsync(roleClaimsToDelete);
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
     }
 
     public async Task EnsureThatRoleCanBeDeletedAsync(IdentityRole role)

@@ -9,8 +9,10 @@ public class IdentitySession : BaseModel
     public LocationInfo Location { set; get; }
     public ClientInfo Client { set; get; }
     public SessionType Type { get; set; }
-    public bool ViaMFA { get; set; }
+    public bool ViaMfa { get; set; }
     public SessionStatus Status { set; get; }
+    public string VerificationId { get; set; }
+    public DateTime? VerificationExpire { get; set; }
     public string Language { set; get; }
     public Ulid? DeactivatedBySessionId { set; get; }
     public DateTime? DeactivatedAt { set; get; }
@@ -21,5 +23,6 @@ public class IdentitySession : BaseModel
     public IdentityDevice Device { get; set; }
     public Ulid? QrId { get; set; }
     public IdentityQr Qr { get; set; }
+    public Dictionary<string, string> Data { get; set; }
     public List<IdentityRefreshToken> Tokens { get; set; } = [];
 }

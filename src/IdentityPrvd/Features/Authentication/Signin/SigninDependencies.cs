@@ -14,6 +14,7 @@ public static class SigninDependencies
     {
         services.AddScoped<IValidator<SigninRequestDto>, SigninRequestDtoValidator>();
         services.AddScoped<SigninOrchestrator>();
+        services.AddScoped<SigninMfaOrchestrator>();
         services.AddScoped<IUserSecureService, UserSecureService>();
         services.AddDeviceDetector();
 

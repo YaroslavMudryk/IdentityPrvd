@@ -32,7 +32,7 @@ public static class CacheAside
             }
         }
 
-        var hasLock = await SemaphoreSlim.WaitAsync(500);
+        var hasLock = await SemaphoreSlim.WaitAsync(500, cancellationToken);
 
         if (!hasLock)
             return default!;

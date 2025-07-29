@@ -10,6 +10,7 @@ public class IdentityContact : BaseModel
     public bool IsMain { get; set; }
     public bool IsConfirmed { get; set; }
     public DateTime? ConfirmedAt { get; set; }
+    public bool CanBeDeleted { get; set; }
 
     public Ulid UserId { get; set; }
     public IdentityUser User { get; set; }

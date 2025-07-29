@@ -4,9 +4,10 @@ using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
-using IdentityPrvd.Features.Authentication.Signin.Dtos;
+using IdentityPrvd.Features.Shared.Dtos;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Security;
@@ -27,8 +28,9 @@ public class ExternalSigninOrchestrator(
     IUserLoginStore userLoginRepo,
     IUserRoleStore userRoleRepo,
     ISessionStore sessionRepo,
+    ITransactionManager transactionManager,
     TimeProvider timeProvider,
-    IUserLoginQuery externalSigninQuery,
+    IUserLoginsQuery externalSigninQuery,
     ExternalUserExstractorService externalUserExstractor)
 {
     public async Task<SigninResponseDto> SigninExternalProviderAsync(AuthenticateResult authResult)
@@ -38,15 +40,15 @@ public class ExternalSigninOrchestrator(
         var dto = authResult.Properties.Items.GetDtoFromItems();
         var user = await externalUserExstractor.GetUserFromExternalProviderAsync(authResult);
 
-        //await using var transaction = await userRepo.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var userToLogin = await GetOrCreateUserAsync(user);
         var session = await CreateSessionAsync(dto, userToLogin, user.Provider);
         var jwtToken = await tokenService.GetUserTokenAsync(userToLogin.Id, session.Id.GetIdAsString(), user.Provider);
-        var userPermissions = await tokenService.GetUserPermissionsAsync(userToLogin.Id, "1jjd-Pt0B-QFdk-x3Vw");
+        var userPermissions = await tokenService.GetUserPermissionsAsync(userToLogin.Id, dto.ClientId);
 
         await AddSessionToManagerAsync(session, userPermissions);
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
 
         return CreateSigninResponse(jwtToken, session.Tokens.First());
     }
@@ -59,7 +61,7 @@ public class ExternalSigninOrchestrator(
 
     private async Task<IdentityUser> GetOrCreateUserAsync(ExternalUserDto user)
     {
-        var externalLogin = await externalSigninQuery.GetUserLoginByProviderAsync(user.Provider, user.ProviderUserId);
+        var externalLogin = await externalSigninQuery.GetUserLoginByProviderWithUserAsync(user.ProviderUserId, user.Provider);
 
         if (externalLogin == null)
         {

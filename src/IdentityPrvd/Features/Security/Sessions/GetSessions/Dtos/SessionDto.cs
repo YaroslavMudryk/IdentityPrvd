@@ -11,7 +11,7 @@ public class SessionDto
     public LocationInfo Location { set; get; }
     public ClientInfo Client { set; get; }
     public SessionType Type { get; set; }
-    public bool ViaMFA { get; set; }
+    public bool ViaMfa { get; set; }
     public SessionStatus Status { set; get; }
     public string Language { set; get; }
     public Ulid? DeactivatedBySessionId { set; get; }

@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Features.Authorization.Roles.Dtos;
 
@@ -13,6 +14,7 @@ public class UpdateRoleOrchestrator(
     IValidator<UpdateRoleDto> validator,
     IRolesQuery query,
     IRoleStore roleStore,
+    ITransactionManager transactionManager,
     DefaultRoleService defaultRoleService,
     IRoleClaimStore roleClaimStore)
 {
@@ -25,7 +27,7 @@ public class UpdateRoleOrchestrator(
 
         await validator.ValidateAndThrowAsync(dto);
 
-        //await using var transaction = await roleStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var roleToUpdate = await roleStore.GetAsync(roleId);
         roleToUpdate.Name = dto.Name;
@@ -38,7 +40,7 @@ public class UpdateRoleOrchestrator(
 
         await UpdateRoleClaimsAsync(roleId, dto.ClaimIds);
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
 
         return await query.GetRoleAsync(roleId);
     }

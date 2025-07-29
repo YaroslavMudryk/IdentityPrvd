@@ -30,4 +30,5 @@ public class IdentityUser : BaseModel
     public List<IdentityFailedLoginAttempt> FailedLoginAttempts { get; set; } = [];
     public List<IdentitySession> Sessions { get; set; } = [];
     public List<IdentityUserLogin> UserLogins { get; set; } = [];
+    public List<IdentityDevice> Devices { get; set; } = [];
 }

@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Features.Authentication.ChangePassword.Dtos;
@@ -21,6 +22,7 @@ public class ChangePasswordOrchestrator(
     ISessionStore sessionStore,
     IRefreshTokenStore refreshTokenStore,
     ISessionManager sessionManager,
+    ITransactionManager transactionManager,
     IHasher hasher)
 {
     public async Task ChangePasswordAsync(ChangePasswordDto dto)
@@ -32,7 +34,7 @@ public class ChangePasswordOrchestrator(
 
         var userId = currentUser.UserId.GetIdAsUlid();
 
-        //await using var transaction = await passwordStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var userFromDb = await userStore.GetUserAysnc(userId);
 
@@ -96,6 +98,6 @@ public class ChangePasswordOrchestrator(
             }
         }
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
     }
 }

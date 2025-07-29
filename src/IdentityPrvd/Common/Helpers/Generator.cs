@@ -47,6 +47,11 @@ public class Generator
         return $"{Guid.CreateVersion7():N}{Guid.CreateVersion7():N}";
     }
 
+    public static string GetSessionVerification()
+    {
+        return Ulid.NewUlid().ToString();
+    }
+
     public static string GetUniqCode(int sections)
     {
         var commonWords = sections * 4;

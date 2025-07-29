@@ -11,7 +11,7 @@ namespace IdentityPrvd.Features.Authentication.LinkExternalSignin.Services;
 
 public class LinkExternalSigninOrchestrator(
     IUserContext userContext,
-    IUserLoginQuery userLoginQuery,
+    IUserLoginsQuery userLoginQuery,
     IUserLoginStore userLoginStore)
 {
     public async Task LinkExternalProviderToUserAsync(AuthenticateResult authResult)

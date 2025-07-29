@@ -16,6 +16,6 @@ public class ChangePasswordEndpoint : IEndpoint
              {
                  await orc.ChangePasswordAsync(dto);
                  return Results.NoContent();
-             });
+             }).WithTags("Change password");
     }
 }

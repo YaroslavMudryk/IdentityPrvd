@@ -10,5 +10,6 @@ public class SigninRequestDto
     public string ClientId { get; set; }
     public string ClientSecret { get; set; }
     public string AppVersion { get; set; }
+    public Dictionary<string, string> Data { get; set; }
     public ClientInfo Client { get; set; }
 }

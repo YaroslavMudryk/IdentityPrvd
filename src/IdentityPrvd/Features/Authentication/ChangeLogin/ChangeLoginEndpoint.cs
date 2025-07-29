@@ -16,6 +16,6 @@ public class ChangeLoginEndpoint : IEndpoint
             {
                 await orc.ChangeLoginAsync(dto);
                 return Results.NoContent();
-            });
+            }).WithTags("Change login");
     }
 }

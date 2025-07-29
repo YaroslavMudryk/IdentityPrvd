@@ -4,6 +4,7 @@ using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Features.Authentication.Signup.Dtos;
@@ -24,6 +25,7 @@ public class SignupOrchestrator(
     IEmailService emailService,
     ISmsService smsService,
     IValidator<SignupRequestDto> validator,
+    ITransactionManager transactionManager,
     TimeProvider timeProvider,
     IdentityPrvdOptions options)
 {
@@ -31,7 +33,7 @@ public class SignupOrchestrator(
     {
         await validator.ValidateAndThrowAsync(dto);
 
-        //await using var transaction = await userStore.BeginTransactionAsync();
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -43,6 +45,7 @@ public class SignupOrchestrator(
             UserName = dto.UserName ?? Guid.NewGuid().ToString("N")[..10],
             FirstName = dto.FirstName,
             LastName = dto.LastName,
+            CanBeBlocked = true,
             IsConfirmed = !options.UserOptions.ConfirmRequired,
             ConfirmedAt = !options.UserOptions.ConfirmRequired ? utcNow : null,
             ConfirmedBy = !options.UserOptions.ConfirmRequired ? userContext.GetBy<ServiceUser>() : null
@@ -82,7 +85,7 @@ public class SignupOrchestrator(
             await SendVerificationAsync(codeToConfirm, user.Login);
         }
 
-        //await transaction.CommitAsync();
+        await transaction.CommitAsync();
 
         return new SignupResponseDto
         {
