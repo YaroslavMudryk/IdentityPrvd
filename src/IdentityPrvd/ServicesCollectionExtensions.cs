@@ -65,8 +65,6 @@ public static class ServicesCollectionExtensions
         services.AddTransient<CorrelationContextMiddleware>();
         services.AddTransient<ServerSideSessionMiddleware>();
         services.AddTransient<GlobalExceptionHandlerMiddleware>();
-        services.AddTransient<LoggingMiddleware>();
-        services.AddTransient<ETagMiddleware>();
 
         //features
         services.AddSignupDependencies();
@@ -212,8 +210,6 @@ public static class WebApplicationExtensions
     public static WebApplication UseIdentityPrvd(this WebApplication app)
     {
         app.UseMiddleware<CorrelationContextMiddleware>();
-        app.UseMiddleware<ETagMiddleware>();
-        app.UseMiddleware<LoggingMiddleware>();
         app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
         app.UseAuthentication();
