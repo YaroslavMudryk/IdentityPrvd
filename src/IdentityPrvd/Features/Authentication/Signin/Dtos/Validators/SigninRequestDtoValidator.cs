@@ -33,12 +33,12 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         RuleFor(x => x.Language)
             .Must((language) =>
             {
-                if (options.LanguageOptions.LanguageRequired)
+                if (options.Language.LanguageRequired)
                 {
-                    if (!options.LanguageOptions.UseCustomLanguages)
+                    if (!options.Language.UseCustomLanguages)
                     {
-                        if (!options.LanguageOptions.Languages.Any(s => s.Contains(language)))
-                            throw new BadRequestException($"Language `{language}` is not at available list ({string.Join(',', options.LanguageOptions.Languages)})");
+                        if (!options.Language.Languages.Any(s => s.Contains(language)))
+                            throw new BadRequestException($"Language `{language}` is not at available list ({string.Join(',', options.Language.Languages)})");
                     }
                 }
 

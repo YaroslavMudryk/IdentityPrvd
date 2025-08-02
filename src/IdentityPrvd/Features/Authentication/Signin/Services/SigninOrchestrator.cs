@@ -18,8 +18,6 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Graph.Models;
-using Microsoft.Graph.Models.CallRecords;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Services;
 
@@ -33,7 +31,7 @@ public class SigninOrchestrator(
     IDetector detector,
     ITransactionManager transactionManager,
     TimeProvider timeProvider,
-    TokenOptions tokenOptions,
+    IdentityPrvdOptions identityOptions,
     ISessionStore sessionRepo,
     IdentityPrvdContext dbContext,
     IValidator<SigninRequestDto> validator)
@@ -85,7 +83,7 @@ public class SigninOrchestrator(
             Status = SessionStatus.New,
             Type = SessionType.Mfa,
             ViaMfa = true,
-            ExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(tokenOptions.SessionLifeTimeInDays),
+            ExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.SessionLifeTimeInDays),
             VerificationId = sessionVerification,
             VerificationExpire = timeProvider.GetUtcNow().UtcDateTime.AddHours(1)
         };
@@ -106,7 +104,7 @@ public class SigninOrchestrator(
         {
             SessionId = sessionId,
             Value = Generator.GetRefreshToken(),
-            ExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(tokenOptions.RefreshLifeTimeInDays)
+            ExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.RefreshLifeTimeInDays)
         };
 
         var newSession = new IdentitySession
@@ -120,7 +118,7 @@ public class SigninOrchestrator(
             Language = dto.Language,
             Status = SessionStatus.Active,
             Type = SessionType.Password,
-            ExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(tokenOptions.SessionLifeTimeInDays),
+            ExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.SessionLifeTimeInDays),
             ViaMfa = false,
             Tokens = [refreshToken]
         };
@@ -147,7 +145,7 @@ public class SigninOrchestrator(
             VerifyId = null,
             AccessToken = jwtToken.Token,
             RefreshToken = refreshToken.Value,
-            ExpiredIn = tokenOptions.LifeTimeInMinutes / 60,
+            ExpiredIn = identityOptions.Token.LifeTimeInMinutes / 60,
         };
     }
 }

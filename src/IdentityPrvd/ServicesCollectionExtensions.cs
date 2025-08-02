@@ -1,5 +1,4 @@
-﻿using IdentityPrvd.Common.Extensions;
-using IdentityPrvd.Common.Helpers;
+﻿using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
@@ -31,12 +30,13 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
-using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Redis.OM;
 using Redis.OM.Contracts;
@@ -46,156 +46,59 @@ namespace IdentityPrvd;
 
 public static class ServicesCollectionExtensions
 {
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services)
+    {
+        var identityOptions = new IdentityPrvdOptions();
+        return services.AddIdentityPrvd(identityOptions);
+    }
+
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, Action<IdentityPrvdOptions> actionOptions)
+    {
+        var identityOptions = new IdentityPrvdOptions();
+        actionOptions.Invoke(identityOptions);
+        return services.AddIdentityPrvd(identityOptions);
+    }
+
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration)
+    {
+        var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
+        return services.AddIdentityPrvd(identityOptions);
+    }
+
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration, Action<IdentityPrvdOptions> actionOptions)
     {
-        var options = new IdentityPrvdOptions();
-        actionOptions.Invoke(options);
-        options.ValidateAndThrowIfNeeded();
-        services.AddScoped<IdentityPrvdOptions>((sp) => options);
-        var identityPrvdSection = configuration.GetSection("IdentityPrvd");
+        var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
+        actionOptions.Invoke(identityOptions);
+        return services.AddIdentityPrvd(identityOptions);
+    }
+
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IdentityPrvdOptions identityOptions)
+    {
+        identityOptions.ValidateAndThrowIfNeeded();
+        services.AddScoped(_ => identityOptions);
 
         services.AddEndpoints();
 
-        //db
-        services.AddDbContext<IdentityPrvdContext>(options =>
-            options.UseNpgsql(identityPrvdSection["Connections:Db"])
-                .UseSnakeCaseNamingConvention());
-        services.AddScoped<IRedisConnectionProvider>(_ =>
-            new RedisConnectionProvider(identityPrvdSection["Connections:Redis"]));
+        services.AddDbServices(identityOptions);
 
-        services.AddScoped<ITransactionManager, EfCoreTransactionManager>();
-        //services.AddScoped<ITransactionScope, EfCoreTransactionScope>();
+        services.AddMiddlewares();
 
+        services.AddFeatures();
 
+        services.AddProtectionServices();
 
-        //middlewares
-        services.AddTransient<CorrelationContextMiddleware>();
-        services.AddTransient<ServerSideSessionMiddleware>();
-        services.AddTransient<GlobalExceptionHandlerMiddleware>();
+        services.AddContexts();
 
-        //features
-        services.AddSignupDependencies();
-        services.AddSigninDependencies();
-        services.AddRefreshTokenDependencies();
-        services.AddSignoutDependencies();
-        services.AddGetSessionsDependencies();
-        services.AddRevokeSessionsDependencies();
-        services.AddEnableMfaDependencies();
-        services.AddDisableMfaDependencies();
-        services.AddRolesDependencies();
-        services.AddClaimsDependencies();
-        services.AddExternalSigninDependencies();
-        services.AddLinkExternalProviderDependencies();
-        services.AddChangeLoginDependencies();
-        services.AddChangePasswordDependencies();
-        services.AddRestorePasswordDependencies();
-        services.AddContactsDependencies();
-        services.AddDevicesDependencies();
+        services.AddServerSideSessions();
 
-        //protection
-        services.AddScopedConfiguration<AppOptions>(identityPrvdSection, "App");
-        services.AddScopedConfiguration<ProtectionOptions>(identityPrvdSection, "Protection");
-        services.AddScoped<IProtectionService, AesProtectionService>();
-        services.AddScoped<IMfaService, TotpMfaService>();
-        services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IHasher, Sha512Hasher>();
+        services.AddIdentityAuth(identityOptions);
 
-
-        //others
-        services.AddScoped<IUserContext, UserContext>();
-        services.AddScoped<ICurrentContext, CurrentContext>();
-        services.AddScoped<ISessionManager, SessionManager>();
-        services.AddScoped<Infrastructure.Caching.ISessionStore, RedisSessionStore>();
-        services.AddScopedConfiguration<TokenOptions>(identityPrvdSection, "Token");
-        services.AddScoped<UserHelper>();
-        services.AddHttpClient<ILocationService, IpApiLocationService>("Location", options =>
-        {
-            options.BaseAddress = new Uri("http://ip-api.com");
-        });
-
-        services.AddStoresAndQueries();
-
-        services.AddScoped<IEmailService, FakeEmailService>();
-        services.AddScoped<ISmsService, FakeSmsService>();
-
-
-        services.AddSingleton(TimeProvider.System);
-        services.AddAuthorization();
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddCookie("cookie")
-            .AddGoogle(googleOptions =>
-            {
-                googleOptions.ClientId = identityPrvdSection["Auth:Google:ClientId"];
-                googleOptions.ClientSecret = identityPrvdSection["Auth:Google:ClientSecret"];
-                googleOptions.CallbackPath = "/signin-google";
-                googleOptions.SignInScheme = "cookie";
-                googleOptions.SaveTokens = true;
-            })
-            .AddMicrosoftAccount(microsoftOptions =>
-            {
-                microsoftOptions.ClientId = identityPrvdSection["Auth:Microsoft:ClientId"];
-                microsoftOptions.ClientSecret = identityPrvdSection["Auth:Microsoft:ClientSecret"];
-                microsoftOptions.CallbackPath = "/signin-microsoft";
-                microsoftOptions.SignInScheme = "cookie";
-                microsoftOptions.SaveTokens = true;
-            })
-            .AddGitHub(githubOptions =>
-            {
-                githubOptions.ClientId = identityPrvdSection["Auth:GitHub:ClientId"];
-                githubOptions.ClientSecret = identityPrvdSection["Auth:GitHub:ClientSecret"];
-                githubOptions.CallbackPath = "/signin-github";
-                githubOptions.SignInScheme = "cookie";
-                githubOptions.Scope.Add("read:user");
-                githubOptions.Scope.Add("user:email");
-                githubOptions.SaveTokens = true;
-            })
-            .AddFacebook(facebookOptions =>
-            {
-                facebookOptions.AppId = identityPrvdSection["Auth:Facebook:AppId"];
-                facebookOptions.AppSecret = identityPrvdSection["Auth:Facebook:AppSecret"];
-                facebookOptions.CallbackPath = "/signin-facebook";
-                facebookOptions.SignInScheme = "cookie";
-                facebookOptions.SaveTokens = true;
-            })
-            .AddTwitter(twitterOptions =>
-            {
-                twitterOptions.ClientId = identityPrvdSection["Auth:Twitter:ClientId"];
-                twitterOptions.ClientSecret = identityPrvdSection["Auth:Twitter:ClientSecret"];
-                twitterOptions.CallbackPath = "/signin-twitter";
-                twitterOptions.SignInScheme = "cookie";
-                twitterOptions.Scope.Add("users.read");
-                twitterOptions.Scope.Add("users.email");
-                twitterOptions.SaveTokens = true;
-            })
-            .AddSteam(steamOptions =>
-            {
-                steamOptions.ApplicationKey = identityPrvdSection["Auth:Steam:ClientId"];
-                steamOptions.CallbackPath = "/signin-steam";
-                steamOptions.SignInScheme = "cookie";
-                steamOptions.SaveTokens = true;
-            })
-            .AddJwtBearer(jwt =>
-            {
-                jwt.RequireHttpsMetadata = false;
-                jwt.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ClockSkew = TimeSpan.Zero,
-                    ValidateIssuer = true,
-                    ValidIssuer = identityPrvdSection["Token:Issuer"],
-                    ValidateAudience = true,
-                    ValidAudience = identityPrvdSection["Token:Audience"],
-                    ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(identityPrvdSection["Token:SecretKey"]!)),
-                    ValidateIssuerSigningKey = true,
-                };
-                jwt.SaveToken = true;
-            });
-
+        services.AddOthers();
 
         return services;
     }
 
-    private static IServiceCollection AddStoresAndQueries(this IServiceCollection services)
+    private static IServiceCollection AddDbServices(this IServiceCollection services, IdentityPrvdOptions identityOptions)
     {
         services.AddScoped<IClaimsQuery, EfClaimsQuery>();
         services.AddScoped<IClientsQuery, EfClientsQuery>();
@@ -220,6 +123,179 @@ public static class ServicesCollectionExtensions
         services.AddScoped<IUserStore, EfUserStore>();
         services.AddScoped<IContactStore, EfContactStore>();
         services.AddScoped<IDeviceStore, EfDeviceStore>();
+
+        services.AddDbContext<IdentityPrvdContext>(options =>
+            options.UseNpgsql(identityOptions.Connections.Db) //Postgres db
+                .UseSnakeCaseNamingConvention());
+
+        services.AddScoped<IRedisConnectionProvider>(_ =>
+            new RedisConnectionProvider(identityOptions.Connections.Redis));
+
+        services.AddScoped<ITransactionManager, EfCoreTransactionManager>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddProtectionServices(this IServiceCollection services)
+    {
+        services.AddScoped<IProtectionService, AesProtectionService>();
+        services.AddScoped<IMfaService, TotpMfaService>();
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IHasher, Sha512Hasher>();
+        return services;
+    }
+
+    private static IServiceCollection AddFeatures(this IServiceCollection services)
+    {
+        services.AddSignupDependencies();
+        services.AddSigninDependencies();
+        services.AddRefreshTokenDependencies();
+        services.AddSignoutDependencies();
+        services.AddGetSessionsDependencies();
+        services.AddRevokeSessionsDependencies();
+        services.AddEnableMfaDependencies();
+        services.AddDisableMfaDependencies();
+        services.AddRolesDependencies();
+        services.AddClaimsDependencies();
+        services.AddExternalSigninDependencies();
+        services.AddLinkExternalProviderDependencies();
+        services.AddChangeLoginDependencies();
+        services.AddChangePasswordDependencies();
+        services.AddRestorePasswordDependencies();
+        services.AddContactsDependencies();
+        services.AddDevicesDependencies();
+        return services;
+    }
+
+    private static IServiceCollection AddMiddlewares(this IServiceCollection services)
+    {
+        services.AddTransient<CorrelationContextMiddleware>();
+        services.AddTransient<ServerSideSessionMiddleware>();
+        services.AddTransient<GlobalExceptionHandlerMiddleware>();
+        return services;
+    }
+
+    private static IServiceCollection AddContexts(this IServiceCollection services)
+    {
+        services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<ICurrentContext, CurrentContext>();
+        return services;
+    }
+
+    private static IServiceCollection AddServerSideSessions(this IServiceCollection services)
+    {
+        services.AddScoped<ISessionManager, SessionManager>();
+        services.AddScoped<Infrastructure.Caching.ISessionStore, RedisSessionStore>();
+        services.AddTransient<ServerSideSessionMiddleware>();
+        return services;
+    }
+
+    private static IServiceCollection AddIdentityAuth(this IServiceCollection services, IdentityPrvdOptions identityOptions)
+    {
+        services.AddAuthorization();
+        var identityBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddCookie("cookie");
+
+        if (identityOptions.ExternalProviders["Google"].IsAvailable)
+        {
+            identityBuilder.AddGoogle(options =>
+            {
+                options.ClientId = identityOptions.ExternalProviders["Google"].ClientId;
+                options.ClientSecret = identityOptions.ExternalProviders["Google"].ClientSecret;
+                options.CallbackPath = "/signin-google";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+        if (identityOptions.ExternalProviders["Microsoft"].IsAvailable)
+        {
+            identityBuilder.AddMicrosoftAccount(options =>
+            {
+                options.ClientId = identityOptions.ExternalProviders["Microsoft"].ClientId;
+                options.ClientSecret = identityOptions.ExternalProviders["Microsoft"].ClientSecret;
+                options.CallbackPath = "/signin-microsoft";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+        if (identityOptions.ExternalProviders["GitHub"].IsAvailable)
+        {
+            identityBuilder.AddGitHub(options =>
+            {
+                options.ClientId = identityOptions.ExternalProviders["GitHub"].ClientId;
+                options.ClientSecret = identityOptions.ExternalProviders["GitHub"].ClientSecret;
+                options.CallbackPath = "/signin-github";
+                options.SignInScheme = "cookie";
+                options.Scope.Add("read:user");
+                options.Scope.Add("user:email");
+                options.SaveTokens = true;
+            });
+        }
+        if (identityOptions.ExternalProviders["Facebook"].IsAvailable)
+        {
+            identityBuilder.AddFacebook(options =>
+            {
+                options.AppId = identityOptions.ExternalProviders["Facebook"].ClientId;
+                options.AppSecret = identityOptions.ExternalProviders["Facebook"].ClientSecret;
+                options.CallbackPath = "/signin-facebook";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+        if (identityOptions.ExternalProviders["Twitter"].IsAvailable)
+        {
+            identityBuilder.AddTwitter(options =>
+            {
+                options.ClientId = identityOptions.ExternalProviders["Twitter"].ClientId;
+                options.ClientSecret = identityOptions.ExternalProviders["Twitter"].ClientSecret;
+                options.CallbackPath = "/signin-twitter";
+                options.SignInScheme = "cookie";
+                options.Scope.Add("users.read");
+                options.Scope.Add("users.email");
+                options.SaveTokens = true;
+            });
+        }
+        if (identityOptions.ExternalProviders["Steam"].IsAvailable)
+        {
+            identityBuilder.AddSteam(options =>
+            {
+                options.ApplicationKey = identityOptions.ExternalProviders["Steam"].ClientId;
+                options.CallbackPath = "/signin-steam";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+        identityBuilder
+            .AddJwtBearer(jwt =>
+            {
+                jwt.RequireHttpsMetadata = false;
+                jwt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateIssuer = true,
+                    ValidIssuer = identityOptions.Token.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = identityOptions.Token.Audience,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(identityOptions.Token.SecretKey!)),
+                    ValidateIssuerSigningKey = true,
+                };
+                jwt.SaveToken = true;
+            });
+
+        return services;
+    }
+
+    private static IServiceCollection AddOthers(this IServiceCollection services)
+    {
+        services.AddScoped<UserHelper>();
+        services.AddHttpClient<ILocationService, IpApiLocationService>("Location", options =>
+        {
+            options.BaseAddress = new Uri("http://ip-api.com");
+        });
+
+        services.AddScoped<IEmailService, FakeEmailService>();
+        services.AddScoped<ISmsService, FakeSmsService>();
+        services.TryAddSingleton(TimeProvider.System);
 
         return services;
     }

@@ -14,7 +14,7 @@ namespace IdentityPrvd.Services.Security;
 
 public class TokenService(
     IdentityPrvdContext dbContext,
-    TokenOptions tokenOptions,
+    IdentityPrvdOptions identityOptions,
     TimeProvider timeProvider) : ITokenService
 {
     public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId)
@@ -71,16 +71,16 @@ public class TokenService(
                     ClaimsIdentity.DefaultRoleClaimType);
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
-        var expiredAt = utcNow.Add(TimeSpan.FromMinutes(tokenOptions.LifeTimeInMinutes));
+        var expiredAt = utcNow.Add(TimeSpan.FromMinutes(identityOptions.Token.LifeTimeInMinutes));
         var jwt = new JwtSecurityToken(
-                    issuer: tokenOptions.Issuer,
-                    audience: tokenOptions.Audience,
+                    issuer: identityOptions.Token.Issuer,
+                    audience: identityOptions.Token.Audience,
                     notBefore: utcNow,
                     claims: claimsIdentity.Claims,
                     expires: expiredAt,
                     signingCredentials: new SigningCredentials(
                         new SymmetricSecurityKey(
-                            Encoding.ASCII.GetBytes(tokenOptions.SecretKey!)), SecurityAlgorithms.HmacSha256));
+                            Encoding.ASCII.GetBytes(identityOptions.Token.SecretKey!)), SecurityAlgorithms.HmacSha256));
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
         return new JwtToken
         {

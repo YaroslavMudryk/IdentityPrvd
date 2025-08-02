@@ -12,7 +12,7 @@ public class Program
 
         builder.Services.AddIdentityPrvd(builder.Configuration, options =>
         {
-            options.UserOptions.ConfirmCodeValidInMinutes = 10;
+            options.User.ConfirmCodeValidInMinutes = 10;
         });
 
         var app = builder.Build();
@@ -21,7 +21,7 @@ public class Program
         {
             await SeedData.InitializeAsync(app.Services);
         }
-
+        
         app.UseSwagger();
         app.UseSwaggerUI();
 

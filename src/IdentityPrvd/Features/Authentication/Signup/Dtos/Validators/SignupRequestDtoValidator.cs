@@ -15,19 +15,19 @@ public class SignupRequestDtoValidator : AbstractValidator<SignupRequestDto>
         RuleFor(s => s)
             .MustAsync(async (dto, token) =>
         {
-            if (options.UserOptions.LoginType == LoginType.Email)
+            if (options.User.LoginType == LoginType.Email)
             {
                 var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
                 if (!emailRegex.IsMatch(dto.Login))
                     throw new BadRequestException("Login must be a valid email address");
             }
-            else if (options.UserOptions.LoginType == LoginType.Phone)
+            else if (options.User.LoginType == LoginType.Phone)
             {
                 var phoneRegex = new Regex(@"^\+?[1-9]\d{1,14}$");
                 if (!phoneRegex.IsMatch(dto.Login))
                     throw new BadRequestException("Login must be a valid phone number");
             }
-            else if (options.UserOptions.LoginType == LoginType.Any)
+            else if (options.User.LoginType == LoginType.Any)
             {
                 if (string.IsNullOrWhiteSpace(dto.Login))
                     throw new BadRequestException("Login is required");
@@ -52,11 +52,11 @@ public class SignupRequestDtoValidator : AbstractValidator<SignupRequestDto>
             .WithMessage("Password is required.")
             .Must((dto, token) =>
             {
-                if (!string.IsNullOrEmpty(options.PasswordOptions.Regex))
+                if (!string.IsNullOrEmpty(options.Password.Regex))
                 {
-                    var passwordRegex = new Regex(options.PasswordOptions.Regex);
+                    var passwordRegex = new Regex(options.Password.Regex);
                     if (!passwordRegex.IsMatch(dto.Password))
-                        throw new BadRequestException($"{options.PasswordOptions.RegexErrorMessage}");
+                        throw new BadRequestException($"{options.Password.RegexErrorMessage}");
                 }
 
                 return true;

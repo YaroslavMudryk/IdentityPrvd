@@ -28,7 +28,7 @@ public class ChangeLoginOrchestrator(
 
         VerifyLoginType(dto.NewLogin, options);
 
-        if (options.UserOptions.VerifyPasswordOnChangeLogin)
+        if (options.User.VerifyPasswordOnChangeLogin)
         {
             var passwordVerified = hasher.Verify(userFromDb.PasswordHash, dto.Password);
             if (!passwordVerified)
@@ -47,11 +47,11 @@ public class ChangeLoginOrchestrator(
 
     private static void VerifyLoginType(string newLogin, IdentityPrvdOptions options)
     {
-        if (options.UserOptions.LoginType == LoginType.Email)
+        if (options.User.LoginType == LoginType.Email)
             if (!LoginExtensions.IsEmail(newLogin))
                 throw new BadRequestException("Your login should be an email address");
 
-        if (options.UserOptions.LoginType == LoginType.Phone)
+        if (options.User.LoginType == LoginType.Phone)
             if (!LoginExtensions.IsPhone(newLogin))
                 throw new BadRequestException("Your login should be an phone number");
     }

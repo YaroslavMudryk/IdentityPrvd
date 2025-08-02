@@ -19,7 +19,7 @@ namespace IdentityPrvd.Features.Authentication.ExternalSignin.Services;
 public class ExternalSigninOrchestrator(
     ITokenService tokenService,
     ISessionManager sessionManager,
-    TokenOptions tokenOptions,
+    IdentityPrvdOptions identityOptions,
     ILocationService locationService,
     ICurrentContext currentContext,
     IRolesQuery rolesQuery,
@@ -91,8 +91,8 @@ public class ExternalSigninOrchestrator(
     {
         var sessionId = Ulid.NewUlid();
         var refreshTokenValue = Generator.GetRefreshToken();
-        var refreshTokenExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(tokenOptions.RefreshLifeTimeInDays);
-        var sessionExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(tokenOptions.SessionLifeTimeInDays);
+        var refreshTokenExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.RefreshLifeTimeInDays);
+        var sessionExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.SessionLifeTimeInDays);
         
         var refreshToken = ExternalSigninEntityFactory.CreateRefreshToken(sessionId, refreshTokenValue, refreshTokenExpiredAt);
         var client = await clientsQuery.GetClientByIdAsync(dto.ClientId);
@@ -123,7 +123,7 @@ public class ExternalSigninOrchestrator(
         {
             AccessToken = jwtToken.Token,
             RefreshToken = refreshToken.Value,
-            ExpiredIn = tokenOptions.LifeTimeInMinutes / 60,
+            ExpiredIn = identityOptions.Token.LifeTimeInMinutes / 60,
         };
     }
 }

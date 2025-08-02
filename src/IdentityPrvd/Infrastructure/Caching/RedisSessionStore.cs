@@ -10,7 +10,7 @@ namespace IdentityPrvd.Infrastructure.Caching;
 
 public class RedisSessionStore(
     IRedisConnectionProvider provider,
-    TokenOptions tokenOptions,
+    IdentityPrvdOptions identityOptions,
     ILogger<RedisSessionStore> logger) : ISessionStore
 {
     private readonly IRedisCollection<SessionInfo> _sessions = provider.RedisCollection<SessionInfo>();
@@ -30,7 +30,7 @@ public class RedisSessionStore(
             return (false, $"Session with Id:{sessionInfo.SessionId} already exists for user {sessionInfo.UserId}");
         }
 
-        var key = await _sessions.InsertAsync(sessionInfo, TimeSpan.FromDays(tokenOptions.SessionLifeTimeInDays));
+        var key = await _sessions.InsertAsync(sessionInfo, TimeSpan.FromDays(identityOptions.Token.SessionLifeTimeInDays));
         return (true, $"Session with key:{key} added successfully.");
     }
 

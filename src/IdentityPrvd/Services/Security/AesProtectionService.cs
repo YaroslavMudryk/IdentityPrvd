@@ -4,9 +4,10 @@ using System.Text;
 
 namespace IdentityPrvd.Services.Security;
 
-public class AesProtectionService(ProtectionOptions options) : IProtectionService
+public class AesProtectionService(
+    IdentityPrvdOptions identityOptions) : IProtectionService
 {
-    private readonly byte[] EncryptionKey = ConvertHexStringToBytes(options.Key);
+    private readonly byte[] EncryptionKey = ConvertHexStringToBytes(identityOptions.Protection.Key);
 
     public string DecryptData(string cipherText)
     {

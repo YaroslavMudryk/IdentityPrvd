@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Data.Queries;
+using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Options;
 
@@ -10,7 +11,7 @@ public class RefreshTokenDtoValidator : AbstractValidator<RefreshTokenDto>
 {
     public RefreshTokenDtoValidator(
         IRefreshTokensQuery refreshTokenQuery,
-        TokenOptions tokenOptions,
+        IdentityPrvdOptions identityOptions,
         TimeProvider timeProvider)
     {
         RuleFor(s => s).MustAsync(async (dto, _) =>
@@ -22,7 +23,7 @@ public class RefreshTokenDtoValidator : AbstractValidator<RefreshTokenDto>
 
             var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
-            //IsExpiredRefreshToken(refreshTokenEntity, utcNow, tokenOptions);
+            //IsExpiredRefreshToken(refreshTokenEntity, utcNow, identityOptions);
 
             if (refreshTokenEntity.ExpiredAt < utcNow)
                 throw new BadRequestException($"Refresh token ({dto.Token}) already expired");
@@ -33,14 +34,14 @@ public class RefreshTokenDtoValidator : AbstractValidator<RefreshTokenDto>
         });
     }
 
-    //private static bool IsExpiredRefreshToken(RefreshToken refreshTokenEntity, DateTime utcNow, Shared.Options.TokenOptions tokenOptions)
+    //private static bool IsExpiredRefreshToken(IdentityRefreshToken refreshTokenEntity, DateTime utcNow, IdentityPrvdOptions identityOptions)
     //{
     //    if (refreshTokenEntity.ExpiredAt > utcNow)
     //    {
-    //        if (refreshTokenEntity.TokenUsedAt.HasValue)
+    //        if (refreshTokenEntity.UsedAt.HasValue)
     //        {
-    //            var maxTimeWithWindow = utcNow.AddMinutes(tokenOptions.RefreshTokenExpireWindowInMinutes);
-    //            if (maxTimeWithWindow - refreshTokenEntity.TokenUsedAt.Value == TimeSpan.FromMinutes(tokenOptions.RefreshTokenExpireWindowInMinutes))
+    //            var maxTimeWithWindow = utcNow.AddMinutes(identityOptions.Token.RefreshTokenExpireWindowInMinutes);
+    //            if (maxTimeWithWindow - refreshTokenEntity.UsedAt.Value == TimeSpan.FromMinutes(identityOptions.Token.RefreshTokenExpireWindowInMinutes))
     //            {
     //                throw new BadRequestException($"Refresh token already expired");
     //            }

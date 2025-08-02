@@ -48,7 +48,7 @@ public class ChangePasswordOrchestrator(
 
         IdentityPassword activePassword = null;
 
-        if (!options.UserOptions.UseOldPasswords)
+        if (!options.User.UseOldPasswords)
         {
             var passwords = await passwordStore.GetAllUserPasswordsAsync(userId);
             foreach (var password in passwords.Where(s => !s.IsActive))
@@ -77,7 +77,7 @@ public class ChangePasswordOrchestrator(
 
         await passwordStore.AddAsync(newUserPassword);
 
-        if (options.UserOptions.ForceSignoutEverywhere || dto.SignoutEverywhere)
+        if (options.User.ForceSignoutEverywhere || dto.SignoutEverywhere)
         {
             var userSessions = await sessionStore.GetActiveSessionsByUserIdAsync(userId);
             var sessionId = currentUser.SessionId.GetIdAsUlid();

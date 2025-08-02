@@ -20,7 +20,7 @@ public class EnableMfaOrchestrator(
     IProtectionService protectionService,
     TimeProvider timeProvider,
     IMfaStore mfaStore,
-    AppOptions appOptions,
+    IdentityPrvdOptions identityOptions,
     IMfaService mfaService,
     ITransactionManager transactionManager,
     IUserContext userContext)
@@ -78,7 +78,7 @@ public class EnableMfaOrchestrator(
             {
                 RestoreCodes = [.. recoveryCodes],
                 SetupCode = secret,
-                SetupUrl = new OtpUri(OtpType.Totp, secret, user.Login, appOptions.Name).ToString(),
+                SetupUrl = new OtpUri(OtpType.Totp, secret, user.Login, identityOptions.App.Name).ToString(),
             };
         }
         else
@@ -88,7 +88,7 @@ public class EnableMfaOrchestrator(
             {
                 RestoreCodes = [],
                 SetupCode = secret,
-                SetupUrl = new OtpUri(OtpType.Totp, secret, user.Login, appOptions.Name).ToString()
+                SetupUrl = new OtpUri(OtpType.Totp, secret, user.Login, identityOptions.App.Name).ToString()
             };
         }
     }

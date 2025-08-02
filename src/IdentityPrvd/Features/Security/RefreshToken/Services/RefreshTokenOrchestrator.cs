@@ -15,7 +15,7 @@ namespace IdentityPrvd.Features.Security.RefreshToken.Services;
 public class RefreshTokenOrchestrator(
     IValidator<RefreshTokenDto> validator,
     TimeProvider timeProvider,
-    TokenOptions tokenOptions,
+    IdentityPrvdOptions identityOptions,
     IRefreshTokenStore refreshTokenRepo,
     ITokenService tokenService,
     ITransactionManager transactionManager,
@@ -37,7 +37,7 @@ public class RefreshTokenOrchestrator(
         {
             SessionId = oldRefreshToken.SessionId,
             Value = Generator.GetRefreshToken(),
-            ExpiredAt = utcNow.AddDays(tokenOptions.RefreshLifeTimeInDays)
+            ExpiredAt = utcNow.AddDays(identityOptions.Token.RefreshLifeTimeInDays)
         };
         await refreshTokenRepo.AddAsync(newRefreshToken);
 

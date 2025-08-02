@@ -46,9 +46,9 @@ public class SignupOrchestrator(
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             CanBeBlocked = true,
-            IsConfirmed = !options.UserOptions.ConfirmRequired,
-            ConfirmedAt = !options.UserOptions.ConfirmRequired ? utcNow : null,
-            ConfirmedBy = !options.UserOptions.ConfirmRequired ? userContext.GetBy<ServiceUser>() : null
+            IsConfirmed = !options.User.ConfirmRequired,
+            ConfirmedAt = !options.User.ConfirmRequired ? utcNow : null,
+            ConfirmedBy = !options.User.ConfirmRequired ? userContext.GetBy<ServiceUser>() : null
         };
 
         await userStore.AddAsync(user);
@@ -69,13 +69,13 @@ public class SignupOrchestrator(
         };
         await passwordStore.AddAsync(password);
 
-        if (options.UserOptions.ConfirmRequired)
+        if (options.User.ConfirmRequired)
         {
             var codeToConfirm = GetCodeToConfirm(user.Login);
             var confirmCode = new IdentityConfirm
             {
                 ActiveFrom = utcNow,
-                ActiveTo = utcNow.AddMinutes(options.UserOptions.ConfirmCodeValidInMinutes),
+                ActiveTo = utcNow.AddMinutes(options.User.ConfirmCodeValidInMinutes),
                 VerifyId = Guid.NewGuid().ToString("N"),
                 Code = Generator.GetString(6),
                 UserId = user.Id,

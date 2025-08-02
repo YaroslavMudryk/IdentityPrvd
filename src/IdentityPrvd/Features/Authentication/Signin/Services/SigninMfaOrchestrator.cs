@@ -21,7 +21,7 @@ public class SigninMfaOrchestrator(
     TimeProvider timeProvider,
     ITokenService tokenService,
     ISessionManager sessionManager,
-    TokenOptions tokenOptions,
+    IdentityPrvdOptions identityOptions,
     ITransactionManager transactionManager)
 {
     public async Task<SigninResponseDto> SinginMfaAsync(SigninMfaRequestDto dto)
@@ -48,7 +48,7 @@ public class SigninMfaOrchestrator(
         {
             SessionId = sessionToActivate.Id,
             Value = Generator.GetRefreshToken(),
-            ExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(tokenOptions.RefreshLifeTimeInDays)
+            ExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.RefreshLifeTimeInDays)
         };
         await refreshTokenStore.AddAsync(refreshToken);
 
@@ -72,7 +72,7 @@ public class SigninMfaOrchestrator(
         {
             AccessToken = userToken.Token,
             RefreshToken = refreshToken.Value,
-            ExpiredIn = tokenOptions.LifeTimeInMinutes / 60,
+            ExpiredIn = identityOptions.Token.LifeTimeInMinutes / 60,
         };
     }
 }
