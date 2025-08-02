@@ -10,6 +10,7 @@ using IdentityPrvd.Features.Authentication.ExternalSignin;
 using IdentityPrvd.Features.Authentication.LinkExternalSignin;
 using IdentityPrvd.Features.Authentication.RestorePassword;
 using IdentityPrvd.Features.Authentication.Signin;
+using IdentityPrvd.Features.Authentication.SigninOptions;
 using IdentityPrvd.Features.Authentication.Signout;
 using IdentityPrvd.Features.Authentication.Signup;
 using IdentityPrvd.Features.Authorization.Claims;
@@ -149,6 +150,7 @@ public static class ServicesCollectionExtensions
     {
         services.AddSignupDependencies();
         services.AddSigninDependencies();
+        services.AddSigninOptionsDependencies();
         services.AddRefreshTokenDependencies();
         services.AddSignoutDependencies();
         services.AddGetSessionsDependencies();
