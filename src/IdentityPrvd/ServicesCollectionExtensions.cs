@@ -27,6 +27,7 @@ using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Transactions;
 using IdentityPrvd.Infrastructure.Middleware;
 using IdentityPrvd.Options;
+using IdentityPrvd.Services.AuthSchemes;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
@@ -298,6 +299,7 @@ public static class ServicesCollectionExtensions
         services.AddScoped<IEmailService, FakeEmailService>();
         services.AddScoped<ISmsService, FakeSmsService>();
         services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<IAuthSchemes, DefaultAuthSchemes>();
 
         return services;
     }

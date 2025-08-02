@@ -7,7 +7,6 @@ public static class SigninOptionsDependencies
 {
     public static IServiceCollection AddSigninOptionsDependencies(this IServiceCollection services)
     {
-        services.AddScoped<IAuthenticationProviderDiscoveryService, AuthenticationProviderDiscoveryService>();
         services.AddScoped<SigninOptionsOrchestrator>();
         return services;
     }
