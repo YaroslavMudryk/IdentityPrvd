@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.4.0" />
     <PackageReference Include="AspNet.Security.OAuth.Twitter" Version="9.4.0" />
+    <PackageReference Include="AspNet.Security.OpenId.Steam" Version="9.0.0" />
     <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
     <PackageReference Include="Extensions.DeviceDetector" Version="1.0.3" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />

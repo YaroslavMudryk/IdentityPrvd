@@ -1,8 +1,10 @@
 ﻿using AspNet.Security.OAuth.GitHub;
 using AspNet.Security.OAuth.Twitter;
+using AspNet.Security.OpenId.Steam;
 using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Endpoints;
+using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
@@ -13,7 +15,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 
 namespace IdentityPrvd.Features.Authentication.ExternalSignin;
 
@@ -65,6 +66,7 @@ public class ExternalSigninCallbackEndpoint : IEndpoint
             "GitHub" => await context.AuthenticateAsync(GitHubAuthenticationDefaults.AuthenticationScheme),
             "Facebook" => await context.AuthenticateAsync(FacebookDefaults.AuthenticationScheme),
             "Twitter" => await context.AuthenticateAsync(TwitterAuthenticationDefaults.AuthenticationScheme),
+            "Steam" => await context.AuthenticateAsync(SteamAuthenticationDefaults.AuthenticationScheme),
             _ => throw new BadRequestException($"Unsupported provider: {provider}"),
         };
     }

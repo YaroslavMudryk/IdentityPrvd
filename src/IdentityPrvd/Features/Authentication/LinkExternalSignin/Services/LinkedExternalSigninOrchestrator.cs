@@ -38,5 +38,6 @@ public class LinkedExternalSigninOrchestrator(
             {"Apple", "/img/apple.svg"},
             {"GitHub", "/img/github.svg"},
             {"Twitter", "/img/twitter.svg"},
+            {"Steam", "/img/steam.svg" }
         };
 }

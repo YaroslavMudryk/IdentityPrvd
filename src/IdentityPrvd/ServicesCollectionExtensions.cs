@@ -31,6 +31,7 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
+using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -165,6 +166,13 @@ public static class ServicesCollectionExtensions
                 twitterOptions.Scope.Add("users.read");
                 twitterOptions.Scope.Add("users.email");
                 twitterOptions.SaveTokens = true;
+            })
+            .AddSteam(steamOptions =>
+            {
+                steamOptions.ApplicationKey = identityPrvdSection["Auth:Steam:ClientId"];
+                steamOptions.CallbackPath = "/signin-steam";
+                steamOptions.SignInScheme = "cookie";
+                steamOptions.SaveTokens = true;
             })
             .AddJwtBearer(jwt =>
             {

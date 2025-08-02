@@ -1,5 +1,6 @@
 ﻿using AspNet.Security.OAuth.GitHub;
 using AspNet.Security.OAuth.Twitter;
+using AspNet.Security.OpenId.Steam;
 using IdentityPrvd.Common.Api;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Exceptions;
@@ -85,6 +86,7 @@ public class LinkExternalSigninCallbackEndpoint : IEndpoint
             "GitHub" => await context.AuthenticateAsync(GitHubAuthenticationDefaults.AuthenticationScheme),
             "Facebook" => await context.AuthenticateAsync(FacebookDefaults.AuthenticationScheme),
             "Twitter" => await context.AuthenticateAsync(TwitterAuthenticationDefaults.AuthenticationScheme),
+            "Steam" => await context.AuthenticateAsync(SteamAuthenticationDefaults.AuthenticationScheme),
             _ => throw new BadRequestException($"Unsupported provider: {provider}"),
         };
     }

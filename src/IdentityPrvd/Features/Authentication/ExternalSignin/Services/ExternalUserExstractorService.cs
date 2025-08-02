@@ -23,6 +23,7 @@ public class ExternalUserExstractorService
             "GitHub" => await GetUserFromGitHubAsync(authResult),
             "Facebook" => await GetUserFromFacebookAsync(authResult),
             "Twitter" => await GetUserFromTwitterAsync(authResult),
+            "Steam" => await GetUserFromSteamAsync(authResult),
             _ => throw new BadRequestException($"Unsupported provider: {provider}"),
         };
     }
@@ -164,6 +165,30 @@ public class ExternalUserExstractorService
         return new ExternalUserDto
         {
 
+        };
+    }
+
+    private static async Task<ExternalUserDto> GetUserFromSteamAsync(AuthenticateResult authResult)
+    {
+        var provider = authResult.Principal.Identity.AuthenticationType;
+        var steamUserId = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = steamUserId.Split('/').Last();
+        var userName = authResult.Principal.FindFirstValue(ClaimTypes.Name);
+
+        var token = authResult.Properties?.GetTokenValue("access_token");
+
+        if (token != null)
+        {
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync($"https://api.steampowered.com/ISteamUserOAuth/GetTokenDetails/v1/?access_token={token}");
+            var json = await response.Content.ReadAsStringAsync();
+        }
+
+        return new ExternalUserDto
+        {
+            Provider = provider,
+            ProviderUserId = userId,
+            UserName = userName
         };
     }
 }
