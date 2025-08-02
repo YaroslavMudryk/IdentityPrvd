@@ -10,40 +10,20 @@ public class AuthenticationProviderDiscoveryService(IAuthenticationSchemeProvide
     {
         var schemes = await authenticationSchemeProvider.GetAllSchemesAsync();
 
-        //return new SigninOptionsDto
-        //{
-        //    PasswordSignin = true,
-        //    ExternalProviders = [.. schemes.Where(scheme =>
-        //    {
-        //        if (scheme.Name == "Bearer" || scheme.Name == "cookie" || scheme.Name == "Identity.Application")
-        //            return false;
-
-        //        if (IsProviderAvailable(scheme.Name))
-        //            return true;
-
-        //        return false;
-        //    }).Select(s => s.Name)]
-        //};
-
-        var signinOptions = new SigninOptionsDto
+        return new SigninOptionsDto
         {
-            PasswordSignin = true // Always available
-        };
-
-        foreach (var scheme in schemes)
-        {
-            // Skip default schemes and password-based schemes
-            if (scheme.Name == "Bearer" || scheme.Name == "cookie" || scheme.Name == "Identity.Application")
-                continue;
-
-            // Check if this scheme is configured and available
-            if (IsProviderAvailable(scheme.Name))
+            PasswordSignin = true,
+            ExternalProviders = [.. schemes.Where(scheme =>
             {
-                signinOptions.ExternalProviders.Add(scheme.Name);
-            }
-        }
+                if (scheme.Name == "Bearer" || scheme.Name == "cookie" || scheme.Name == "Identity.Application")
+                    return false;
 
-        return signinOptions;
+                if (IsProviderAvailable(scheme.Name))
+                    return true;
+
+                return false;
+            }).Select(s => s.Name)]
+        };
     }
 
     private bool IsProviderAvailable(string schemeName)
