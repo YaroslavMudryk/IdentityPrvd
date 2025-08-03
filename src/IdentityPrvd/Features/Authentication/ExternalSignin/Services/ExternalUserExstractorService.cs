@@ -162,10 +162,10 @@ public class ExternalUserExstractorService
 
     private static async Task<ExternalUserDto> GetUserFromTwitterAsync(AuthenticateResult authResult)
     {
-        return new ExternalUserDto
+        return await Task.FromResult(new ExternalUserDto
         {
 
-        };
+        });
     }
 
     private static async Task<ExternalUserDto> GetUserFromSteamAsync(AuthenticateResult authResult)

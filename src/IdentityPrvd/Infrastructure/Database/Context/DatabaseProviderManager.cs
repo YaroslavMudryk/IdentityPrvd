@@ -25,6 +25,7 @@ public class DatabaseProviderManager
         _strategies["PostgreSQL"] = new PostgreSqlProviderStrategy();
         _strategies["SQLServer"] = new SqlServerProviderStrategy();
         _strategies["MySQL"] = new MySqlProviderStrategy();
+        _strategies["Sqlite"] = new SqliteProviderStrategy();
     }
 
     /// <summary>

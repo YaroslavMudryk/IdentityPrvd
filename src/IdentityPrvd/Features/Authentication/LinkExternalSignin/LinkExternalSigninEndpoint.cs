@@ -96,7 +96,7 @@ public class DefaultReturnUriEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/api/identity/sso",
-            [AllowAnonymous] async ([FromQuery(Name = "accessToken")] string accessToken, HttpContext context) =>
+            [AllowAnonymous] ([FromQuery(Name = "accessToken")] string accessToken, HttpContext context) =>
             {
                 if (!context.User.Identity.IsAuthenticated)
                 {

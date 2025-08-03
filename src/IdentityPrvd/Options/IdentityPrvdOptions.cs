@@ -8,6 +8,7 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Redis.OM;
 using Redis.OM.Contracts;
 
@@ -21,7 +22,7 @@ public class IdentityPrvdOptions
     public IdentityPrvdOptions()
     {
         Connections = new IdentityConnectionOptions();
-        ExternalProviders = new Dictionary<string, ExternalProviderOptions>();
+        ExternalProviders = [];
         Notifiers = new NotifierConfiguration();
         Sessions = new SessionConfiguration();
         Database = new DatabaseConfiguration();
@@ -52,6 +53,14 @@ public class IdentityPrvdOptions
     public void ValidateAndThrowIfNeeded()
     {
         // Validation logic here
+        if (User.LoginType == LoginType.Any && User.ConfirmRequired)
+            throw new ApplicationException("No confirmation flow available when login is random string");
+
+        if (!Language.UseCustomLanguages)
+        {
+            if (Language.Languages == null || Language.Languages.Length == 0)
+                throw new ApplicationException("Should be at least one language");
+        }
     }
 }
 
@@ -239,10 +248,8 @@ public class SessionConfiguration
 /// </summary>
 public class DatabaseConfiguration
 {
-    private readonly List<ServiceDescriptor> _queries = new();
-    private readonly List<ServiceDescriptor> _stores = new();
-    private readonly HashSet<Type> _skippedQueries = new();
-    private readonly HashSet<Type> _skippedStores = new();
+    private readonly List<ServiceDescriptor> _queries = [];
+    private readonly List<ServiceDescriptor> _stores = [];
     private ServiceDescriptor? _transactionManager;
     private ServiceDescriptor? _redisConnection;
     private string? _connectionString;
@@ -460,509 +467,500 @@ public class DatabaseConfiguration
     }
 
     /// <summary>
-    /// Skip claims query registration
+    /// Map claims query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClaimsQuery()
+    public DatabaseConfiguration MapClaimsQuery<TClaimsQuery>() where TClaimsQuery : class, IClaimsQuery
     {
-        _skippedQueries.Add(typeof(IClaimsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IClaimsQuery), typeof(TClaimsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip clients query registration
+    /// Map clients query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClientsQuery()
+    public DatabaseConfiguration MapClientsQuery<TClientsQuery>() where TClientsQuery : class, IClientsQuery
     {
-        _skippedQueries.Add(typeof(IClientsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IClientsQuery), typeof(TClientsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip refresh tokens query registration
+    /// Map refresh tokens query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipRefreshTokensQuery()
+    public DatabaseConfiguration MapRefreshTokensQuery<TRefreshTokensQuery>() where TRefreshTokensQuery : class, IRefreshTokensQuery
     {
-        _skippedQueries.Add(typeof(IRefreshTokensQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IRefreshTokensQuery), typeof(TRefreshTokensQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip roles query registration
+    /// Map roles query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipRolesQuery()
+    public DatabaseConfiguration MapRolesQuery<TRolesQuery>() where TRolesQuery : class, IRolesQuery
     {
-        _skippedQueries.Add(typeof(IRolesQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IRolesQuery), typeof(TRolesQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip sessions query registration
+    /// Map sessions query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipSessionsQuery()
+    public DatabaseConfiguration MapSessionsQuery<TSessionsQuery>() where TSessionsQuery : class, ISessionsQuery
     {
-        _skippedQueries.Add(typeof(ISessionsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(ISessionsQuery), typeof(TSessionsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip user logins query registration
+    /// Map user logins query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipUserLoginsQuery()
+    public DatabaseConfiguration MapUserLoginsQuery<TUserLoginsQuery>() where TUserLoginsQuery : class, IUserLoginsQuery
     {
-        _skippedQueries.Add(typeof(IUserLoginsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IUserLoginsQuery), typeof(TUserLoginsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip users query registration
+    /// Map users query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipUsersQuery()
+    public DatabaseConfiguration MapUsersQuery<TUsersQuery>() where TUsersQuery : class, IUsersQuery
     {
-        _skippedQueries.Add(typeof(IUsersQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IUsersQuery), typeof(TUsersQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip contacts query registration
+    /// Map contacts query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipContactsQuery()
+    public DatabaseConfiguration MapContactsQuery<TContactsQuery>() where TContactsQuery : class, IContactsQuery
     {
-        _skippedQueries.Add(typeof(IContactsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IContactsQuery), typeof(TContactsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip devices query registration
+    /// Map devices query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipDevicesQuery()
+    public DatabaseConfiguration MapDevicesQuery<TDevicesQuery>() where TDevicesQuery : class, IDevicesQuery
     {
-        _skippedQueries.Add(typeof(IDevicesQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IDevicesQuery), typeof(TDevicesQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip user roles query registration
+    /// Map user roles query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipUserRolesQuery()
+    public DatabaseConfiguration MapUserRolesQuery<TUserRolesQuery>() where TUserRolesQuery : class, IUserRolesQuery
     {
-        _skippedQueries.Add(typeof(IUserRolesQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IUserRolesQuery), typeof(TUserRolesQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip claim store registration
+    /// Map claim store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClaimStore()
+    public DatabaseConfiguration MapClaimStore<TClaimStore>() where TClaimStore : class, IClaimStore
     {
-        _skippedStores.Add(typeof(IClaimStore));
+        _stores.Add(new ServiceDescriptor(typeof(IClaimStore), typeof(TClaimStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip confirm store registration
+    /// Map confirm store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipConfirmStore()
+    public DatabaseConfiguration MapConfirmStore<TConfirmStore>() where TConfirmStore : class, IConfirmStore
     {
-        _skippedStores.Add(typeof(IConfirmStore));
+        _stores.Add(new ServiceDescriptor(typeof(IConfirmStore), typeof(TConfirmStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip MFA store registration
+    /// Map MFA store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipMfaStore()
+    public DatabaseConfiguration MapMfaStore<TMfaStore>() where TMfaStore : class, IMfaStore
     {
-        _skippedStores.Add(typeof(IMfaStore));
+        _stores.Add(new ServiceDescriptor(typeof(IMfaStore), typeof(TMfaStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip password store registration
+    /// Map password store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipPasswordStore()
+    public DatabaseConfiguration MapPasswordStore<TPasswordStore>() where TPasswordStore : class, IPasswordStore
     {
-        _skippedStores.Add(typeof(IPasswordStore));
+        _stores.Add(new ServiceDescriptor(typeof(IPasswordStore), typeof(TPasswordStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip refresh token store registration
+    /// Map refresh token store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipRefreshTokenStore()
+    public DatabaseConfiguration MapRefreshTokenStore<TRefreshTokenStore>() where TRefreshTokenStore : class, IRefreshTokenStore
     {
-        _skippedStores.Add(typeof(IRefreshTokenStore));
+        _stores.Add(new ServiceDescriptor(typeof(IRefreshTokenStore), typeof(TRefreshTokenStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip role claim store registration
+    /// Map role claim store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipRoleClaimStore()
+    public DatabaseConfiguration MapRoleClaimStore<TRoleClaimStore>() where TRoleClaimStore : class, IRoleClaimStore
     {
-        _skippedStores.Add(typeof(IRoleClaimStore));
+        _stores.Add(new ServiceDescriptor(typeof(IRoleClaimStore), typeof(TRoleClaimStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip role store registration
+    /// Map role store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipRoleStore()
+    public DatabaseConfiguration MapRoleStore<TRoleStore>() where TRoleStore : class, IRoleStore
     {
-        _skippedStores.Add(typeof(IRoleStore));
+        _stores.Add(new ServiceDescriptor(typeof(IRoleStore), typeof(TRoleStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip session store registration
+    /// Map session store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipSessionStore()
+    public DatabaseConfiguration MapSessionStore<TSessionStore>() where TSessionStore : class, Data.Stores.ISessionStore
     {
-        _skippedStores.Add(typeof(Data.Stores.ISessionStore));
+        _stores.Add(new ServiceDescriptor(typeof(Data.Stores.ISessionStore), typeof(TSessionStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip user login store registration
+    /// Map user login store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipUserLoginStore()
+    public DatabaseConfiguration MapUserLoginStore<TUserLoginStore>() where TUserLoginStore : class, IUserLoginStore
     {
-        _skippedStores.Add(typeof(IUserLoginStore));
+        _stores.Add(new ServiceDescriptor(typeof(IUserLoginStore), typeof(TUserLoginStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip user role store registration
+    /// Map user role store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipUserRoleStore()
+    public DatabaseConfiguration MapUserRoleStore<TUserRoleStore>() where TUserRoleStore : class, IUserRoleStore
     {
-        _skippedStores.Add(typeof(IUserRoleStore));
+        _stores.Add(new ServiceDescriptor(typeof(IUserRoleStore), typeof(TUserRoleStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip user store registration
+    /// Map user store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipUserStore()
+    public DatabaseConfiguration MapUserStore<TUserStore>() where TUserStore : class, IUserStore
     {
-        _skippedStores.Add(typeof(IUserStore));
+        _stores.Add(new ServiceDescriptor(typeof(IUserStore), typeof(TUserStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip contact store registration
+    /// Map contact store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipContactStore()
+    public DatabaseConfiguration MapContactStore<TContactStore>() where TContactStore : class, IContactStore
     {
-        _skippedStores.Add(typeof(IContactStore));
+        _stores.Add(new ServiceDescriptor(typeof(IContactStore), typeof(TContactStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip device store registration
+    /// Map device store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipDeviceStore()
+    public DatabaseConfiguration MapDeviceStore<TDeviceStore>() where TDeviceStore : class, IDeviceStore
     {
-        _skippedStores.Add(typeof(IDeviceStore));
+        _stores.Add(new ServiceDescriptor(typeof(IDeviceStore), typeof(TDeviceStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip QR store registration
+    /// Map QR store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipQrStore()
+    public DatabaseConfiguration MapQrStore<TQrStore>() where TQrStore : class, IQrStore
     {
-        _skippedStores.Add(typeof(IQrStore));
+        _stores.Add(new ServiceDescriptor(typeof(IQrStore), typeof(TQrStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip MFA recovery code store registration
+    /// Map MFA recovery code store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipMfaRecoveryCodeStore()
+    public DatabaseConfiguration MapMfaRecoveryCodeStore<TMfaRecoveryCodeStore>() where TMfaRecoveryCodeStore : class, IMfaRecoveryCodeStore
     {
-        _skippedStores.Add(typeof(IMfaRecoveryCodeStore));
+        _stores.Add(new ServiceDescriptor(typeof(IMfaRecoveryCodeStore), typeof(TMfaRecoveryCodeStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip failed login attempt store registration
+    /// Map failed login attempt store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipFailedLoginAttemptStore()
+    public DatabaseConfiguration MapFailedLoginAttemptStore<TFailedLoginAttemptStore>() where TFailedLoginAttemptStore : class, IFailedLoginAttemptStore
     {
-        _skippedStores.Add(typeof(IFailedLoginAttemptStore));
+        _stores.Add(new ServiceDescriptor(typeof(IFailedLoginAttemptStore), typeof(TFailedLoginAttemptStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip client store registration
+    /// Map client store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClientStore()
+    public DatabaseConfiguration MapClientStore<TClientStore>() where TClientStore : class, IClientStore
     {
-        _skippedStores.Add(typeof(IClientStore));
+        _stores.Add(new ServiceDescriptor(typeof(IClientStore), typeof(TClientStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip client secret store registration
+    /// Map client secret store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClientSecretStore()
+    public DatabaseConfiguration MapClientSecretStore<TClientSecretStore>() where TClientSecretStore : class, IClientSecretStore
     {
-        _skippedStores.Add(typeof(IClientSecretStore));
+        _stores.Add(new ServiceDescriptor(typeof(IClientSecretStore), typeof(TClientSecretStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip client claim store registration
+    /// Map client claim store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClientClaimStore()
+    public DatabaseConfiguration MapClientClaimStore<TClientClaimStore>() where TClientClaimStore : class, IClientClaimStore
     {
-        _skippedStores.Add(typeof(IClientClaimStore));
+        _stores.Add(new ServiceDescriptor(typeof(IClientClaimStore), typeof(TClientClaimStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip ban store registration
+    /// Map ban store to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipBanStore()
+    public DatabaseConfiguration MapBanStore<TBanStore>() where TBanStore : class, IBanStore
     {
-        _skippedStores.Add(typeof(IBanStore));
+        _stores.Add(new ServiceDescriptor(typeof(IBanStore), typeof(TBanStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all query registrations
+    /// Map all queries to Dapper implementations
     /// </summary>
-    public DatabaseConfiguration SkipAllQueries()
+    public DatabaseConfiguration UseDapperQueries()
     {
-        _skippedQueries.Add(typeof(IClaimsQuery));
-        _skippedQueries.Add(typeof(IClientsQuery));
-        _skippedQueries.Add(typeof(IRefreshTokensQuery));
-        _skippedQueries.Add(typeof(IRolesQuery));
-        _skippedQueries.Add(typeof(ISessionsQuery));
-        _skippedQueries.Add(typeof(IUserLoginsQuery));
-        _skippedQueries.Add(typeof(IUsersQuery));
-        _skippedQueries.Add(typeof(IContactsQuery));
-        _skippedQueries.Add(typeof(IDevicesQuery));
-        _skippedQueries.Add(typeof(IUserRolesQuery));
-        _skippedQueries.Add(typeof(IBansQuery));
-        _skippedQueries.Add(typeof(IPasswordsQuery));
-        _skippedQueries.Add(typeof(IRoleClaimsQuery));
-        _skippedQueries.Add(typeof(IQrsQuery));
-        _skippedQueries.Add(typeof(IMfaRecoveryCodesQuery));
-        _skippedQueries.Add(typeof(IFailedLoginAttemptsQuery));
-        _skippedQueries.Add(typeof(IMfasQuery));
-        _skippedQueries.Add(typeof(IConfirmsQuery));
-        _skippedQueries.Add(typeof(IClientSecretsQuery));
-        _skippedQueries.Add(typeof(IClientClaimsQuery));
+        // This would map all queries to Dapper implementations
+        // Implementation would depend on having Dapper query classes
         return this;
     }
 
     /// <summary>
-    /// Skip all store registrations
+    /// Map all stores to Dapper implementations
     /// </summary>
-    public DatabaseConfiguration SkipAllStores()
+    public DatabaseConfiguration UseDapperStores()
     {
-        _skippedStores.Add(typeof(IClaimStore));
-        _skippedStores.Add(typeof(IConfirmStore));
-        _skippedStores.Add(typeof(IMfaStore));
-        _skippedStores.Add(typeof(IPasswordStore));
-        _skippedStores.Add(typeof(IRefreshTokenStore));
-        _skippedStores.Add(typeof(IRoleClaimStore));
-        _skippedStores.Add(typeof(IRoleStore));
-        _skippedStores.Add(typeof(Data.Stores.ISessionStore));
-        _skippedStores.Add(typeof(IUserLoginStore));
-        _skippedStores.Add(typeof(IUserRoleStore));
-        _skippedStores.Add(typeof(IUserStore));
-        _skippedStores.Add(typeof(IContactStore));
-        _skippedStores.Add(typeof(IDeviceStore));
-        _skippedStores.Add(typeof(IQrStore));
-        _skippedStores.Add(typeof(IMfaRecoveryCodeStore));
-        _skippedStores.Add(typeof(IFailedLoginAttemptStore));
-        _skippedStores.Add(typeof(IClientStore));
-        _skippedStores.Add(typeof(IClientSecretStore));
-        _skippedStores.Add(typeof(IClientClaimStore));
-        _skippedStores.Add(typeof(IBanStore));
+        // This would map all stores to Dapper implementations
+        // Implementation would depend on having Dapper store classes
         return this;
     }
 
     /// <summary>
-    /// Skip all user-related queries
+    /// Map all user-related queries to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipUserQueries()
+    public DatabaseConfiguration MapUserQueries<TUsersQuery, TUserLoginsQuery, TUserRolesQuery>()
+        where TUsersQuery : class, IUsersQuery
+        where TUserLoginsQuery : class, IUserLoginsQuery
+        where TUserRolesQuery : class, IUserRolesQuery
     {
-        _skippedQueries.Add(typeof(IUsersQuery));
-        _skippedQueries.Add(typeof(IUserLoginsQuery));
-        _skippedQueries.Add(typeof(IUserRolesQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IUsersQuery), typeof(TUsersQuery), ServiceLifetime.Scoped));
+        _queries.Add(new ServiceDescriptor(typeof(IUserLoginsQuery), typeof(TUserLoginsQuery), ServiceLifetime.Scoped));
+        _queries.Add(new ServiceDescriptor(typeof(IUserRolesQuery), typeof(TUserRolesQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all user-related stores
+    /// Map all user-related stores to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipUserStores()
+    public DatabaseConfiguration MapUserStores<TUserStore, TUserLoginStore, TUserRoleStore>()
+        where TUserStore : class, IUserStore
+        where TUserLoginStore : class, IUserLoginStore
+        where TUserRoleStore : class, IUserRoleStore
     {
-        _skippedStores.Add(typeof(IUserStore));
-        _skippedStores.Add(typeof(IUserLoginStore));
-        _skippedStores.Add(typeof(IUserRoleStore));
+        _stores.Add(new ServiceDescriptor(typeof(IUserStore), typeof(TUserStore), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IUserLoginStore), typeof(TUserLoginStore), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IUserRoleStore), typeof(TUserRoleStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all role-related queries and stores
+    /// Map all role-related queries and stores to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipRoleServices()
+    public DatabaseConfiguration MapRoleServices<TRolesQuery, TRoleStore, TRoleClaimStore>()
+        where TRolesQuery : class, IRolesQuery
+        where TRoleStore : class, IRoleStore
+        where TRoleClaimStore : class, IRoleClaimStore
     {
-        _skippedQueries.Add(typeof(IRolesQuery));
-        _skippedStores.Add(typeof(IRoleStore));
-        _skippedStores.Add(typeof(IRoleClaimStore));
+        _queries.Add(new ServiceDescriptor(typeof(IRolesQuery), typeof(TRolesQuery), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IRoleStore), typeof(TRoleStore), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IRoleClaimStore), typeof(TRoleClaimStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all claim-related queries and stores
+    /// Map all claim-related queries and stores to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipClaimServices()
+    public DatabaseConfiguration MapClaimServices<TClaimsQuery, TClaimStore>()
+        where TClaimsQuery : class, IClaimsQuery
+        where TClaimStore : class, IClaimStore
     {
-        _skippedQueries.Add(typeof(IClaimsQuery));
-        _skippedStores.Add(typeof(IClaimStore));
+        _queries.Add(new ServiceDescriptor(typeof(IClaimsQuery), typeof(TClaimsQuery), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IClaimStore), typeof(TClaimStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all client-related queries and stores
+    /// Map all client-related queries and stores to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipClientServices()
+    public DatabaseConfiguration MapClientServices<TClientsQuery, TClientSecretsQuery, TClientClaimsQuery, TClientStore, TClientSecretStore, TClientClaimStore>()
+        where TClientsQuery : class, IClientsQuery
+        where TClientSecretsQuery : class, IClientSecretsQuery
+        where TClientClaimsQuery : class, IClientClaimsQuery
+        where TClientStore : class, IClientStore
+        where TClientSecretStore : class, IClientSecretStore
+        where TClientClaimStore : class, IClientClaimStore
     {
-        _skippedQueries.Add(typeof(IClientsQuery));
-        _skippedQueries.Add(typeof(IClientSecretsQuery));
-        _skippedQueries.Add(typeof(IClientClaimsQuery));
-        _skippedStores.Add(typeof(IClientStore));
-        _skippedStores.Add(typeof(IClientSecretStore));
-        _skippedStores.Add(typeof(IClientClaimStore));
+        _queries.Add(new ServiceDescriptor(typeof(IClientsQuery), typeof(TClientsQuery), ServiceLifetime.Scoped));
+        _queries.Add(new ServiceDescriptor(typeof(IClientSecretsQuery), typeof(TClientSecretsQuery), ServiceLifetime.Scoped));
+        _queries.Add(new ServiceDescriptor(typeof(IClientClaimsQuery), typeof(TClientClaimsQuery), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IClientStore), typeof(TClientStore), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IClientSecretStore), typeof(TClientSecretStore), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IClientClaimStore), typeof(TClientClaimStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all MFA-related queries and stores
+    /// Map all MFA-related queries and stores to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipMfaServices()
+    public DatabaseConfiguration MapMfaServices<TMfasQuery, TMfaRecoveryCodesQuery, TMfaStore, TMfaRecoveryCodeStore>()
+        where TMfasQuery : class, IMfasQuery
+        where TMfaRecoveryCodesQuery : class, IMfaRecoveryCodesQuery
+        where TMfaStore : class, IMfaStore
+        where TMfaRecoveryCodeStore : class, IMfaRecoveryCodeStore
     {
-        _skippedQueries.Add(typeof(IMfasQuery));
-        _skippedQueries.Add(typeof(IMfaRecoveryCodesQuery));
-        _skippedStores.Add(typeof(IMfaStore));
-        _skippedStores.Add(typeof(IMfaRecoveryCodeStore));
+        _queries.Add(new ServiceDescriptor(typeof(IMfasQuery), typeof(TMfasQuery), ServiceLifetime.Scoped));
+        _queries.Add(new ServiceDescriptor(typeof(IMfaRecoveryCodesQuery), typeof(TMfaRecoveryCodesQuery), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IMfaStore), typeof(TMfaStore), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IMfaRecoveryCodeStore), typeof(TMfaRecoveryCodeStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all security-related queries and stores
+    /// Map all security-related queries and stores to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipSecurityServices()
+    public DatabaseConfiguration MapSecurityServices<TBansQuery, TFailedLoginAttemptsQuery, TBanStore, TFailedLoginAttemptStore>()
+        where TBansQuery : class, IBansQuery
+        where TFailedLoginAttemptsQuery : class, IFailedLoginAttemptsQuery
+        where TBanStore : class, IBanStore
+        where TFailedLoginAttemptStore : class, IFailedLoginAttemptStore
     {
-        _skippedQueries.Add(typeof(IBansQuery));
-        _skippedQueries.Add(typeof(IFailedLoginAttemptsQuery));
-        _skippedStores.Add(typeof(IBanStore));
-        _skippedStores.Add(typeof(IFailedLoginAttemptStore));
+        _queries.Add(new ServiceDescriptor(typeof(IBansQuery), typeof(TBansQuery), ServiceLifetime.Scoped));
+        _queries.Add(new ServiceDescriptor(typeof(IFailedLoginAttemptsQuery), typeof(TFailedLoginAttemptsQuery), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IBanStore), typeof(TBanStore), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IFailedLoginAttemptStore), typeof(TFailedLoginAttemptStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip all QR-related queries and stores
+    /// Map all QR-related queries and stores to custom implementations
     /// </summary>
-    public DatabaseConfiguration SkipQrServices()
+    public DatabaseConfiguration MapQrServices<TQrsQuery, TQrStore>()
+        where TQrsQuery : class, IQrsQuery
+        where TQrStore : class, IQrStore
     {
-        _skippedQueries.Add(typeof(IQrsQuery));
-        _skippedStores.Add(typeof(IQrStore));
+        _queries.Add(new ServiceDescriptor(typeof(IQrsQuery), typeof(TQrsQuery), ServiceLifetime.Scoped));
+        _stores.Add(new ServiceDescriptor(typeof(IQrStore), typeof(TQrStore), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip bans query registration
+    /// Map bans query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipBansQuery()
+    public DatabaseConfiguration MapBansQuery<TBansQuery>() where TBansQuery : class, IBansQuery
     {
-        _skippedQueries.Add(typeof(IBansQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IBansQuery), typeof(TBansQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip passwords query registration
+    /// Map passwords query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipPasswordsQuery()
+    public DatabaseConfiguration MapPasswordsQuery<TPasswordsQuery>() where TPasswordsQuery : class, IPasswordsQuery
     {
-        _skippedQueries.Add(typeof(IPasswordsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IPasswordsQuery), typeof(TPasswordsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip role claims query registration
+    /// Map role claims query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipRoleClaimsQuery()
+    public DatabaseConfiguration MapRoleClaimsQuery<TRoleClaimsQuery>() where TRoleClaimsQuery : class, IRoleClaimsQuery
     {
-        _skippedQueries.Add(typeof(IRoleClaimsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IRoleClaimsQuery), typeof(TRoleClaimsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip QR query registration
+    /// Map QR query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipQrsQuery()
+    public DatabaseConfiguration MapQrsQuery<TQrsQuery>() where TQrsQuery : class, IQrsQuery
     {
-        _skippedQueries.Add(typeof(IQrsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IQrsQuery), typeof(TQrsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip MFA recovery codes query registration
+    /// Map MFA recovery codes query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipMfaRecoveryCodesQuery()
+    public DatabaseConfiguration MapMfaRecoveryCodesQuery<TMfaRecoveryCodesQuery>() where TMfaRecoveryCodesQuery : class, IMfaRecoveryCodesQuery
     {
-        _skippedQueries.Add(typeof(IMfaRecoveryCodesQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IMfaRecoveryCodesQuery), typeof(TMfaRecoveryCodesQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip failed login attempts query registration
+    /// Map failed login attempts query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipFailedLoginAttemptsQuery()
+    public DatabaseConfiguration MapFailedLoginAttemptsQuery<TFailedLoginAttemptsQuery>() where TFailedLoginAttemptsQuery : class, IFailedLoginAttemptsQuery
     {
-        _skippedQueries.Add(typeof(IFailedLoginAttemptsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IFailedLoginAttemptsQuery), typeof(TFailedLoginAttemptsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip MFAs query registration
+    /// Map MFAs query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipMfasQuery()
+    public DatabaseConfiguration MapMfasQuery<TMfasQuery>() where TMfasQuery : class, IMfasQuery
     {
-        _skippedQueries.Add(typeof(IMfasQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IMfasQuery), typeof(TMfasQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip confirms query registration
+    /// Map confirms query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipConfirmsQuery()
+    public DatabaseConfiguration MapConfirmsQuery<TConfirmsQuery>() where TConfirmsQuery : class, IConfirmsQuery
     {
-        _skippedQueries.Add(typeof(IConfirmsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IConfirmsQuery), typeof(TConfirmsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip client secrets query registration
+    /// Map client secrets query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClientSecretsQuery()
+    public DatabaseConfiguration MapClientSecretsQuery<TClientSecretsQuery>() where TClientSecretsQuery : class, IClientSecretsQuery
     {
-        _skippedQueries.Add(typeof(IClientSecretsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IClientSecretsQuery), typeof(TClientSecretsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
     /// <summary>
-    /// Skip client claims query registration
+    /// Map client claims query to custom implementation
     /// </summary>
-    public DatabaseConfiguration SkipClientClaimsQuery()
+    public DatabaseConfiguration MapClientClaimsQuery<TClientClaimsQuery>() where TClientClaimsQuery : class, IClientClaimsQuery
     {
-        _skippedQueries.Add(typeof(IClientClaimsQuery));
+        _queries.Add(new ServiceDescriptor(typeof(IClientClaimsQuery), typeof(TClientClaimsQuery), ServiceLifetime.Scoped));
         return this;
     }
 
@@ -1052,6 +1050,14 @@ public class DatabaseConfiguration
                     });
                     connectionOptions.Db = _connectionString;
                     break;
+                case "sqlite":
+                    services.AddDbContext<IdentityPrvdContext>((serviceProvider, options) =>
+                    {
+                        var providerManager = serviceProvider.GetRequiredService<DatabaseProviderManager>();
+                        providerManager.ConfigureDbContext(options, "Sqlite", _connectionString);
+                    });
+                    connectionOptions.Db = _connectionString;
+                    break;
                 default:
                     // Use existing connection string from options
                     break;
@@ -1091,142 +1097,57 @@ public class DatabaseConfiguration
                 new RedisConnectionProvider(connectionOptions.Redis));
         }
 
-        // Register default EF Core services if no custom ones were added
-        if (_queries.Count == 0)
-        {
-            RegisterDefaultQueries(services);
-        }
-
-        if (_stores.Count == 0)
-        {
-            RegisterDefaultStores(services);
-        }
+        // Register default EF Core services using TryAddScoped (custom registrations take precedence)
+        RegisterDefaultQueries(services);
+        RegisterDefaultStores(services);
     }
 
     private void RegisterDefaultQueries(IServiceCollection services)
     {
-        if (!_skippedQueries.Contains(typeof(IClaimsQuery)))
-            services.AddScoped<IClaimsQuery, EfClaimsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IClientsQuery)))
-            services.AddScoped<IClientsQuery, EfClientsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IRefreshTokensQuery)))
-            services.AddScoped<IRefreshTokensQuery, EfRefreshTokensQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IRolesQuery)))
-            services.AddScoped<IRolesQuery, EfRolesQuery>();
-
-        if (!_skippedQueries.Contains(typeof(ISessionsQuery)))
-            services.AddScoped<ISessionsQuery, EfSessionsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IUserLoginsQuery)))
-            services.AddScoped<IUserLoginsQuery, EfUserLoginsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IUsersQuery)))
-            services.AddScoped<IUsersQuery, EfUsersQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IContactsQuery)))
-            services.AddScoped<IContactsQuery, EfContactsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IDevicesQuery)))
-            services.AddScoped<IDevicesQuery, EfDevicesQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IUserRolesQuery)))
-            services.AddScoped<IUserRolesQuery, EfUserRolesQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IBansQuery)))
-            services.AddScoped<IBansQuery, EfBansQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IPasswordsQuery)))
-            services.AddScoped<IPasswordsQuery, EfPasswordsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IRoleClaimsQuery)))
-            services.AddScoped<IRoleClaimsQuery, EfRoleClaimsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IQrsQuery)))
-            services.AddScoped<IQrsQuery, EfQrsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IMfaRecoveryCodesQuery)))
-            services.AddScoped<IMfaRecoveryCodesQuery, EfMfaRecoveryCodesQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IFailedLoginAttemptsQuery)))
-            services.AddScoped<IFailedLoginAttemptsQuery, EfFailedLoginAttemptsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IMfasQuery)))
-            services.AddScoped<IMfasQuery, EfMfasQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IConfirmsQuery)))
-            services.AddScoped<IConfirmsQuery, EfConfirmsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IClientSecretsQuery)))
-            services.AddScoped<IClientSecretsQuery, EfClientSecretsQuery>();
-
-        if (!_skippedQueries.Contains(typeof(IClientClaimsQuery)))
-            services.AddScoped<IClientClaimsQuery, EfClientClaimsQuery>();
+        services.TryAddScoped<IClaimsQuery, EfClaimsQuery>();
+        services.TryAddScoped<IClientsQuery, EfClientsQuery>();
+        services.TryAddScoped<IRefreshTokensQuery, EfRefreshTokensQuery>();
+        services.TryAddScoped<IRolesQuery, EfRolesQuery>();
+        services.TryAddScoped<ISessionsQuery, EfSessionsQuery>();
+        services.TryAddScoped<IUserLoginsQuery, EfUserLoginsQuery>();
+        services.TryAddScoped<IUsersQuery, EfUsersQuery>();
+        services.TryAddScoped<IContactsQuery, EfContactsQuery>();
+        services.TryAddScoped<IDevicesQuery, EfDevicesQuery>();
+        services.TryAddScoped<IUserRolesQuery, EfUserRolesQuery>();
+        services.TryAddScoped<IBansQuery, EfBansQuery>();
+        services.TryAddScoped<IPasswordsQuery, EfPasswordsQuery>();
+        services.TryAddScoped<IRoleClaimsQuery, EfRoleClaimsQuery>();
+        services.TryAddScoped<IQrsQuery, EfQrsQuery>();
+        services.TryAddScoped<IMfaRecoveryCodesQuery, EfMfaRecoveryCodesQuery>();
+        services.TryAddScoped<IFailedLoginAttemptsQuery, EfFailedLoginAttemptsQuery>();
+        services.TryAddScoped<IMfasQuery, EfMfasQuery>();
+        services.TryAddScoped<IConfirmsQuery, EfConfirmsQuery>();
+        services.TryAddScoped<IClientSecretsQuery, EfClientSecretsQuery>();
+        services.TryAddScoped<IClientClaimsQuery, EfClientClaimsQuery>();
     }
 
     private void RegisterDefaultStores(IServiceCollection services)
     {
-        if (!_skippedStores.Contains(typeof(IClaimStore)))
-            services.AddScoped<IClaimStore, EfClaimStore>();
-
-        if (!_skippedStores.Contains(typeof(IConfirmStore)))
-            services.AddScoped<IConfirmStore, EfConfirmStore>();
-
-        if (!_skippedStores.Contains(typeof(IMfaStore)))
-            services.AddScoped<IMfaStore, EfMfaStore>();
-
-        if (!_skippedStores.Contains(typeof(IPasswordStore)))
-            services.AddScoped<IPasswordStore, EfPasswordStore>();
-
-        if (!_skippedStores.Contains(typeof(IRefreshTokenStore)))
-            services.AddScoped<IRefreshTokenStore, EfRefreshTokenStore>();
-
-        if (!_skippedStores.Contains(typeof(IRoleClaimStore)))
-            services.AddScoped<IRoleClaimStore, EfRoleClaimStore>();
-
-        if (!_skippedStores.Contains(typeof(IRoleStore)))
-            services.AddScoped<IRoleStore, EfRoleStore>();
-
-        if (!_skippedStores.Contains(typeof(Data.Stores.ISessionStore)))
-            services.AddScoped<Data.Stores.ISessionStore, EfSessionStore>();
-
-        if (!_skippedStores.Contains(typeof(IUserLoginStore)))
-            services.AddScoped<IUserLoginStore, EfUserLoginStore>();
-
-        if (!_skippedStores.Contains(typeof(IUserRoleStore)))
-            services.AddScoped<IUserRoleStore, EfUserRoleStore>();
-
-        if (!_skippedStores.Contains(typeof(IUserStore)))
-            services.AddScoped<IUserStore, EfUserStore>();
-
-        if (!_skippedStores.Contains(typeof(IContactStore)))
-            services.AddScoped<IContactStore, EfContactStore>();
-
-        if (!_skippedStores.Contains(typeof(IDeviceStore)))
-            services.AddScoped<IDeviceStore, EfDeviceStore>();
-
-        if (!_skippedStores.Contains(typeof(IQrStore)))
-            services.AddScoped<IQrStore, EfQrStore>();
-
-        if (!_skippedStores.Contains(typeof(IMfaRecoveryCodeStore)))
-            services.AddScoped<IMfaRecoveryCodeStore, EfMfaRecoveryCodeStore>();
-
-        if (!_skippedStores.Contains(typeof(IFailedLoginAttemptStore)))
-            services.AddScoped<IFailedLoginAttemptStore, EfFailedLoginAttemptStore>();
-
-        if (!_skippedStores.Contains(typeof(IClientStore)))
-            services.AddScoped<IClientStore, EfClientStore>();
-
-        if (!_skippedStores.Contains(typeof(IClientSecretStore)))
-            services.AddScoped<IClientSecretStore, EfClientSecretStore>();
-
-        if (!_skippedStores.Contains(typeof(IClientClaimStore)))
-            services.AddScoped<IClientClaimStore, EfClientClaimStore>();
-
-        if (!_skippedStores.Contains(typeof(IBanStore)))
-            services.AddScoped<IBanStore, EfBanStore>();
+        services.TryAddScoped<IClaimStore, EfClaimStore>();
+        services.TryAddScoped<IConfirmStore, EfConfirmStore>();
+        services.TryAddScoped<IMfaStore, EfMfaStore>();
+        services.TryAddScoped<IPasswordStore, EfPasswordStore>();
+        services.TryAddScoped<IRefreshTokenStore, EfRefreshTokenStore>();
+        services.TryAddScoped<IRoleClaimStore, EfRoleClaimStore>();
+        services.TryAddScoped<IRoleStore, EfRoleStore>();
+        services.TryAddScoped<Data.Stores.ISessionStore, EfSessionStore>();
+        services.TryAddScoped<IUserLoginStore, EfUserLoginStore>();
+        services.TryAddScoped<IUserRoleStore, EfUserRoleStore>();
+        services.TryAddScoped<IUserStore, EfUserStore>();
+        services.TryAddScoped<IContactStore, EfContactStore>();
+        services.TryAddScoped<IDeviceStore, EfDeviceStore>();
+        services.TryAddScoped<IQrStore, EfQrStore>();
+        services.TryAddScoped<IMfaRecoveryCodeStore, EfMfaRecoveryCodeStore>();
+        services.TryAddScoped<IFailedLoginAttemptStore, EfFailedLoginAttemptStore>();
+        services.TryAddScoped<IClientStore, EfClientStore>();
+        services.TryAddScoped<IClientSecretStore, EfClientSecretStore>();
+        services.TryAddScoped<IClientClaimStore, EfClientClaimStore>();
+        services.TryAddScoped<IBanStore, EfBanStore>();
     }
 }
 
@@ -1396,7 +1317,7 @@ public class ExternalProvidersConfiguration
             CallbackPath = callbackPath ?? "/signin-github",
             AuthenticationScheme = "GitHub",
             Icon = "github-icon",
-            Scopes = scopes?.ToList() ?? new List<string> { "read:user", "user:email" }
+            Scopes = scopes?.ToList() ?? ["read:user", "user:email"]
         };
         return this;
     }
@@ -1431,7 +1352,7 @@ public class ExternalProvidersConfiguration
             CallbackPath = callbackPath ?? "/signin-twitter",
             AuthenticationScheme = "Twitter",
             Icon = "twitter-icon",
-            Scopes = scopes?.ToList() ?? new List<string> { "tweet.read", "users.read" }
+            Scopes = scopes?.ToList() ?? ["tweet.read", "users.read"]
         };
         return this;
     }
