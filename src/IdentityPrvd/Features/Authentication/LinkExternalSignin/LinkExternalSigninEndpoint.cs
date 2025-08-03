@@ -1,15 +1,10 @@
-﻿using AspNet.Security.OAuth.GitHub;
-using AspNet.Security.OAuth.Twitter;
-using AspNet.Security.OpenId.Steam;
-using IdentityPrvd.Common.Api;
+﻿using IdentityPrvd.Common.Api;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Endpoints;
 using IdentityPrvd.Features.Authentication.LinkExternalSignin.Services;
+using IdentityPrvd.Services.AuthSchemes;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Facebook;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -67,9 +62,9 @@ public class LinkExternalSigninCallbackEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("/api/identity/link-external-signin-callback",
-            async ([FromQuery(Name = "returnUrl")] string returnUrl, [FromQuery(Name = "provider")] string provider, HttpContext context, LinkExternalSigninOrchestrator orc) =>
+            async ([FromQuery(Name = "returnUrl")] string returnUrl, [FromQuery(Name = "provider")] string provider, HttpContext context, LinkExternalSigninOrchestrator orc, ExternalProviderManager providerManager) =>
             {
-                var authenticateResult = await AuthenticateByProviderAsync(context, provider);
+                var authenticateResult = await AuthenticateByProviderAsync(context, provider, providerManager);
 
                 await orc.LinkExternalProviderToUserAsync(authenticateResult);
 
@@ -77,18 +72,9 @@ public class LinkExternalSigninCallbackEndpoint : IEndpoint
             }).WithTags("Link external signin").WithName("LinkSigninExternalCallback");
     }
 
-    private static async Task<AuthenticateResult> AuthenticateByProviderAsync(HttpContext context, string provider)
+    private static async Task<AuthenticateResult> AuthenticateByProviderAsync(HttpContext context, string provider, ExternalProviderManager providerManager)
     {
-        return provider switch
-        {
-            "Google" => await context.AuthenticateAsync(GoogleDefaults.AuthenticationScheme),
-            "Microsoft" => await context.AuthenticateAsync(MicrosoftAccountDefaults.AuthenticationScheme),
-            "GitHub" => await context.AuthenticateAsync(GitHubAuthenticationDefaults.AuthenticationScheme),
-            "Facebook" => await context.AuthenticateAsync(FacebookDefaults.AuthenticationScheme),
-            "Twitter" => await context.AuthenticateAsync(TwitterAuthenticationDefaults.AuthenticationScheme),
-            "Steam" => await context.AuthenticateAsync(SteamAuthenticationDefaults.AuthenticationScheme),
-            _ => throw new BadRequestException($"Unsupported provider: {provider}"),
-        };
+        return await providerManager.AuthenticateAsync(context, provider);
     }
 }
 

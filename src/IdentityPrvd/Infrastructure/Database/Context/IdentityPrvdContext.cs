@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace IdentityPrvd.Infrastructure.Database.Context;
 
-public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options) : DbContext(options)
+public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options, DatabaseProviderManager providerManager, string providerName)
+        : DbContext(options)
 {
     public DbSet<Audit> Audits { get; set; } = null!;
     public DbSet<IdentityBan> Bans { get; set; } = null!;
@@ -34,7 +35,17 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options) 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityPrvdContext).Assembly);
+
+        // Use provider-specific configuration if available
+        if (providerManager != null && !string.IsNullOrEmpty(providerName))
+        {
+            providerManager.ConfigureModel(modelBuilder, providerName);
+        }
+        else
+        {
+            // Fallback to default configuration
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityPrvdContext).Assembly);
+        }
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
