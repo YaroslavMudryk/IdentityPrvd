@@ -1,3 +1,4 @@
+using IdentityPrvd.Extensions;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;

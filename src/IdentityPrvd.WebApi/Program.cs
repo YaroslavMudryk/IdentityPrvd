@@ -19,7 +19,7 @@ public class Program
 
         if (app.Environment.IsDevelopment())
         {
-            await SeedData.InitializeAsync(app.Services);
+            await IdentityPrvdSeedLoader.InitializeAsync(app.Services);
         }
         
         app.UseSwagger();

@@ -25,7 +25,7 @@ using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace IdentityPrvd;
+namespace IdentityPrvd.Extensions;
 
 public static class ServiceRegistrationExtensions
 {
@@ -48,8 +48,7 @@ public static class ServiceRegistrationExtensions
         services.AddChangePasswordDependencies();
         services.AddRestorePasswordDependencies();
         services.AddContactsDependencies();
-        services.AddDevicesDependencies();
-        
+        services.AddDevicesDependencies();        
         return services;
     }
 
@@ -57,16 +56,14 @@ public static class ServiceRegistrationExtensions
     {
         services.AddTransient<CorrelationContextMiddleware>();
         services.AddTransient<ServerSideSessionMiddleware>();
-        services.AddTransient<GlobalExceptionHandlerMiddleware>();
-        
+        services.AddTransient<GlobalExceptionHandlerMiddleware>();        
         return services;
     }
 
     public static IServiceCollection AddContexts(this IServiceCollection services)
     {
         services.AddScoped<IUserContext, UserContext>();
-        services.AddScoped<ICurrentContext, CurrentContext>();
-        
+        services.AddScoped<ICurrentContext, CurrentContext>();        
         return services;
     }
 
@@ -75,8 +72,7 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IProtectionService, AesProtectionService>();
         services.AddScoped<IMfaService, TotpMfaService>();
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IHasher, Sha512Hasher>();
-        
+        services.AddScoped<IHasher, Sha512Hasher>();        
         return services;
     }
 
@@ -84,8 +80,7 @@ public static class ServiceRegistrationExtensions
     {
         services.AddScoped<UserHelper>();
         services.TryAddSingleton(TimeProvider.System);
-        services.AddScoped<IAuthSchemes, DefaultAuthSchemes>();
-        
+        services.AddScoped<IAuthSchemes, DefaultAuthSchemes>();        
         return services;
     }
 } 

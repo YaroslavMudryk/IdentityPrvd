@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityPrvd.Infrastructure.Database.Seeding;
 
-public static class SeedData
+public static class IdentityPrvdSeedLoader
 {
     public static async Task InitializeAsync(IServiceProvider serviceProvider)
     {

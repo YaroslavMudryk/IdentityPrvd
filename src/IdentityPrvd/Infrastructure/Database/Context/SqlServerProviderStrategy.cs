@@ -24,9 +24,6 @@ public class SqlServerProviderStrategy : IDatabaseProviderStrategy
 
     public void ConfigureModel(ModelBuilder modelBuilder)
     {
-        // Apply all configurations from assembly
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityPrvdContext).Assembly);
-
         // SQL Server-specific configurations
         ConfigureSqlServerSpecificSettings(modelBuilder);
     }

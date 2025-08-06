@@ -23,9 +23,6 @@ public class MySqlProviderStrategy : IDatabaseProviderStrategy
 
     public void ConfigureModel(ModelBuilder modelBuilder)
     {
-        // Apply all configurations from assembly
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityPrvdContext).Assembly);
-
         // MySQL-specific configurations
         ConfigureMySqlSpecificSettings(modelBuilder);
     }

@@ -43,8 +43,8 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options, 
         }
         else
         {
-            // Fallback to default configuration
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityPrvdContext).Assembly);
+            // Fallback to default configuration - no configurations available since they've been moved to specific providers
+            // Consider configuring a default provider strategy or throw an exception
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using IdentityPrvd.Endpoints;
+using IdentityPrvd.Extensions;
 using IdentityPrvd.Infrastructure.Middleware;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.AuthSchemes;
