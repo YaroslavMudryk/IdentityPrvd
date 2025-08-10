@@ -22,6 +22,7 @@ using IdentityPrvd.Features.Security.Mfa.EnableMfa;
 using IdentityPrvd.Features.Security.RefreshToken;
 using IdentityPrvd.Features.Security.Sessions.GetSessions;
 using IdentityPrvd.Features.Security.Sessions.RevokeSessions;
+using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Transactions;
 using IdentityPrvd.Infrastructure.Middleware;
@@ -29,9 +30,10 @@ using IdentityPrvd.Services.AuthSchemes;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Redis.OM;
+using Redis.OM.Contracts;
 
 namespace IdentityPrvd.DependencyInjection;
 
@@ -83,6 +85,18 @@ public static class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IHasher, Sha512Hasher>();
 
+        return builder;
+    }
+
+    public static IIdentityPrvdBuilder AddSessionServices(this IIdentityPrvdBuilder builder)
+    {
+        builder.Services.AddScoped<ISessionManager, SessionManager>();
+        builder.Services.AddScoped<Infrastructure.Caching.ISessionStore, RedisSessionStore>();
+        builder.Services.AddScoped<IRedisConnectionProvider>(provider =>
+        {
+            return new RedisConnectionProvider(builder.Option.Connections.Redis);
+        });
+        builder.Services.AddTransient<ServerSideSessionMiddleware>();
         return builder;
     }
 
@@ -174,7 +188,7 @@ public static class IdentityPrvdBuilderExtensionsCore
         where TRefreshTokenStore : class, IRefreshTokenStore
         where TRoleClaimStore : class, IRoleClaimStore
         where TRoleStore : class, IRoleStore
-        where TSessionStore : class, ISessionStore
+        where TSessionStore : class, Data.Stores.ISessionStore
         where TUserLoginStore : class, IUserLoginStore
         where TUserRoleStore : class, IUserRoleStore
         where TUserStore : class, IUserStore
@@ -195,7 +209,7 @@ public static class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddScoped<IRefreshTokenStore, TRefreshTokenStore>();
         builder.Services.AddScoped<IRoleClaimStore, TRoleClaimStore>();
         builder.Services.AddScoped<IRoleStore, TRoleStore>();
-        builder.Services.AddScoped<ISessionStore, TSessionStore>();
+        builder.Services.AddScoped<Data.Stores.ISessionStore, TSessionStore>();
         builder.Services.AddScoped<IUserLoginStore, TUserLoginStore>();
         builder.Services.AddScoped<IUserRoleStore, TUserRoleStore>();
         builder.Services.AddScoped<IUserStore, TUserStore>();
@@ -301,7 +315,7 @@ public static class IdentityPrvdBuilderExtensionsCore
     {
         return AddDbContext<IdentityPrvdContext>(builder, options =>
         {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+            options.UseNpgsql(builder.Option.Connections.Db);
         });
     }
 }

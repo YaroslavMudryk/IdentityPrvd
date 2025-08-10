@@ -40,18 +40,20 @@ public static class IdentityPrvdServiceCollectionExtensions
         services.AddScoped(_ => identityOptions);
 
         var builder = services.AddIdentityPrvdBuilder();
+        builder.Option = identityOptions;
 
         builder
             .AddCoreServices()
             .AddRequiredServices()
             .AddMiddlewares()
+            .AddContexts()
             .AddEndpoints()
             .AddProtectionServices()
+            .AddSessionServices()
             .AddEfTransaction()
             .AddEfStores()
             .AddEfQueries()
-            .AddDefaultContext()
-            .AddContexts();
+            .AddDefaultContext();
 
         return builder;
     }
