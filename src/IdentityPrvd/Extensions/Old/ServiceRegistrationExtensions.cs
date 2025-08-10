@@ -25,7 +25,7 @@ using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace IdentityPrvd.Extensions;
+namespace IdentityPrvd.Extensions.Old;
 
 public static class ServiceRegistrationExtensions
 {

@@ -3,7 +3,7 @@ using IdentityPrvd.Options;
 using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityPrvd.Extensions;
+namespace IdentityPrvd.Extensions.Old;
 
 /// <summary>
 /// Builder for session services with support for different implementations

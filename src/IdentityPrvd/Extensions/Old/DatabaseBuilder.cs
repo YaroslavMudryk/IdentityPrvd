@@ -7,7 +7,7 @@ using IdentityPrvd.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityPrvd.Extensions;
+namespace IdentityPrvd.Extensions.Old;
 
 /// <summary>
 /// Builder for database services with support for different implementations

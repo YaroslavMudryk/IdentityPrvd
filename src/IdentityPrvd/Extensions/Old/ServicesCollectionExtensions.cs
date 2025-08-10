@@ -1,5 +1,4 @@
 ﻿using IdentityPrvd.Endpoints;
-using IdentityPrvd.Extensions;
 using IdentityPrvd.Infrastructure.Middleware;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.AuthSchemes;
@@ -9,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Redis.OM;
 
-namespace IdentityPrvd;
+namespace IdentityPrvd.Extensions.Old;
 
 public static class ServicesCollectionExtensions
 {

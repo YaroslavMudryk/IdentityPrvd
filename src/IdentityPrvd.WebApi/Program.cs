@@ -1,3 +1,4 @@
+using IdentityPrvd.DependencyInjection;
 using IdentityPrvd.Infrastructure.Database.Seeding;
 
 namespace IdentityPrvd.WebApi;

@@ -2,7 +2,7 @@ using IdentityPrvd.Options;
 using IdentityPrvd.Services.Notification;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityPrvd.Extensions;
+namespace IdentityPrvd.Extensions.Old;
 
 /// <summary>
 /// Builder for notification services with support for different implementations

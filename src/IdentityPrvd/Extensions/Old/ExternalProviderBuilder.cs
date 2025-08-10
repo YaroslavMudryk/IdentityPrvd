@@ -2,7 +2,7 @@ using IdentityPrvd.Options;
 using IdentityPrvd.Services.AuthSchemes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityPrvd.Extensions;
+namespace IdentityPrvd.Extensions.Old;
 
 /// <summary>
 /// Builder for external authentication providers

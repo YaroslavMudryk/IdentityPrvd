@@ -1,4 +1,4 @@
-using IdentityPrvd.Extensions;
+using IdentityPrvd.Extensions.Old;
 using IdentityPrvd.Options;
 using Microsoft.Extensions.DependencyInjection;
 

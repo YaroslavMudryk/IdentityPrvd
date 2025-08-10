@@ -27,7 +27,7 @@ using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace IdentityPrvd.Extensions;
+namespace IdentityPrvd.Extensions.Old;
 
 /// <summary>
 /// Main builder for configuring IdentityPrvd services
@@ -124,33 +124,5 @@ public class IdentityPrvdBuilder(IServiceCollection services, IdentityPrvdOption
         services.AddRestorePasswordDependencies();
         services.AddContactsDependencies();
         services.AddDevicesDependencies();
-    }
-
-    private void AddMiddlewares()
-    {
-        services.AddTransient<CorrelationContextMiddleware>();
-        services.AddTransient<ServerSideSessionMiddleware>();
-        services.AddTransient<GlobalExceptionHandlerMiddleware>();
-    }
-
-    private void AddContexts()
-    {
-        services.AddScoped<IUserContext, UserContext>();
-        services.AddScoped<ICurrentContext, CurrentContext>();
-    }
-
-    private void AddProtectionServices()
-    {
-        services.AddScoped<IProtectionService, AesProtectionService>();
-        services.AddScoped<IMfaService, TotpMfaService>();
-        services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IHasher, Sha512Hasher>();
-    }
-
-    private void AddOthers()
-    {
-        services.AddScoped<UserHelper>();
-        services.TryAddSingleton(TimeProvider.System);
-        services.AddScoped<IAuthSchemes, DefaultAuthSchemes>();
     }
 }
