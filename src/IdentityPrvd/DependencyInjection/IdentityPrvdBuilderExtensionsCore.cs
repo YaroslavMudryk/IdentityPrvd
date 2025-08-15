@@ -27,6 +27,8 @@ using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Transactions;
 using IdentityPrvd.Infrastructure.Middleware;
 using IdentityPrvd.Services.AuthSchemes;
+using IdentityPrvd.Services.Location;
+using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.EntityFrameworkCore;
@@ -113,6 +115,44 @@ public static class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddTransient<ServerSideSessionMiddleware>();
         builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
         return builder;
+    }
+
+    public static IIdentityPrvdBuilder AddSmsNotifier<TSmsNotifier>(this IIdentityPrvdBuilder builder) where TSmsNotifier : class, ISmsService
+    {
+        builder.Services.AddScoped<ISmsService, TSmsNotifier>();
+        return builder;
+    }
+
+    public static IIdentityPrvdBuilder AddFakeSmsNotifier(this IIdentityPrvdBuilder builder)
+    {
+        return AddSmsNotifier<FakeSmsService>(builder);
+    }
+
+    public static IIdentityPrvdBuilder AddEmailNotifier<TEmailNotifier>(this IIdentityPrvdBuilder builder) where TEmailNotifier : class, IEmailService
+    {
+        builder.Services.AddScoped<IEmailService, TEmailNotifier>();
+        return builder;
+    }
+
+    public static IIdentityPrvdBuilder AddFakeEmailNotifier(this IIdentityPrvdBuilder builder)
+    {
+        return AddEmailNotifier<FakeEmailService>(builder);
+    }
+
+    public static IIdentityPrvdBuilder AddLocationService<TLocationService>(this IIdentityPrvdBuilder builder) where TLocationService : class, ILocationService
+    {
+        builder.Services.AddScoped<ILocationService, TLocationService>();
+        return builder;
+    }
+
+    public static IIdentityPrvdBuilder AddFakeLocationService(this IIdentityPrvdBuilder builder)
+    {
+        return AddLocationService<FakeLocationService>(builder);
+    }
+
+    public static IIdentityPrvdBuilder AddIpApiLocationService(this IIdentityPrvdBuilder builder)
+    {
+        return AddLocationService<IpApiLocationService>(builder);
     }
 
     public static IIdentityPrvdBuilder AddTransaction<TTransactionManager>(this IIdentityPrvdBuilder builder) where TTransactionManager : class, ITransactionManager
@@ -307,7 +347,10 @@ public static class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder AddDbContext<DbContext>(this IIdentityPrvdBuilder builder, Action<DbContextOptionsBuilder> optionsAction) where DbContext : IdentityPrvdContext
     {
-        builder.Services.AddDbContext<DbContext>(optionsAction);
+        builder.Services.AddDbContext<DbContext>(opt =>
+        {
+            opt.UseSqlServer();
+        });
         return builder;
     }
 

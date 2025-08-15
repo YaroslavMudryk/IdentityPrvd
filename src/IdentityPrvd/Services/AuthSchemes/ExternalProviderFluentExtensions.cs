@@ -1,6 +1,5 @@
 using IdentityPrvd.Extensions.Old;
 using IdentityPrvd.Options;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityPrvd.Services.AuthSchemes;
