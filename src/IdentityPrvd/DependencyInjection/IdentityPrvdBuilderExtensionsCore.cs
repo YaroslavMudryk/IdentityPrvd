@@ -24,6 +24,7 @@ using IdentityPrvd.Features.Security.Sessions.GetSessions;
 using IdentityPrvd.Features.Security.Sessions.RevokeSessions;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
+using IdentityPrvd.Infrastructure.Database.Extensions;
 using IdentityPrvd.Infrastructure.Database.Transactions;
 using IdentityPrvd.Infrastructure.Middleware;
 using IdentityPrvd.Services.AuthSchemes;
@@ -162,6 +163,10 @@ public static class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder AddIpApiLocationService(this IIdentityPrvdBuilder builder)
     {
+        builder.Services.AddHttpClient<IpApiLocationService>(options =>
+        {
+            options.BaseAddress = new Uri("http://ip-api.com");
+        });
         return AddLocationService<IpApiLocationService>(builder);
     }
 
@@ -355,6 +360,16 @@ public static class IdentityPrvdBuilderExtensionsCore
             EfUsersQuery>(builder);
     }
 
+    public static IIdentityPrvdBuilder AddDbContext<DbContext>(this IIdentityPrvdBuilder builder, string connectionString) where DbContext : IdentityPrvdContext
+    {
+        builder.Services.AddDbContext<DbContext>(options =>
+        {
+            options.AutoConfigureDbContext(connectionString);
+        });
+
+        return builder;
+    }
+
     public static IIdentityPrvdBuilder AddDbContext<DbContext>(this IIdentityPrvdBuilder builder, Action<DbContextOptionsBuilder> optionsAction) where DbContext : IdentityPrvdContext
     {
         builder.Services.AddDbContext<DbContext>(opt =>
@@ -368,7 +383,7 @@ public static class IdentityPrvdBuilderExtensionsCore
     {
         return AddDbContext<IdentityPrvdContext>(builder, options =>
         {
-            options.UseNpgsql(builder.Option.Connections.Db);
+            options.AutoConfigureDbContext(builder.Option.Connections.Db);
         });
     }
 }
