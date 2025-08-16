@@ -56,7 +56,7 @@ public static class IdentityPrvdServiceCollectionExtensions
             .AddEfTransaction()
             .AddEfStores()
             .AddEfQueries()
-            .AddDefaultContext();
+            .AddDbContext();
 
         return builder;
     }

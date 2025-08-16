@@ -362,28 +362,20 @@ public static class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder AddDbContext<DbContext>(this IIdentityPrvdBuilder builder, string connectionString) where DbContext : IdentityPrvdContext
     {
-        builder.Services.AddDbContext<DbContext>(options =>
+        return AddDbContext<DbContext>(builder, options =>
         {
             options.AutoConfigureDbContext(connectionString);
         });
-
-        return builder;
     }
 
     public static IIdentityPrvdBuilder AddDbContext<DbContext>(this IIdentityPrvdBuilder builder, Action<DbContextOptionsBuilder> optionsAction) where DbContext : IdentityPrvdContext
     {
-        builder.Services.AddDbContext<DbContext>(opt =>
-        {
-            opt.UseSqlServer();
-        });
+        builder.Services.AddDbContext<DbContext>(optionsAction);
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddDefaultContext(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder AddDbContext(this IIdentityPrvdBuilder builder)
     {
-        return AddDbContext<IdentityPrvdContext>(builder, options =>
-        {
-            options.AutoConfigureDbContext(builder.Option.Connections.Db);
-        });
+        return AddDbContext<IdentityPrvdContext>(builder, builder.Option.Connections.Db);
     }
 }
