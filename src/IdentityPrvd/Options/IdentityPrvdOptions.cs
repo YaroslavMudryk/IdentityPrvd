@@ -983,15 +983,6 @@ public class DatabaseConfiguration
     }
 
     /// <summary>
-    /// Add custom database provider strategy
-    /// </summary>
-    public DatabaseConfiguration AddCustomProviderStrategy<TStrategy>() where TStrategy : class, IDatabaseProviderStrategy
-    {
-        // This will be handled by the DatabaseProviderManager
-        return this;
-    }
-
-    /// <summary>
     /// Use EF Core (default)
     /// </summary>
     public DatabaseConfiguration UseEfCore()
@@ -1016,92 +1007,7 @@ public class DatabaseConfiguration
         return this;
     }
 
-    internal void RegisterServices(IServiceCollection services, IdentityConnectionOptions connectionOptions)
-    {
-        // Register database provider manager
-        services.AddDatabaseProviderManager();
-
-        // Register database context based on type
-        if (!string.IsNullOrEmpty(_connectionString))
-        {
-            switch (_databaseType?.ToLowerInvariant())
-            {
-                case "postgresql":
-                    services.AddDbContext<IdentityPrvdContext>((serviceProvider, options) =>
-                    {
-                        var providerManager = serviceProvider.GetRequiredService<DatabaseProviderManager>();
-                        providerManager.ConfigureDbContext(options, "PostgreSQL", _connectionString);
-                    });
-                    connectionOptions.Db = _connectionString;
-                    break;
-                case "sqlserver":
-                    services.AddDbContext<IdentityPrvdContext>((serviceProvider, options) =>
-                    {
-                        var providerManager = serviceProvider.GetRequiredService<DatabaseProviderManager>();
-                        providerManager.ConfigureDbContext(options, "SQLServer", _connectionString);
-                    });
-                    connectionOptions.Db = _connectionString;
-                    break;
-                case "mysql":
-                    services.AddDbContext<IdentityPrvdContext>((serviceProvider, options) =>
-                    {
-                        var providerManager = serviceProvider.GetRequiredService<DatabaseProviderManager>();
-                        providerManager.ConfigureDbContext(options, "MySQL", _connectionString);
-                    });
-                    connectionOptions.Db = _connectionString;
-                    break;
-                case "sqlite":
-                    services.AddDbContext<IdentityPrvdContext>((serviceProvider, options) =>
-                    {
-                        var providerManager = serviceProvider.GetRequiredService<DatabaseProviderManager>();
-                        providerManager.ConfigureDbContext(options, "Sqlite", _connectionString);
-                    });
-                    connectionOptions.Db = _connectionString;
-                    break;
-                default:
-                    // Use existing connection string from options
-                    break;
-            }
-        }
-
-        // Register custom queries
-        foreach (var query in _queries)
-        {
-            services.Add(query);
-        }
-
-        // Register custom stores
-        foreach (var store in _stores)
-        {
-            services.Add(store);
-        }
-
-        // Register transaction manager
-        if (_transactionManager != null)
-        {
-            services.Add(_transactionManager);
-        }
-        else
-        {
-            services.AddScoped<ITransactionManager, EfCoreTransactionManager>();
-        }
-
-        // Register Redis connection
-        if (_redisConnection != null)
-        {
-            services.Add(_redisConnection);
-        }
-        else
-        {
-            services.AddScoped<IRedisConnectionProvider>(_ =>
-                new RedisConnectionProvider(connectionOptions.Redis));
-        }
-
-        // Register default EF Core services using TryAddScoped (custom registrations take precedence)
-        RegisterDefaultQueries(services);
-        RegisterDefaultStores(services);
-    }
-
+    
     private void RegisterDefaultQueries(IServiceCollection services)
     {
         services.TryAddScoped<IClaimsQuery, EfClaimsQuery>();
