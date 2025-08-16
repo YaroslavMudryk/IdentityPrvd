@@ -18,7 +18,7 @@ public interface ISessionManager
 }
 
 public class SessionManager(
-    ISessionStore sessionStore,
+    ISessionManagerStore sessionStore,
     ILogger<SessionManager> logger,
     TimeProvider timeProvider) : ISessionManager
 {

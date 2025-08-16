@@ -90,14 +90,24 @@ public static class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddSessionServices(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder AddInMemorySessionServices(this IIdentityPrvdBuilder builder)
     {
-        builder.Services.AddScoped<ISessionManager, SessionManager>();
-        builder.Services.AddScoped<Infrastructure.Caching.ISessionStore, RedisSessionStore>();
+        return AddSessionServices<InMemorySessionManagerStore>(builder);
+    }
+
+    public static IIdentityPrvdBuilder AddRedisSessionServices(this IIdentityPrvdBuilder builder)
+    {
         builder.Services.AddScoped<IRedisConnectionProvider>(provider =>
         {
             return new RedisConnectionProvider(builder.Option.Connections.Redis);
         });
+        return AddSessionServices<RedisSessionManagerStore>(builder);
+    }
+
+    public static IIdentityPrvdBuilder AddSessionServices<TSessionManagerStore>(this IIdentityPrvdBuilder builder) where TSessionManagerStore : class, ISessionManagerStore
+    {
+        builder.Services.AddScoped<ISessionManager, SessionManager>();
+        builder.Services.AddScoped<ISessionManagerStore, TSessionManagerStore>();
         builder.Services.AddTransient<ServerSideSessionMiddleware>();
         return builder;
     }
@@ -228,7 +238,7 @@ public static class IdentityPrvdBuilderExtensionsCore
         where TRefreshTokenStore : class, IRefreshTokenStore
         where TRoleClaimStore : class, IRoleClaimStore
         where TRoleStore : class, IRoleStore
-        where TSessionStore : class, Data.Stores.ISessionStore
+        where TSessionStore : class, ISessionStore
         where TUserLoginStore : class, IUserLoginStore
         where TUserRoleStore : class, IUserRoleStore
         where TUserStore : class, IUserStore
@@ -249,7 +259,7 @@ public static class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddScoped<IRefreshTokenStore, TRefreshTokenStore>();
         builder.Services.AddScoped<IRoleClaimStore, TRoleClaimStore>();
         builder.Services.AddScoped<IRoleStore, TRoleStore>();
-        builder.Services.AddScoped<Data.Stores.ISessionStore, TSessionStore>();
+        builder.Services.AddScoped<ISessionStore, TSessionStore>();
         builder.Services.AddScoped<IUserLoginStore, TUserLoginStore>();
         builder.Services.AddScoped<IUserRoleStore, TUserRoleStore>();
         builder.Services.AddScoped<IUserStore, TUserStore>();

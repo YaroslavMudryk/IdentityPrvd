@@ -8,10 +8,10 @@ using Redis.OM.Searching;
 
 namespace IdentityPrvd.Infrastructure.Caching;
 
-public class RedisSessionStore(
+public class RedisSessionManagerStore(
     IRedisConnectionProvider provider,
     IdentityPrvdOptions identityOptions,
-    ILogger<RedisSessionStore> logger) : ISessionStore
+    ILogger<RedisSessionManagerStore> logger) : ISessionManagerStore
 {
     private readonly IRedisCollection<SessionInfo> _sessions = provider.RedisCollection<SessionInfo>();
     private SessionInfo _currentSession;

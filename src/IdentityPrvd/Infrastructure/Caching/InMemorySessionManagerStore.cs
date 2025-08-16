@@ -1,10 +1,16 @@
-﻿using IdentityPrvd.Services.ServerSideSessions;
+﻿using IdentityPrvd.Common.Extensions;
+using IdentityPrvd.Domain.Enums;
+using IdentityPrvd.Infrastructure.Database.Context;
+using IdentityPrvd.Services.Security;
+using IdentityPrvd.Services.ServerSideSessions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityPrvd.Infrastructure.Caching;
 
-public class InMemorySessionStore : ISessionStore
+public class InMemorySessionManagerStore(IServiceProvider serviceProvider) : ISessionManagerStore
 {
-    private readonly List<SessionInfo> _activeSessions = [];
+    private List<SessionInfo> _activeSessions = [];
 
     public async Task<SessionInfo> GetSessionAsync(string sessionId)
     {
@@ -62,7 +68,22 @@ public class InMemorySessionStore : ISessionStore
 
     public async Task InitializeAsync()
     {
-        await Task.CompletedTask; // No initialization needed for in-memory store
+        using var scope = serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IdentityPrvdContext>();
+        var tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
+        var activeSessions = await dbContext.Sessions.AsNoTracking().Where(s => s.Status == SessionStatus.Active).ToListAsync();
+
+        foreach (var session in activeSessions)
+        {
+            _activeSessions.Add(new SessionInfo
+            {
+                SessionId = session.Id.GetIdAsString(),
+                UserId = session.UserId.GetIdAsString(),
+                CreatedAt = session.CreatedAt,
+                Permissions = await tokenService.GetUserPermissionsAsync(session.UserId, session.App.Id.GetIdAsString()),
+                SessionExpire = session.ExpireAt,
+            });
+        }
     }
 
     public async Task<IList<SessionInfo>> GetUserSessionsAsync(string userId)

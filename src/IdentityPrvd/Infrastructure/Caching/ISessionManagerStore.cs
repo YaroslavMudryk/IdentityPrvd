@@ -2,7 +2,7 @@
 
 namespace IdentityPrvd.Infrastructure.Caching;
 
-public interface ISessionStore
+public interface ISessionManagerStore
 {
     Task InitializeAsync();
     Task<SessionInfo> GetSessionAsync(string sessionId);

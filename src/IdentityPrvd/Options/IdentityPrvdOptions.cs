@@ -179,9 +179,9 @@ public class SessionConfiguration
     /// <summary>
     /// Add custom session store
     /// </summary>
-    public SessionConfiguration AddCustomStore<TSessionStore>() where TSessionStore : class, Infrastructure.Caching.ISessionStore
+    public SessionConfiguration AddCustomStore<TSessionStore>() where TSessionStore : class, Infrastructure.Caching.ISessionManagerStore
     {
-        _sessionStore = new ServiceDescriptor(typeof(Infrastructure.Caching.ISessionStore), typeof(TSessionStore), ServiceLifetime.Scoped);
+        _sessionStore = new ServiceDescriptor(typeof(Infrastructure.Caching.ISessionManagerStore), typeof(TSessionStore), ServiceLifetime.Scoped);
         return this;
     }
 
@@ -202,7 +202,7 @@ public class SessionConfiguration
     public SessionConfiguration UseRedisSessions()
     {
         _sessionManager = new ServiceDescriptor(typeof(ISessionManager), typeof(SessionManager), ServiceLifetime.Scoped);
-        _sessionStore = new ServiceDescriptor(typeof(Infrastructure.Caching.ISessionStore), typeof(RedisSessionStore), ServiceLifetime.Scoped);
+        _sessionStore = new ServiceDescriptor(typeof(Infrastructure.Caching.ISessionManagerStore), typeof(RedisSessionManagerStore), ServiceLifetime.Scoped);
         return this;
     }
 
@@ -212,7 +212,7 @@ public class SessionConfiguration
     public SessionConfiguration UseInMemorySessions()
     {
         _sessionManager = new ServiceDescriptor(typeof(ISessionManager), typeof(SessionManager), ServiceLifetime.Scoped);
-        _sessionStore = new ServiceDescriptor(typeof(Infrastructure.Caching.ISessionStore), typeof(InMemorySessionStore), ServiceLifetime.Scoped);
+        _sessionStore = new ServiceDescriptor(typeof(Infrastructure.Caching.ISessionManagerStore), typeof(InMemorySessionManagerStore), ServiceLifetime.Scoped);
         return this;
     }
 
@@ -235,7 +235,7 @@ public class SessionConfiguration
         }
         else
         {
-            services.AddScoped<Infrastructure.Caching.ISessionStore, RedisSessionStore>();
+            services.AddScoped<Infrastructure.Caching.ISessionManagerStore, RedisSessionManagerStore>();
         }
 
         // Always register middleware

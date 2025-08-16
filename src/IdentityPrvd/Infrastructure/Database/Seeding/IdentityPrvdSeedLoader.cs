@@ -16,7 +16,7 @@ public static class IdentityPrvdSeedLoader
         using var scope = serviceProvider.CreateScope();
         var utcNow = scope.ServiceProvider.GetRequiredService<TimeProvider>().GetUtcNow().UtcDateTime;
         var dbContext = scope.ServiceProvider.GetRequiredService<IdentityPrvdContext>();
-        var sessionStore = scope.ServiceProvider.GetRequiredService<ISessionStore>();
+        var sessionStore = scope.ServiceProvider.GetRequiredService<ISessionManagerStore>();
         var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();
         var currentContext = scope.ServiceProvider.GetRequiredService<ICurrentContext>();
         var hasher = scope.ServiceProvider.GetRequiredService<IHasher>();

@@ -52,7 +52,7 @@ public static class IdentityPrvdServiceCollectionExtensions
             .AddContexts()
             .AddEndpoints()
             .AddProtectionServices()
-            .AddSessionServices()
+            .AddRedisSessionServices()
             .AddEfTransaction()
             .AddEfStores()
             .AddEfQueries()
