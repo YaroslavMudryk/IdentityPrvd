@@ -35,8 +35,10 @@ using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Tokens;
 using Redis.OM;
 using Redis.OM.Contracts;
+using System.Text;
 
 namespace IdentityPrvd.DependencyInjection;
 
@@ -47,6 +49,36 @@ public static class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddEndpoints();
 
         return builder;
+    }
+
+    public static IIdentityPrvdAuthBuilder AddAuthentication(this IIdentityPrvdBuilder builder)
+    {
+        var services = builder.Services;
+        var options = builder.Option;
+
+        var authBuilder = services.AddAuthentication();
+        authBuilder
+            .AddCookie("cookie")
+            .AddJwtBearer(jwt =>
+            {
+                jwt.RequireHttpsMetadata = false;
+                jwt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateIssuer = true,
+                    ValidIssuer = options.Token.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = options.Token.Audience,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.Token.SecretKey!)),
+                    ValidateIssuerSigningKey = true,
+                };
+                jwt.SaveToken = true;
+            });
+
+        services.AddAuthorization();
+
+        return new IdentityPrvdAuthBuilder(builder.Services, authBuilder);
     }
 
     public static IIdentityPrvdBuilder AddCoreServices(this IIdentityPrvdBuilder builder)

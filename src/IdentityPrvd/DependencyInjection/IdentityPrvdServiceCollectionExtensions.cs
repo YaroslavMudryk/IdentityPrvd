@@ -45,6 +45,7 @@ public static class IdentityPrvdServiceCollectionExtensions
         builder
             .AddCoreServices()
             .AddRequiredServices()
+            .AddAuthentication()
             .AddFakeEmailNotifier()
             .AddFakeSmsNotifier()
             .AddIpApiLocationService()
