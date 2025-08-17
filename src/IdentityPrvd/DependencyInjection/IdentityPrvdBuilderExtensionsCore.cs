@@ -51,7 +51,7 @@ public static class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdAuthBuilder AddAuthentication(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder AddAuthentication(this IIdentityPrvdBuilder builder)
     {
         var services = builder.Services;
         var options = builder.Option;
@@ -78,7 +78,7 @@ public static class IdentityPrvdBuilderExtensionsCore
 
         services.AddAuthorization();
 
-        return new IdentityPrvdAuthBuilder(builder.Services, authBuilder);
+        return builder;
     }
 
     public static IIdentityPrvdBuilder AddCoreServices(this IIdentityPrvdBuilder builder)
