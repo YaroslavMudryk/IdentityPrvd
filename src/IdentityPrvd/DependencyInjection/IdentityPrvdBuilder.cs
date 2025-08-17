@@ -15,5 +15,5 @@ public class IdentityPrvdBuilder(IServiceCollection services) : IIdentityPrvdBui
 {
     public IServiceCollection Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
     public IConfiguration Configuration => Services.BuildServiceProvider().GetRequiredService<IConfiguration>();
-    public IdentityPrvdOptions Option { get; set; }
+    public IdentityPrvdOptions Option { get; set; } = new IdentityPrvdOptions();
 }

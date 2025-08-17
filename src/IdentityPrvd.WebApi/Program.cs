@@ -11,9 +11,9 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddIdentityPrvd(builder.Configuration, options =>
+        builder.Services.AddIdentityPrvd(builder.Configuration, builder =>
         {
-            options.User.ConfirmCodeValidInMinutes = 10;
+            builder.Option.User.ConfirmCodeValidInMinutes = 10;
         });
 
         var app = builder.Build();

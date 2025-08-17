@@ -8,39 +8,40 @@ public static class IdentityPrvdServiceCollectionExtensions
 {
     public static IIdentityPrvdBuilder AddIdentityPrvdBuilder(this IServiceCollection services) => new IdentityPrvdBuilder(services);
 
-    public static IIdentityPrvdBuilder AddIdentityPrvd(this IServiceCollection services)
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services)
     {
-        var identityOptions = new IdentityPrvdOptions();        
-        return services.AddIdentityPrvd(identityOptions);
+        var builder = new IdentityPrvdBuilder(services);
+        return services.AddIdentityPrvd(builder);
     }
 
-    public static IIdentityPrvdBuilder AddIdentityPrvd(this IServiceCollection services, Action<IdentityPrvdOptions> setupAction)
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, Action<IdentityPrvdBuilder> builder)
     {
-        var identityOptions = new IdentityPrvdOptions();
-        setupAction.Invoke(identityOptions);
-        return services.AddIdentityPrvd(identityOptions);
+        var identityBuilder = new IdentityPrvdBuilder(services);
+        builder.Invoke(identityBuilder);
+        return services.AddIdentityPrvd(identityBuilder);
     }
 
-    public static IIdentityPrvdBuilder AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<IdentityPrvdOptions>(configuration);
-        return services.AddIdentityPrvd();
-    }
-
-    public static IIdentityPrvdBuilder AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration, Action<IdentityPrvdOptions> setupAction)
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration)
     {
         var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
-        setupAction.Invoke(identityOptions);
-        return services.AddIdentityPrvd(identityOptions);
+        var builder = new IdentityPrvdBuilder(services)
+        {
+            Option = identityOptions
+        };
+        return services.AddIdentityPrvd(builder);
     }
 
-    public static IIdentityPrvdBuilder AddIdentityPrvd(this IServiceCollection services, IdentityPrvdOptions identityOptions)
+    public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration, Action<IdentityPrvdBuilder> builder)
     {
-        identityOptions.ValidateAndThrowIfNeeded();
-        services.AddScoped(_ => identityOptions);
+        var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
+        var identityBuilder = new IdentityPrvdBuilder(services);
+        builder.Invoke(identityBuilder);
+        return services.AddIdentityPrvd(identityBuilder);
+    }
 
-        var builder = services.AddIdentityPrvdBuilder();
-        builder.Option = identityOptions;
+    private static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IdentityPrvdBuilder builder)
+    {
+        services.AddScoped(_ => builder.Option);
 
         builder
             .AddCoreServices()
@@ -48,17 +49,18 @@ public static class IdentityPrvdServiceCollectionExtensions
             .AddAuthentication()
             .AddFakeEmailNotifier()
             .AddFakeSmsNotifier()
-            .AddIpApiLocationService()
+            .AddFakeLocationService()
             .AddMiddlewares()
             .AddContexts()
             .AddEndpoints()
             .AddProtectionServices()
-            .AddRedisSessionServices()
+            .AddRedisSessionManagerStore()
+            .AddSessionServices()
             .AddEfTransaction()
             .AddEfStores()
             .AddEfQueries()
-            .AddDbContext();
+            .AddDefaultDbContext();
 
-        return builder;
+        return services;
     }
 }
