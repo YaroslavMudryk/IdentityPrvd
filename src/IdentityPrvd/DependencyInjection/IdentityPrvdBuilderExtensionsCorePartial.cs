@@ -6,6 +6,7 @@ using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Extensions;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
+using IdentityPrvd.Services.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,32 +36,42 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddSessionManagerStore<TSessionManagerStore>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TSessionManagerStore : class, ISessionManagerStore
+    public static IIdentityPrvdBuilder UseSessionManagerStore<TSessionManagerStore>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TSessionManagerStore : class, ISessionManagerStore
     {
         return AddService<ISessionManagerStore, TSessionManagerStore>(builder, lifetime);
     }
 
-    public static IIdentityPrvdBuilder AddSmsNotifier<TSmsNotifier>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TSmsNotifier : class, ISmsService
+    public static IIdentityPrvdBuilder UseSmsNotifier<TSmsNotifier>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TSmsNotifier : class, ISmsService
     {
         return AddService<ISmsService, TSmsNotifier>(builder, lifetime);
     }
 
-    public static IIdentityPrvdBuilder AddEmailNotifier<TEmailNotifier>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TEmailNotifier : class, IEmailService
+    public static IIdentityPrvdBuilder UseEmailNotifier<TEmailNotifier>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TEmailNotifier : class, IEmailService
     {
         return AddService<IEmailService, TEmailNotifier>(builder, lifetime);
     }
 
-    public static IIdentityPrvdBuilder AddLocationService<TLocationService>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TLocationService : class, ILocationService
+    public static IIdentityPrvdBuilder UseLocationService<TLocationService>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TLocationService : class, ILocationService
     {
         return AddService<ILocationService, TLocationService>(builder, lifetime);
     }
 
-    public static IIdentityPrvdBuilder AddTransaction<TTransactionManager>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TTransactionManager : class, ITransactionManager
+    public static IIdentityPrvdBuilder UseProtectionService<TProtectionService>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TProtectionService : class, IProtectionService
+    {
+        return AddService<IProtectionService, TProtectionService>(builder, lifetime);
+    }
+
+    public static IIdentityPrvdBuilder UseHasher<THasher>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where THasher : class, IHasher
+    {
+        return AddService<IHasher, THasher>(builder, lifetime);
+    }
+
+    public static IIdentityPrvdBuilder UseTransaction<TTransactionManager>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TTransactionManager : class, ITransactionManager
     {
         return AddService<ITransactionManager, TTransactionManager>(builder, lifetime);
     }
 
-    public static IIdentityPrvdBuilder AddStores<
+    public static IIdentityPrvdBuilder UseStores<
         TBanStore,
         TClaimStore,
         TClientClaimStore,
@@ -125,7 +136,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddQueries<
+    public static IIdentityPrvdBuilder UseQueries<
         TBansQuery,
         TClaimsQuery,
         TClientClaimsQuery,
@@ -190,15 +201,15 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddDbContext<DbContext>(this IIdentityPrvdBuilder builder, string connectionString) where DbContext : IdentityPrvdContext
+    public static IIdentityPrvdBuilder UseDbContext<DbContext>(this IIdentityPrvdBuilder builder, string connectionString) where DbContext : IdentityPrvdContext
     {
-        return AddDbContext<DbContext>(builder, options =>
+        return UseDbContext<DbContext>(builder, options =>
         {
             options.AutoConfigureDbContext(connectionString);
         });
     }
 
-    public static IIdentityPrvdBuilder AddDbContext<DbContext>(this IIdentityPrvdBuilder builder, Action<DbContextOptionsBuilder> optionsAction) where DbContext : IdentityPrvdContext
+    public static IIdentityPrvdBuilder UseDbContext<DbContext>(this IIdentityPrvdBuilder builder, Action<DbContextOptionsBuilder> optionsAction) where DbContext : IdentityPrvdContext
     {
         builder.Services.AddDbContext<DbContext>(optionsAction);
         return builder;

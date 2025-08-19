@@ -13,7 +13,12 @@ public class Program
 
         builder.Services.AddIdentityPrvd(builder.Configuration, builder =>
         {
-            builder.Option.User.ConfirmCodeValidInMinutes = 10;
+            builder.Options.User.ConfirmCodeValidInMinutes = 10;
+            builder
+                .UseSha512Hasher()
+                .UseAesProtectionService()
+                .UseRedisSessionManagerStore()
+                .UseIpApiLocationService();
         });
 
         var app = builder.Build();

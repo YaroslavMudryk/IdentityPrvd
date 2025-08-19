@@ -30,6 +30,7 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
@@ -41,16 +42,16 @@ namespace IdentityPrvd.DependencyInjection;
 
 public static partial class IdentityPrvdBuilderExtensionsCore
 {
-    public static IIdentityPrvdBuilder AddEndpoints(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddEndpoints(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddEndpoints();
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddAuthentication(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddAuthentication(this IIdentityPrvdBuilder builder)
     {
         var services = builder.Services;
-        var options = builder.Option;
+        var options = builder.Options;
 
         var authBuilder = services.AddAuthentication();
         authBuilder
@@ -73,11 +74,12 @@ public static partial class IdentityPrvdBuilderExtensionsCore
             });
 
         services.AddAuthorization();
+        services.AddScoped<ExternalProviderManager>();
 
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddCoreServices(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddCoreServices(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddSignupDependencies();
         builder.Services.AddSigninDependencies();
@@ -100,53 +102,40 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddRequiredServices(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddRequiredServices(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<UserHelper>();
         builder.Services.TryAddSingleton(TimeProvider.System);
         builder.Services.AddScoped<IAuthSchemes, DefaultAuthSchemes>();
-        return builder;
-    }
-
-    public static IIdentityPrvdBuilder AddProtectionServices(this IIdentityPrvdBuilder builder)
-    {
-        builder.Services.AddScoped<IProtectionService, AesProtectionService>();
         builder.Services.AddScoped<IMfaService, TotpMfaService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
-        builder.Services.AddScoped<IHasher, Sha512Hasher>();
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddInMemorySessionManagerStore(this IIdentityPrvdBuilder builder)
-    {
-        return AddSessionManagerStore<InMemorySessionManagerStore>(builder);
-    }
-
-    public static IIdentityPrvdBuilder AddRedisSessionManagerStore(this IIdentityPrvdBuilder builder)
-    {
-        builder.Services.AddScoped<IRedisConnectionProvider>(provider =>
-        {
-            return new RedisConnectionProvider(builder.Option.Connections.Redis);
-        });
-        return AddSessionManagerStore<RedisSessionManagerStore>(builder);
-    }
-
-    public static IIdentityPrvdBuilder AddSessionServices(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddSessionServices(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddScoped<ISessionManager, SessionManager>();
         builder.Services.AddTransient<ServerSideSessionMiddleware>();
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddContexts(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddContexts(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddScoped<IUserContext, UserContext>();
         builder.Services.AddScoped<ICurrentContext, CurrentContext>();
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddMiddlewares(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddDefaultDbContext(this IIdentityPrvdBuilder builder)
+    {
+        return UseDbContext<IdentityPrvdContext>(builder, options =>
+        {
+            options.UseNpgsql(builder.Options.Connections.Db);
+        });
+    }
+
+    internal static IIdentityPrvdBuilder AddMiddlewares(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddTransient<CorrelationContextMiddleware>();
         builder.Services.AddTransient<ServerSideSessionMiddleware>();
@@ -154,38 +143,72 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdBuilder AddFakeSmsNotifier(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder UseFakeProtectionService(this IIdentityPrvdBuilder builder)
     {
-        return AddSmsNotifier<FakeSmsService>(builder);
+        return UseProtectionService<FakeProtectionService>(builder);
     }
 
-    public static IIdentityPrvdBuilder AddFakeEmailNotifier(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder UseAesProtectionService(this IIdentityPrvdBuilder builder)
     {
-        return AddEmailNotifier<FakeEmailService>(builder);
+        return UseProtectionService<AesProtectionService>(builder);
     }
 
-    public static IIdentityPrvdBuilder AddFakeLocationService(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder UseFakeHasher(this IIdentityPrvdBuilder builder)
     {
-        return AddLocationService<FakeLocationService>(builder);
+        return UseHasher<FakeHasher>(builder);
     }
 
-    public static IIdentityPrvdBuilder AddIpApiLocationService(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder UseSha512Hasher(this IIdentityPrvdBuilder builder)
+    {
+        return UseHasher<Sha512Hasher>(builder);
+    }
+
+    public static IIdentityPrvdBuilder UseInMemorySessionManagerStore(this IIdentityPrvdBuilder builder)
+    {
+        return UseSessionManagerStore<InMemorySessionManagerStore>(builder);
+    }
+
+    public static IIdentityPrvdBuilder UseRedisSessionManagerStore(this IIdentityPrvdBuilder builder)
+    {
+        builder.Services.AddScoped<IRedisConnectionProvider>(provider =>
+        {
+            return new RedisConnectionProvider(builder.Options.Connections.Redis);
+        });
+        return UseSessionManagerStore<RedisSessionManagerStore>(builder);
+    }
+
+    public static IIdentityPrvdBuilder UseFakeSmsNotifier(this IIdentityPrvdBuilder builder)
+    {
+        return UseSmsNotifier<FakeSmsService>(builder);
+    }
+
+    public static IIdentityPrvdBuilder UseFakeEmailNotifier(this IIdentityPrvdBuilder builder)
+    {
+        return UseEmailNotifier<FakeEmailService>(builder);
+    }
+
+    public static IIdentityPrvdBuilder UseFakeLocationService(this IIdentityPrvdBuilder builder)
+    {
+        return UseLocationService<FakeLocationService>(builder);
+    }
+
+    public static IIdentityPrvdBuilder UseIpApiLocationService(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddHttpClient<IpApiLocationService>(options =>
         {
             options.BaseAddress = new Uri("http://ip-api.com");
         });
-        return AddLocationService<IpApiLocationService>(builder);
+        return UseLocationService<IpApiLocationService>(builder);
     }
 
-    public static IIdentityPrvdBuilder AddEfTransaction(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder UseEfTransaction(this IIdentityPrvdBuilder builder)
     {
-        return AddTransaction<EfCoreTransactionManager>(builder);
+        return UseTransaction<EfCoreTransactionManager>(builder);
     }
 
-    public static IIdentityPrvdBuilder AddEfStores(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder UseEfStores(this IIdentityPrvdBuilder builder)
     {
-        return AddStores<
+        return UseStores<
             EfBanStore,
             EfClaimStore,
             EfClientClaimStore,
@@ -208,9 +231,9 @@ public static partial class IdentityPrvdBuilderExtensionsCore
             EfUserStore>(builder);
     }
 
-    public static IIdentityPrvdBuilder AddEfQueries(this IIdentityPrvdBuilder builder)
+    public static IIdentityPrvdBuilder UseEfQueries(this IIdentityPrvdBuilder builder)
     {
-        return AddQueries<EfBansQuery,
+        return UseQueries<EfBansQuery,
             EfClaimsQuery,
             EfClientClaimsQuery,
             EfClientSecretsQuery,
@@ -230,10 +253,5 @@ public static partial class IdentityPrvdBuilderExtensionsCore
             EfUserLoginsQuery,
             EfUserRolesQuery,
             EfUsersQuery>(builder);
-    }
-
-    public static IIdentityPrvdBuilder AddDefaultDbContext(this IIdentityPrvdBuilder builder)
-    {
-        return AddDbContext<IdentityPrvdContext>(builder, builder.Option.Connections.Db);
     }
 }

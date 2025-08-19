@@ -11,14 +11,14 @@ public static class IdentityPrvdServiceCollectionExtensions
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services)
     {
         var builder = new IdentityPrvdBuilder(services);
-        return services.AddIdentityPrvd(builder);
+        return services;
     }
 
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, Action<IdentityPrvdBuilder> builder)
     {
         var identityBuilder = new IdentityPrvdBuilder(services);
         builder.Invoke(identityBuilder);
-        return services.AddIdentityPrvd(identityBuilder);
+        return services;
     }
 
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration)
@@ -26,41 +26,16 @@ public static class IdentityPrvdServiceCollectionExtensions
         var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
         var builder = new IdentityPrvdBuilder(services)
         {
-            Option = identityOptions
+            Options = identityOptions
         };
-        return services.AddIdentityPrvd(builder);
+        return services;
     }
 
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration, Action<IdentityPrvdBuilder> builder)
     {
         var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
-        var identityBuilder = new IdentityPrvdBuilder(services);
+        var identityBuilder = new IdentityPrvdBuilder(services, identityOptions);
         builder.Invoke(identityBuilder);
-        return services.AddIdentityPrvd(identityBuilder);
-    }
-
-    private static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IdentityPrvdBuilder builder)
-    {
-        services.AddScoped(_ => builder.Option);
-
-        builder
-            .AddCoreServices()
-            .AddRequiredServices()
-            .AddAuthentication()
-            .AddFakeEmailNotifier()
-            .AddFakeSmsNotifier()
-            .AddFakeLocationService()
-            .AddMiddlewares()
-            .AddContexts()
-            .AddEndpoints()
-            .AddProtectionServices()
-            .AddRedisSessionManagerStore()
-            .AddSessionServices()
-            .AddEfTransaction()
-            .AddEfStores()
-            .AddEfQueries()
-            .AddDefaultDbContext();
-
         return services;
     }
 }
