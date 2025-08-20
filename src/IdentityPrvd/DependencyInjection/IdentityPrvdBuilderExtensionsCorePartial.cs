@@ -3,7 +3,6 @@ using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
-using IdentityPrvd.Infrastructure.Database.Extensions;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
@@ -201,17 +200,92 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    public static IIdentityPrvdBuilder UseDbContext<DbContext>(this IIdentityPrvdBuilder builder, string connectionString) where DbContext : IdentityPrvdContext
-    {
-        return UseDbContext<DbContext>(builder, options =>
-        {
-            options.AutoConfigureDbContext(connectionString);
-        });
-    }
-
     public static IIdentityPrvdBuilder UseDbContext<DbContext>(this IIdentityPrvdBuilder builder, Action<DbContextOptionsBuilder> optionsAction) where DbContext : IdentityPrvdContext
     {
         builder.Services.AddDbContext<DbContext>(optionsAction);
+        return builder;
+    }
+
+    public static IIdentityPrvdBuilder UseExternalProviders(this IIdentityPrvdBuilder builder)
+    {
+        var identityOptions = builder.Options;
+        var authBuilder = builder.AuthenticationBuilder;
+
+        if (identityOptions.ExternalProviders.TryGetValue("Google", out var googleOptions))
+        {
+            authBuilder.AddGoogle(options =>
+            {
+                options.ClientId = googleOptions.ClientId;
+                options.ClientSecret = googleOptions.ClientSecret;
+                options.CallbackPath = "/signin-google";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+
+        if (identityOptions.ExternalProviders.TryGetValue("Microsoft", out var microsoftOptions))
+        {
+            authBuilder.AddMicrosoftAccount(options =>
+            {
+                options.ClientId = microsoftOptions.ClientId;
+                options.ClientSecret = microsoftOptions.ClientSecret;
+                options.CallbackPath = "/signin-microsoft";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+
+        if (identityOptions.ExternalProviders.TryGetValue("GitHub", out var githubOptions))
+        {
+            authBuilder.AddGitHub(options =>
+            {
+                options.ClientId = githubOptions.ClientId;
+                options.ClientSecret = githubOptions.ClientSecret;
+                options.CallbackPath = "/signin-github";
+                options.SignInScheme = "cookie";
+                options.Scope.Add("read:user");
+                options.Scope.Add("user:email");
+                options.SaveTokens = true;
+            });
+        }
+
+        if (identityOptions.ExternalProviders.TryGetValue("Facebook", out var facebookOptions))
+        {
+            authBuilder.AddFacebook(options =>
+            {
+                options.ClientId = facebookOptions.ClientId;
+                options.ClientSecret = facebookOptions.ClientSecret;
+                options.CallbackPath = "/signin-facebook";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+
+        if (identityOptions.ExternalProviders.TryGetValue("Twitter", out var twitterOptions))
+        {
+            authBuilder.AddTwitter(options =>
+            {
+                options.ClientId = twitterOptions.ClientId;
+                options.ClientSecret = twitterOptions.ClientSecret;
+                options.CallbackPath = "/signin-twitter";
+                options.SignInScheme = "cookie";
+                options.Scope.Add("users.read");
+                options.Scope.Add("users.email");
+                options.SaveTokens = true;
+            });
+        }
+
+        if (identityOptions.ExternalProviders.TryGetValue("Steam", out var steamOptions))
+        {
+            authBuilder.AddSteam(options =>
+            {
+                options.ApplicationKey = steamOptions.ClientId;
+                options.CallbackPath = "/signin-steam";
+                options.SignInScheme = "cookie";
+                options.SaveTokens = true;
+            });
+        }
+
         return builder;
     }
 }

@@ -1,5 +1,7 @@
 using IdentityPrvd.DependencyInjection;
+using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Seeding;
+using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.WebApi;
 
@@ -17,8 +19,13 @@ public class Program
             builder
                 .UseSha512Hasher()
                 .UseAesProtectionService()
+                .UseIpApiLocationService()
+                .UseExternalProviders()
                 .UseRedisSessionManagerStore()
-                .UseIpApiLocationService();
+                .UseDbContext<IdentityPrvdContext>(options =>
+                {
+                    options.UseNpgsql(builder.Options.Connections.Db);
+                });
         });
 
         var app = builder.Build();

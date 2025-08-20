@@ -3,25 +3,17 @@ using Microsoft.AspNetCore.Http;
 
 namespace IdentityPrvd.Services.AuthSchemes;
 
-public class ExternalProviderManager
+public class ExternalProviderManager(IAuthSchemes authSchemes)
 {
-    private readonly Dictionary<string, string> _schemeMappings = new Dictionary<string, string>
-    {
-        ["Google"] = "Google",
-        ["Microsoft"] = "Microsoft",
-        ["GitHub"] = "GitHub",
-        ["Facebook"] = "Facebook",
-        ["Twitter"] = "Twitter",
-        ["Steam"] = "Steam"
-    };
-
     public async Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string provider)
     {
-        if (!_schemeMappings.TryGetValue(provider, out var scheme))
+        var schemeMappings = await authSchemes.GetAvailableSchemesAsync();
+
+        if (!schemeMappings.Any(s => s.Provider.Equals(provider, StringComparison.CurrentCultureIgnoreCase)))
         {
             throw new ArgumentException($"Unsupported provider: {provider}");
         }
 
-        return await context.AuthenticateAsync(scheme);
+        return await context.AuthenticateAsync(provider);
     }
 }

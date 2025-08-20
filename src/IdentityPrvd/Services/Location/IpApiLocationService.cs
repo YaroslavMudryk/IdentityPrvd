@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace IdentityPrvd.Services.Location;
 
-public class IpApiLocationService(HttpClient httpClient) : ILocationService
+public class IpApiLocationService(IHttpClientFactory factory) : ILocationService
 {
     public async Task<LocationInfo> GetIpInfoAsync(string ip)
     {
@@ -29,6 +29,7 @@ public class IpApiLocationService(HttpClient httpClient) : ILocationService
                 else
                     urlRequest += $"/{ip}?fields=63700991";
             }
+            var httpClient = factory.CreateClient("IpApiLocation");
             var resultFromApi = await httpClient.GetAsync(urlRequest);
             if (!resultFromApi.IsSuccessStatusCode)
                 return location!;

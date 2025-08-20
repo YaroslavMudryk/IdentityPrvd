@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Endpoints;
 using IdentityPrvd.Features.Authentication.LinkExternalSignin.Services;
+using IdentityPrvd.Options;
 using IdentityPrvd.Services.AuthSchemes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -102,8 +103,7 @@ public class DefaultReturnUriEndpoint : IEndpoint
                 {
                     if (!string.IsNullOrEmpty(accessToken))
                     {
-                        context.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues($"Bearer {accessToken}");
-                        var principal = JwtPrincipalFactory.CreatePrincipalFromJwt(accessToken, context.RequestServices.GetService<IConfiguration>())
+                        var principal = JwtPrincipalFactory.CreatePrincipalFromJwt(accessToken, context.RequestServices.GetService<IdentityPrvdOptions>())
                         ?? throw new UnauthorizedException("Authentication failed");
 
                         context.User = principal;

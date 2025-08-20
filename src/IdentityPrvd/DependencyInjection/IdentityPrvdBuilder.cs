@@ -1,4 +1,6 @@
 ﻿using IdentityPrvd.Options;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,12 +11,17 @@ public interface IIdentityPrvdBuilder
     IServiceCollection Services { get; }
     IConfiguration Configuration { get; }
     IdentityPrvdOptions Options { get; set; }
+    AuthenticationBuilder AuthenticationBuilder { get; }
 }
 
 public class IdentityPrvdBuilder(IServiceCollection services) : IIdentityPrvdBuilder
 {
     public IdentityPrvdBuilder(IServiceCollection services, IdentityPrvdOptions options) : this(services)
     {
+        services.AddScoped(_ => options);
+        Options = options ?? throw new ArgumentNullException(nameof(options));
+        AuthenticationBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+
         this.AddCoreServices()
             .AddRequiredServices()
             .AddAuthentication()
@@ -32,12 +39,10 @@ public class IdentityPrvdBuilder(IServiceCollection services) : IIdentityPrvdBui
             .UseFakeEmailNotifier()
             .UseFakeSmsNotifier()
             .UseFakeLocationService();
-
-        services.AddScoped(_ => options);
-        Options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
     public IServiceCollection Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
     public IConfiguration Configuration => Services.BuildServiceProvider().GetRequiredService<IConfiguration>();
     public IdentityPrvdOptions Options { get; set; } = new IdentityPrvdOptions();
+    public AuthenticationBuilder AuthenticationBuilder { get; }
 }

@@ -30,6 +30,7 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -52,9 +53,9 @@ public static partial class IdentityPrvdBuilderExtensionsCore
     {
         var services = builder.Services;
         var options = builder.Options;
+        services.AddAuthorization();
 
-        var authBuilder = services.AddAuthentication();
-        authBuilder
+        builder.AuthenticationBuilder
             .AddCookie("cookie")
             .AddJwtBearer(jwt =>
             {
@@ -73,9 +74,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
                 jwt.SaveToken = true;
             });
 
-        services.AddAuthorization();
         services.AddScoped<ExternalProviderManager>();
-
         return builder;
     }
 
@@ -170,9 +169,16 @@ public static partial class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder UseRedisSessionManagerStore(this IIdentityPrvdBuilder builder)
     {
+        return UseRedisSessionManagerStore(builder, builder.Options.Connections.Redis);
+    }
+
+    public static IIdentityPrvdBuilder UseRedisSessionManagerStore(this IIdentityPrvdBuilder builder, string redisConnection)
+    {
+        ArgumentNullException.ThrowIfNull(redisConnection);
+
         builder.Services.AddScoped<IRedisConnectionProvider>(provider =>
         {
-            return new RedisConnectionProvider(builder.Options.Connections.Redis);
+            return new RedisConnectionProvider(redisConnection);
         });
         return UseSessionManagerStore<RedisSessionManagerStore>(builder);
     }
@@ -194,9 +200,9 @@ public static partial class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder UseIpApiLocationService(this IIdentityPrvdBuilder builder)
     {
-        builder.Services.AddHttpClient<IpApiLocationService>(options =>
+        builder.Services.AddHttpClient("IpApiLocation", options =>
         {
-            options.BaseAddress = new Uri("http://ip-api.com");
+            options.BaseAddress = new Uri("http://ip-api.com/");
         });
         return UseLocationService<IpApiLocationService>(builder);
     }

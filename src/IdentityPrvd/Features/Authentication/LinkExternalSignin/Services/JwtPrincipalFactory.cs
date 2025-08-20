@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IdentityPrvd.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -8,13 +9,12 @@ namespace IdentityPrvd.Features.Authentication.LinkExternalSignin.Services;
 
 public class JwtPrincipalFactory
 {
-    public static ClaimsPrincipal CreatePrincipalFromJwt(string jwtToken, IConfiguration configuration)
+    public static ClaimsPrincipal CreatePrincipalFromJwt(string jwtToken, IdentityPrvdOptions options)
     {
-        var config = configuration.GetSection("IdentityPrvd");
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(config["Token:SecretKey"]!);
-        var issuer = config["Token:Issuer"];
-        var audience = config["Token:Audience"];
+        var key = Encoding.ASCII.GetBytes(options.Token.SecretKey!);
+        var issuer = options.Token.Issuer;
+        var audience = options.Token.Audience;
 
         var tokenValidationParameters = new TokenValidationParameters
         {
