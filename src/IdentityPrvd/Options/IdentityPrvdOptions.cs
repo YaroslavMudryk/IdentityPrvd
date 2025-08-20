@@ -1193,6 +1193,30 @@ public class ExternalProvidersConfiguration
         return this;
     }
 
+    // Parameterless overloads to allow fluent provider enabling when credentials are configured via appsettings
+    public ExternalProvidersConfiguration AddGoogle()
+    {
+        if (!_options.ExternalProviders.TryGetValue("Google", out var existing))
+        {
+            _options.ExternalProviders["Google"] = new ExternalProviderOptions
+            {
+                IsAvailable = true,
+                ClientId = string.Empty,
+                ClientSecret = string.Empty,
+                CallbackPath = "/signin-google",
+                AuthenticationScheme = "Google",
+                Icon = "google-icon"
+            };
+        }
+        else
+        {
+            existing.IsAvailable = true;
+            existing.CallbackPath = string.IsNullOrWhiteSpace(existing.CallbackPath) ? "/signin-google" : existing.CallbackPath;
+            existing.AuthenticationScheme = string.IsNullOrWhiteSpace(existing.AuthenticationScheme) ? "Google" : existing.AuthenticationScheme;
+        }
+        return this;
+    }
+
     /// <summary>
     /// Add Microsoft provider
     /// </summary>
@@ -1207,6 +1231,29 @@ public class ExternalProvidersConfiguration
             AuthenticationScheme = "Microsoft",
             Icon = "microsoft-icon"
         };
+        return this;
+    }
+
+    public ExternalProvidersConfiguration AddMicrosoft()
+    {
+        if (!_options.ExternalProviders.TryGetValue("Microsoft", out var existing))
+        {
+            _options.ExternalProviders["Microsoft"] = new ExternalProviderOptions
+            {
+                IsAvailable = true,
+                ClientId = string.Empty,
+                ClientSecret = string.Empty,
+                CallbackPath = "/signin-microsoft",
+                AuthenticationScheme = "Microsoft",
+                Icon = "microsoft-icon"
+            };
+        }
+        else
+        {
+            existing.IsAvailable = true;
+            existing.CallbackPath = string.IsNullOrWhiteSpace(existing.CallbackPath) ? "/signin-microsoft" : existing.CallbackPath;
+            existing.AuthenticationScheme = string.IsNullOrWhiteSpace(existing.AuthenticationScheme) ? "Microsoft" : existing.AuthenticationScheme;
+        }
         return this;
     }
 
@@ -1228,6 +1275,34 @@ public class ExternalProvidersConfiguration
         return this;
     }
 
+    public ExternalProvidersConfiguration AddGitHub(IEnumerable<string>? scopes = null)
+    {
+        if (!_options.ExternalProviders.TryGetValue("GitHub", out var existing))
+        {
+            _options.ExternalProviders["GitHub"] = new ExternalProviderOptions
+            {
+                IsAvailable = true,
+                ClientId = string.Empty,
+                ClientSecret = string.Empty,
+                CallbackPath = "/signin-github",
+                AuthenticationScheme = "GitHub",
+                Icon = "github-icon",
+                Scopes = scopes?.ToList() ?? ["read:user", "user:email"]
+            };
+        }
+        else
+        {
+            existing.IsAvailable = true;
+            existing.CallbackPath = string.IsNullOrWhiteSpace(existing.CallbackPath) ? "/signin-github" : existing.CallbackPath;
+            existing.AuthenticationScheme = string.IsNullOrWhiteSpace(existing.AuthenticationScheme) ? "GitHub" : existing.AuthenticationScheme;
+            if (scopes != null)
+            {
+                existing.Scopes = scopes.ToList();
+            }
+        }
+        return this;
+    }
+
     /// <summary>
     /// Add Facebook provider
     /// </summary>
@@ -1242,6 +1317,29 @@ public class ExternalProvidersConfiguration
             AuthenticationScheme = "Facebook",
             Icon = "facebook-icon"
         };
+        return this;
+    }
+
+    public ExternalProvidersConfiguration AddFacebook()
+    {
+        if (!_options.ExternalProviders.TryGetValue("Facebook", out var existing))
+        {
+            _options.ExternalProviders["Facebook"] = new ExternalProviderOptions
+            {
+                IsAvailable = true,
+                ClientId = string.Empty,
+                ClientSecret = string.Empty,
+                CallbackPath = "/signin-facebook",
+                AuthenticationScheme = "Facebook",
+                Icon = "facebook-icon"
+            };
+        }
+        else
+        {
+            existing.IsAvailable = true;
+            existing.CallbackPath = string.IsNullOrWhiteSpace(existing.CallbackPath) ? "/signin-facebook" : existing.CallbackPath;
+            existing.AuthenticationScheme = string.IsNullOrWhiteSpace(existing.AuthenticationScheme) ? "Facebook" : existing.AuthenticationScheme;
+        }
         return this;
     }
 
@@ -1263,6 +1361,34 @@ public class ExternalProvidersConfiguration
         return this;
     }
 
+    public ExternalProvidersConfiguration AddTwitter(IEnumerable<string>? scopes = null)
+    {
+        if (!_options.ExternalProviders.TryGetValue("Twitter", out var existing))
+        {
+            _options.ExternalProviders["Twitter"] = new ExternalProviderOptions
+            {
+                IsAvailable = true,
+                ClientId = string.Empty,
+                ClientSecret = string.Empty,
+                CallbackPath = "/signin-twitter",
+                AuthenticationScheme = "Twitter",
+                Icon = "twitter-icon",
+                Scopes = scopes?.ToList() ?? ["tweet.read", "users.read"]
+            };
+        }
+        else
+        {
+            existing.IsAvailable = true;
+            existing.CallbackPath = string.IsNullOrWhiteSpace(existing.CallbackPath) ? "/signin-twitter" : existing.CallbackPath;
+            existing.AuthenticationScheme = string.IsNullOrWhiteSpace(existing.AuthenticationScheme) ? "Twitter" : existing.AuthenticationScheme;
+            if (scopes != null)
+            {
+                existing.Scopes = scopes.ToList();
+            }
+        }
+        return this;
+    }
+
     /// <summary>
     /// Add Steam provider
     /// </summary>
@@ -1277,6 +1403,29 @@ public class ExternalProvidersConfiguration
             AuthenticationScheme = "Steam",
             Icon = "steam-icon"
         };
+        return this;
+    }
+
+    public ExternalProvidersConfiguration AddSteam()
+    {
+        if (!_options.ExternalProviders.TryGetValue("Steam", out var existing))
+        {
+            _options.ExternalProviders["Steam"] = new ExternalProviderOptions
+            {
+                IsAvailable = true,
+                ClientId = string.Empty,
+                ClientSecret = string.Empty,
+                CallbackPath = "/signin-steam",
+                AuthenticationScheme = "Steam",
+                Icon = "steam-icon"
+            };
+        }
+        else
+        {
+            existing.IsAvailable = true;
+            existing.CallbackPath = string.IsNullOrWhiteSpace(existing.CallbackPath) ? "/signin-steam" : existing.CallbackPath;
+            existing.AuthenticationScheme = string.IsNullOrWhiteSpace(existing.AuthenticationScheme) ? "Steam" : existing.AuthenticationScheme;
+        }
         return this;
     }
 

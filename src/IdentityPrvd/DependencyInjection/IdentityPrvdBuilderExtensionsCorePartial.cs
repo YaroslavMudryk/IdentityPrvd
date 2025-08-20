@@ -3,6 +3,7 @@ using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
+using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
@@ -206,81 +207,113 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
+    public static IIdentityPrvdBuilder UseExternalProviders(this IIdentityPrvdBuilder builder, Action<IExternalProvidersBuilder> configure)
+    {
+        if (configure != null)
+        {
+            var providersBuilder = new ExternalProvidersBuilder(builder);
+            configure(providersBuilder);
+        }
+
+        // When using the fluent providers builder, assume explicit registration is done there
+        return builder;
+    }
+
     public static IIdentityPrvdBuilder UseExternalProviders(this IIdentityPrvdBuilder builder)
     {
         var identityOptions = builder.Options;
         var authBuilder = builder.AuthenticationBuilder;
 
-        if (identityOptions.ExternalProviders.TryGetValue("Google", out var googleOptions))
+        if (identityOptions.ExternalProviders.TryGetValue("Google", out var googleOptions) && (googleOptions?.IsAvailable ?? false))
         {
             authBuilder.AddGoogle(options =>
             {
                 options.ClientId = googleOptions.ClientId;
                 options.ClientSecret = googleOptions.ClientSecret;
-                options.CallbackPath = "/signin-google";
+                options.CallbackPath = string.IsNullOrWhiteSpace(googleOptions.CallbackPath) ? "/signin-google" : googleOptions.CallbackPath;
                 options.SignInScheme = "cookie";
                 options.SaveTokens = true;
             });
         }
 
-        if (identityOptions.ExternalProviders.TryGetValue("Microsoft", out var microsoftOptions))
+        if (identityOptions.ExternalProviders.TryGetValue("Microsoft", out var microsoftOptions) && (microsoftOptions?.IsAvailable ?? false))
         {
             authBuilder.AddMicrosoftAccount(options =>
             {
                 options.ClientId = microsoftOptions.ClientId;
                 options.ClientSecret = microsoftOptions.ClientSecret;
-                options.CallbackPath = "/signin-microsoft";
+                options.CallbackPath = string.IsNullOrWhiteSpace(microsoftOptions.CallbackPath) ? "/signin-microsoft" : microsoftOptions.CallbackPath;
                 options.SignInScheme = "cookie";
                 options.SaveTokens = true;
             });
         }
 
-        if (identityOptions.ExternalProviders.TryGetValue("GitHub", out var githubOptions))
+        if (identityOptions.ExternalProviders.TryGetValue("GitHub", out var githubOptions) && (githubOptions?.IsAvailable ?? false))
         {
             authBuilder.AddGitHub(options =>
             {
                 options.ClientId = githubOptions.ClientId;
                 options.ClientSecret = githubOptions.ClientSecret;
-                options.CallbackPath = "/signin-github";
+                options.CallbackPath = string.IsNullOrWhiteSpace(githubOptions.CallbackPath) ? "/signin-github" : githubOptions.CallbackPath;
                 options.SignInScheme = "cookie";
-                options.Scope.Add("read:user");
-                options.Scope.Add("user:email");
+                if (githubOptions.Scopes != null && githubOptions.Scopes.Count > 0)
+                {
+                    foreach (var scope in githubOptions.Scopes)
+                    {
+                        options.Scope.Add(scope);
+                    }
+                }
+                else
+                {
+                    options.Scope.Add("read:user");
+                    options.Scope.Add("user:email");
+                }
                 options.SaveTokens = true;
             });
         }
 
-        if (identityOptions.ExternalProviders.TryGetValue("Facebook", out var facebookOptions))
+        if (identityOptions.ExternalProviders.TryGetValue("Facebook", out var facebookOptions) && (facebookOptions?.IsAvailable ?? false))
         {
             authBuilder.AddFacebook(options =>
             {
                 options.ClientId = facebookOptions.ClientId;
                 options.ClientSecret = facebookOptions.ClientSecret;
-                options.CallbackPath = "/signin-facebook";
+                options.CallbackPath = string.IsNullOrWhiteSpace(facebookOptions.CallbackPath) ? "/signin-facebook" : facebookOptions.CallbackPath;
                 options.SignInScheme = "cookie";
                 options.SaveTokens = true;
             });
         }
 
-        if (identityOptions.ExternalProviders.TryGetValue("Twitter", out var twitterOptions))
+        if (identityOptions.ExternalProviders.TryGetValue("Twitter", out var twitterOptions) && (twitterOptions?.IsAvailable ?? false))
         {
             authBuilder.AddTwitter(options =>
             {
                 options.ClientId = twitterOptions.ClientId;
                 options.ClientSecret = twitterOptions.ClientSecret;
-                options.CallbackPath = "/signin-twitter";
+                options.CallbackPath = string.IsNullOrWhiteSpace(twitterOptions.CallbackPath) ? "/signin-twitter" : twitterOptions.CallbackPath;
                 options.SignInScheme = "cookie";
-                options.Scope.Add("users.read");
-                options.Scope.Add("users.email");
+                if (twitterOptions.Scopes != null && twitterOptions.Scopes.Count > 0)
+                {
+                    foreach (var scope in twitterOptions.Scopes)
+                    {
+                        options.Scope.Add(scope);
+                    }
+                }
+                else
+                {
+                    options.Scope.Add("users.read");
+                    options.Scope.Add("users.email");
+                }
                 options.SaveTokens = true;
             });
         }
 
-        if (identityOptions.ExternalProviders.TryGetValue("Steam", out var steamOptions))
+        if (identityOptions.ExternalProviders.TryGetValue("Steam", out var steamOptions) && (steamOptions?.IsAvailable ?? false))
         {
             authBuilder.AddSteam(options =>
             {
                 options.ApplicationKey = steamOptions.ClientId;
-                options.CallbackPath = "/signin-steam";
+                options.CallbackPath = string.IsNullOrWhiteSpace(steamOptions.CallbackPath) ? "/signin-steam" : steamOptions.CallbackPath;
                 options.SignInScheme = "cookie";
                 options.SaveTokens = true;
             });

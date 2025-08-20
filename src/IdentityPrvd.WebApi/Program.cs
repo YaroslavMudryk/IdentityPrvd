@@ -20,7 +20,12 @@ public class Program
                 .UseSha512Hasher()
                 .UseAesProtectionService()
                 .UseIpApiLocationService()
-                .UseExternalProviders()
+                .UseExternalProviders(providerBuidler =>
+                {
+                    providerBuidler
+                        .AddFacebook()
+                        .AddCustomProvider<SamsungProvider>();
+                })
                 .UseRedisSessionManagerStore()
                 .UseDbContext<IdentityPrvdContext>(options =>
                 {
