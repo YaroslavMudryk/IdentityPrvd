@@ -1,9 +1,10 @@
+using IdentityPrvd.DependencyInjection.Auth;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityPrvd.DependencyInjection;
+namespace IdentityPrvd.DependencyInjection.Auth;
 
 public static class AuthenticationBuilderProviderExtensions
 {
@@ -111,7 +112,7 @@ public static class AuthenticationBuilderProviderExtensions
 	}
 
 	// Generic helper for custom OAuth-based providers
-	public static AuthenticationBuilder AddExternalOAuthFromOptions(this AuthenticationBuilder authenticationBuilder, IdentityPrvdOptions options, string providerName, Action<OAuthOptions>? configure = null)
+	public static AuthenticationBuilder AddExternalOAuthFromOptions(this AuthenticationBuilder authenticationBuilder, IdentityPrvdOptions options, string providerName, Action<OAuthOptions> configure = null)
 	{
 		if (!TryGet(options, providerName, out var provider)) return authenticationBuilder;
 		authenticationBuilder.AddOAuth(providerName, o =>
@@ -141,5 +142,3 @@ public static class AuthenticationBuilderProviderExtensions
 		return true;
 	}
 }
-
-

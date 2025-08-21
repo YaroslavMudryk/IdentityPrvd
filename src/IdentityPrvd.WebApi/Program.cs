@@ -1,4 +1,6 @@
 using IdentityPrvd.DependencyInjection;
+using IdentityPrvd.DependencyInjection.Auth;
+using IdentityPrvd.DependencyInjection.Auth.Providers;
 using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Seeding;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +25,8 @@ public class Program
                 .UseExternalProviders(providerBuidler =>
                 {
                     providerBuidler
-                        .AddFacebook()
-                        .AddCustomProvider<SamsungProvider>();
+                        .AddCustomProvider<SamsungProvider>()
+                        .AddCustomProvider<BattleNetProvider>();
                 })
                 .UseRedisSessionManagerStore()
                 .UseDbContext<IdentityPrvdContext>(options =>

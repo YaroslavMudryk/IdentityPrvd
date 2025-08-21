@@ -1,5 +1,8 @@
-﻿using AspNet.Security.OAuth.GitHub;
+﻿using AspNet.Security.OAuth.BattleNet;
+using AspNet.Security.OAuth.GitHub;
 using IdentityPrvd.Common.Exceptions;
+using IdentityPrvd.DependencyInjection.Auth;
+using IdentityPrvd.DependencyInjection.Auth.Providers;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Graph;
@@ -11,11 +14,16 @@ using System.Security.Claims;
 
 namespace IdentityPrvd.Features.Authentication.ExternalSignin.Services;
 
-public class ExternalUserExstractorService
+public class ExternalUserExstractorService(IEnumerable<ICustomExternalProvider> externalProviders)
 {
     public async Task<ExternalUserDto> GetUserFromExternalProviderAsync(AuthenticateResult authResult)
     {
         var provider = authResult.Principal.Identity.AuthenticationType;
+
+        var customProvider = externalProviders.FirstOrDefault(p => p.Provider.Equals(provider, StringComparison.OrdinalIgnoreCase));
+        if (customProvider != null)
+            return await customProvider.GetUserFromProviderAsync(authResult);
+
         return provider switch
         {
             "Google" => await GetUserFromGoogleAsync(authResult),
@@ -24,6 +32,7 @@ public class ExternalUserExstractorService
             "Facebook" => await GetUserFromFacebookAsync(authResult),
             "Twitter" => await GetUserFromTwitterAsync(authResult),
             "Steam" => await GetUserFromSteamAsync(authResult),
+            "BattleNet" => await GetUserFromBattleNetAsync(authResult),
             _ => throw new BadRequestException($"Unsupported provider: {provider}"),
         };
     }
@@ -189,6 +198,36 @@ public class ExternalUserExstractorService
             Provider = provider,
             ProviderUserId = userId,
             UserName = userName
+        };
+    }
+
+    public static async Task<ExternalUserDto> GetUserFromBattleNetAsync(AuthenticateResult authResult)
+    {
+        var provider = authResult.Principal.Identity.AuthenticationType;
+        var userId = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userName = authResult.Principal.FindFirstValue(ClaimTypes.Name);
+
+        if (authResult.Properties?.GetTokenValue("access_token") != null)
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Properties?.GetTokenValue("access_token"));
+            var response = await client.GetAsync(BattleNetAuthenticationDefaults.Unified.UserInformationEndpoint);
+            response.EnsureSuccessStatusCode();
+            var userInfo = await response.Content.ReadFromJsonAsync<BattleNetProfileInfo>();
+        }
+
+        return new ExternalUserDto
+        {
+            Provider = provider,
+            ProviderUserId = userId,
+            UserName = userName,
+            FullName = null,
+            Email = null,
+            Picture = null,
+            FirstName = null,
+            LastName = null,
+            Phone = null,
+            Language = null
         };
     }
 }
