@@ -8,6 +8,14 @@ using System.Text.Json.Serialization;
 
 namespace IdentityPrvd.DependencyInjection.Auth.Providers;
 
+public static class FacebookProviderExtensions
+{
+    public static IExternalProvidersBuilder AddFacebook(this IExternalProvidersBuilder authBuilder)
+    {
+        return authBuilder.AddCustomProvider<FacebookProvider>();
+    }
+}
+
 public sealed class FacebookProvider : ICustomExternalProvider
 {
     public string Provider => "Facebook";
@@ -22,10 +30,11 @@ public sealed class FacebookProvider : ICustomExternalProvider
         var email = authResult.Principal.FindFirstValue(ClaimTypes.Email);
         string picture = null;
 
-        if (authResult.Properties?.GetTokenValue("access_token") != null)
+        var token = authResult.Properties?.GetTokenValue("access_token");
+        if (token != null)
         {
             using var client = new HttpClient();
-            var response = await client.GetAsync($"https://graph.facebook.com/v20.0/me?fields=id,name,email,picture,first_name,last_name,languages&access_token={authResult.Properties?.GetTokenValue("access_token")}");
+            var response = await client.GetAsync($"https://graph.facebook.com/v20.0/me?fields=id,name,email,picture,first_name,last_name,languages&access_token={token}");
             var json = await response.Content.ReadAsStringAsync();
             var userInfo = await response.Content.ReadFromJsonAsync<FacebookProfileInfo>();
             picture = userInfo.Picture.Data.Url;
@@ -50,8 +59,9 @@ public sealed class FacebookProvider : ICustomExternalProvider
     {
         authBuilder.AddFacebook(o =>
         {
-            o.ClientId = identityOptions.ExternalProviders[Provider].ClientId;
-            o.ClientSecret = identityOptions.ExternalProviders[Provider].ClientSecret;
+            var providerOptions = identityOptions.ExternalProviders[Provider];
+            o.ClientId = providerOptions.ClientId;
+            o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-facebook";
             o.SignInScheme = "cookie";
             o.SaveTokens = true;

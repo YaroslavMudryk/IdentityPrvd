@@ -22,15 +22,20 @@ public class Program
                 .UseSha512Hasher()
                 .UseAesProtectionService()
                 .UseIpApiLocationService()
-                .UseExternalProviders()
-                .UseExternalProviders(providerBuidler =>
+                //.UseExternalProviders()
+                .UseExternalProviders(providerBuilder =>
                 {
-                    providerBuidler
-                    .AddGoogle()
+                    providerBuilder
+                        .AddBattleNet()
+                        .AddFacebook()
+                        .AddGitHub()
+                        .AddGoogle()
+                        .AddMicrosoft()
                         .AddCustomProvider<SamsungProvider>()
-                        .AddCustomProvider<BattleNetProvider>();
+                        .AddSteam()
+                        .AddTwitter();
                 })
-                .UseRedisSessionManagerStore()
+                .UseRedisSessionManagerStore(builder.Options.Connections.Redis)
                 .UseDbContext<IdentityPrvdContext>(options =>
                 {
                     options.UseNpgsql(builder.Options.Connections.Db);

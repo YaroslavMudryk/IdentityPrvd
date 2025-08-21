@@ -9,6 +9,14 @@ using System.Text.Json.Serialization;
 
 namespace IdentityPrvd.DependencyInjection.Auth.Providers;
 
+public static class GoogleProviderExtensions
+{
+    public static IExternalProvidersBuilder AddGoogle(this IExternalProvidersBuilder authBuilder)
+    {
+        return authBuilder.AddCustomProvider<GoogleProvider>();
+    }
+}
+
 public sealed class GoogleProvider : ICustomExternalProvider
 {
     public string Provider => "Google";
@@ -23,10 +31,11 @@ public sealed class GoogleProvider : ICustomExternalProvider
         var email = authResult.Principal.FindFirstValue(ClaimTypes.Email);
         string picture = null;
 
-        if (authResult.Properties?.GetTokenValue("access_token") != null)
+        var token = authResult.Properties?.GetTokenValue("access_token");
+        if (token != null)
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Properties?.GetTokenValue("access_token"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await client.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
             var userInfoJson = await response.Content.ReadFromJsonAsync<GoogleProfileInfo>();
             picture = userInfoJson.Picture;
@@ -43,6 +52,7 @@ public sealed class GoogleProvider : ICustomExternalProvider
             Picture = picture,
             Language = null,
             Phone = null,
+            UserName = email,
         };
     }
 
@@ -50,8 +60,9 @@ public sealed class GoogleProvider : ICustomExternalProvider
     {
         authBuilder.AddGoogle(o =>
         {
-            o.ClientId = identityOptions.ExternalProviders[Provider].ClientId;
-            o.ClientSecret = identityOptions.ExternalProviders[Provider].ClientSecret;
+            var providerOptions = identityOptions.ExternalProviders[Provider];
+            o.ClientId = providerOptions.ClientId;
+            o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-google";
             o.SignInScheme = "cookie";
             o.SaveTokens = true;

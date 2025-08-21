@@ -1,12 +1,21 @@
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
-using IdentityPrvd.Features.Authentication.ExternalSignin.Services;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
+using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Authentication;
 using System.Security.Claims;
 
 namespace IdentityPrvd.DependencyInjection.Auth.Providers;
+
+public static class MicrosoftProviderExtensions
+{
+    public static IExternalProvidersBuilder AddMicrosoft(this IExternalProvidersBuilder authBuilder)
+    {
+        return authBuilder.AddCustomProvider<MicrosoftProvider>();
+    }
+}
 
 public sealed class MicrosoftProvider : ICustomExternalProvider
 {
@@ -22,9 +31,10 @@ public sealed class MicrosoftProvider : ICustomExternalProvider
         var email = authResult.Principal.FindFirstValue(ClaimTypes.Email);
         string language = null;
 
-        if (authResult.Properties?.GetTokenValue("access_token") != null)
+        var token = authResult.Properties?.GetTokenValue("access_token");
+        if (token != null)
         {
-            var client = new GraphServiceClient(new BearerTokenCredential(authResult.Properties.GetTokenValue("access_token")));
+            var client = new GraphServiceClient(new BearerTokenCredential(token));
             var meInfo = await client.Me.GetAsync();
             language = meInfo.PreferredLanguage;
         }
@@ -47,11 +57,21 @@ public sealed class MicrosoftProvider : ICustomExternalProvider
     {
         authBuilder.AddMicrosoftAccount(o =>
         {
-            o.ClientId = identityOptions.ExternalProviders[Provider].ClientId;
-            o.ClientSecret = identityOptions.ExternalProviders[Provider].ClientSecret;
+            var providerOptions = identityOptions.ExternalProviders[Provider];
+            o.ClientId = providerOptions.ClientId;
+            o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-microsoft";
             o.SignInScheme = "cookie";
             o.SaveTokens = true;
         });
+    }
+}
+
+public class BearerTokenCredential(string accessToken) : IAuthenticationProvider
+{
+    public Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object> additionalAuthenticationContext = null, CancellationToken cancellationToken = default)
+    {
+        request.Headers.TryAdd("Authorization", $"Bearer {accessToken}");
+        return Task.CompletedTask;
     }
 }

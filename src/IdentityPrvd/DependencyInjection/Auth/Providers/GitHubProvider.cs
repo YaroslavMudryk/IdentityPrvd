@@ -10,6 +10,14 @@ using System.Text.Json.Serialization;
 
 namespace IdentityPrvd.DependencyInjection.Auth.Providers;
 
+public static class GitHubProviderExtensions
+{
+    public static IExternalProvidersBuilder AddGitHub(this IExternalProvidersBuilder authBuilder)
+    {
+        return authBuilder.AddCustomProvider<GitHubProvider>();
+    }
+}
+
 public sealed class GitHubProvider : ICustomExternalProvider
 {
     public string Provider => "GitHub";
@@ -23,10 +31,11 @@ public sealed class GitHubProvider : ICustomExternalProvider
         var email = authResult.Principal.FindFirstValue(ClaimTypes.Email);
         string picture = null;
 
-        if (authResult.Properties?.GetTokenValue("access_token") != null)
+        var token = authResult.Properties?.GetTokenValue("access_token");
+        if (token != null)
         {
             using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Properties?.GetTokenValue("access_token"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("IdentityPrvd", "1.0"));
             using var response = await httpClient.GetAsync(GitHubAuthenticationDefaults.UserInformationEndpoint);
             var userInfo = await response.Content.ReadFromJsonAsync<GitHubProfileInfo>();
@@ -52,13 +61,14 @@ public sealed class GitHubProvider : ICustomExternalProvider
     {
         authBuilder.AddGitHub(o =>
         {
-            o.ClientId = identityOptions.ExternalProviders[Provider].ClientId;
-            o.ClientSecret = identityOptions.ExternalProviders[Provider].ClientSecret;
+            var providerOptions = identityOptions.ExternalProviders[Provider];
+            o.ClientId = providerOptions.ClientId;
+            o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-github";
             o.SignInScheme = "cookie";
-            if (identityOptions.ExternalProviders[Provider].Scopes != null && identityOptions.ExternalProviders[Provider].Scopes.Count > 0)
+            if (providerOptions.Scopes != null && providerOptions.Scopes.Count > 0)
             {
-                foreach (var scope in identityOptions.ExternalProviders[Provider].Scopes)
+                foreach (var scope in providerOptions.Scopes)
                     o.Scope.Add(scope);
             }
             else

@@ -6,6 +6,14 @@ using System.Security.Claims;
 
 namespace IdentityPrvd.DependencyInjection.Auth.Providers;
 
+public static class SteamProviderExtensions
+{
+    public static IExternalProvidersBuilder AddSteam(this IExternalProvidersBuilder authBuilder)
+    {
+        return authBuilder.AddCustomProvider<SteamProvider>();
+    }
+}
+
 public sealed class SteamProvider : ICustomExternalProvider
 {
     public string Provider => "Steam";
@@ -18,7 +26,6 @@ public sealed class SteamProvider : ICustomExternalProvider
         var userName = authResult.Principal.FindFirstValue(ClaimTypes.Name);
 
         var token = authResult.Properties?.GetTokenValue("access_token");
-
         if (token != null)
         {
             using var httpClient = new HttpClient();

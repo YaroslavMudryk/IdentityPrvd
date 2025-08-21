@@ -10,6 +10,14 @@ using System.Text.Json.Serialization;
 
 namespace IdentityPrvd.DependencyInjection.Auth.Providers;
 
+public static class BattleNetProviderExtensions
+{
+    public static IExternalProvidersBuilder AddBattleNet(this IExternalProvidersBuilder authBuilder)
+    {
+        return authBuilder.AddCustomProvider<BattleNetProvider>();
+    }
+}
+
 public sealed class BattleNetProvider : ICustomExternalProvider
 {
     public string Provider => "BattleNet";
@@ -20,10 +28,11 @@ public sealed class BattleNetProvider : ICustomExternalProvider
         var userId = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var userName = authResult.Principal.FindFirstValue(ClaimTypes.Name);
 
-        if (authResult.Properties?.GetTokenValue("access_token") != null)
+        var token = authResult.Properties?.GetTokenValue("access_token");
+        if (token != null)
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Properties?.GetTokenValue("access_token"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await client.GetAsync(BattleNetAuthenticationDefaults.Unified.UserInformationEndpoint);
             response.EnsureSuccessStatusCode();
             var userInfo = await response.Content.ReadFromJsonAsync<BattleNetProfileInfo>();
@@ -48,8 +57,9 @@ public sealed class BattleNetProvider : ICustomExternalProvider
     {
         authBuilder.AddBattleNet(options =>
         {
-            options.ClientId = identityOptions.ExternalProviders["BattleNet"].ClientId;
-            options.ClientSecret = identityOptions.ExternalProviders["BattleNet"].ClientSecret;
+            var providerOptions = identityOptions.ExternalProviders[Provider];
+            options.ClientId = providerOptions.ClientId;
+            options.ClientSecret = providerOptions.ClientSecret;
             options.CallbackPath = "/signin-battlenet";
             options.SignInScheme = "cookie";
             options.SaveTokens = true;

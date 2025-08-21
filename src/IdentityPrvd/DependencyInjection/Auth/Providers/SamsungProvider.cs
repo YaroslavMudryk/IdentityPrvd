@@ -9,6 +9,14 @@ using System.Text.Json.Serialization;
 
 namespace IdentityPrvd.DependencyInjection.Auth.Providers;
 
+public static class SamsungProviderExtensions
+{
+    public static IExternalProvidersBuilder AddSamsung(this IExternalProvidersBuilder authBuilder)
+    {
+        return authBuilder.AddCustomProvider<SamsungProvider>();
+    }
+}
+
 public sealed class SamsungProvider : ICustomExternalProvider
 {
     public string Provider => "Samsung";
@@ -46,10 +54,11 @@ public sealed class SamsungProvider : ICustomExternalProvider
         var userId = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var userName = authResult.Principal.FindFirstValue(ClaimTypes.Name);
 
-        if (authResult.Properties?.GetTokenValue("access_token") != null)
+        var token = authResult.Properties?.GetTokenValue("access_token");
+        if (token != null)
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Properties?.GetTokenValue("access_token"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await client.GetAsync("https://api.samsung.com/v1/me");
             response.EnsureSuccessStatusCode();
             var userInfo = await response.Content.ReadFromJsonAsync<SamsungProfileInfo>();
