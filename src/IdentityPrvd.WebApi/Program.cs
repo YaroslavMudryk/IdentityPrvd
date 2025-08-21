@@ -22,7 +22,6 @@ public class Program
                 .UseSha512Hasher()
                 .UseAesProtectionService()
                 .UseIpApiLocationService()
-                //.UseExternalProviders()
                 .UseExternalProviders(providerBuilder =>
                 {
                     providerBuilder
@@ -33,7 +32,8 @@ public class Program
                         .AddMicrosoft()
                         .AddCustomProvider<SamsungProvider>()
                         .AddSteam()
-                        .AddTwitter();
+                        .AddTwitter()
+                        .AddDiscord();
                 })
                 .UseRedisSessionManagerStore(builder.Options.Connections.Redis)
                 .UseDbContext<IdentityPrvdContext>(options =>
