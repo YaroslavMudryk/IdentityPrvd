@@ -22,9 +22,11 @@ public class Program
                 .UseSha512Hasher()
                 .UseAesProtectionService()
                 .UseIpApiLocationService()
+                .UseExternalProviders()
                 .UseExternalProviders(providerBuidler =>
                 {
                     providerBuidler
+                    .AddGoogle()
                         .AddCustomProvider<SamsungProvider>()
                         .AddCustomProvider<BattleNetProvider>();
                 })
