@@ -1,4 +1,9 @@
+using IdentityPrvd.DependencyInjection;
+using IdentityPrvd.DependencyInjection.Auth;
+using IdentityPrvd.DependencyInjection.Auth.Providers;
+using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Seeding;
+using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.WebApi;
 
@@ -10,16 +15,38 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddIdentityPrvd(builder.Configuration, options =>
+        builder.Services.AddIdentityPrvd(builder.Configuration, builder =>
         {
-            options.User.ConfirmCodeValidInMinutes = 10;
+            builder.Options.User.ConfirmCodeValidInMinutes = 10;
+            builder
+                .UseSha512Hasher()
+                .UseAesProtectionService()
+                .UseIpApiLocationService()
+                //.UseExternalProviders()
+                .UseExternalProviders(providerBuilder =>
+                {
+                    providerBuilder
+                        .AddBattleNet()
+                        .AddFacebook()
+                        .AddGitHub()
+                        .AddGoogle()
+                        .AddMicrosoft()
+                        .AddCustomProvider<SamsungProvider>()
+                        .AddSteam()
+                        .AddTwitter();
+                })
+                .UseRedisSessionManagerStore(builder.Options.Connections.Redis)
+                .UseDbContext<IdentityPrvdContext>(options =>
+                {
+                    options.UseNpgsql(builder.Options.Connections.Db);
+                });
         });
 
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
         {
-            await SeedData.InitializeAsync(app.Services);
+            await IdentityPrvdSeedLoader.InitializeAsync(app.Services);
         }
         
         app.UseSwagger();

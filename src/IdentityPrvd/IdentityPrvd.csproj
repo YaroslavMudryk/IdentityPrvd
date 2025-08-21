@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.BattleNet" Version="9.4.0" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.4.0" />
     <PackageReference Include="AspNet.Security.OAuth.Twitter" Version="9.4.0" />
     <PackageReference Include="AspNet.Security.OpenId.Steam" Version="9.0.0" />
@@ -19,10 +20,14 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
     <PackageReference Include="Microsoft.Graph" Version="5.87.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="9.23.90" />
     <PackageReference Include="Otp.NET" Version="1.4.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-rc.1.efcore.9.0.0" />
     <PackageReference Include="Redis.OM" Version="1.0.1" />
     <PackageReference Include="Redis.OM.Identity" Version="0.1.2" />
     <PackageReference Include="Redis.OM.Vectorizers" Version="1.0.1" />
