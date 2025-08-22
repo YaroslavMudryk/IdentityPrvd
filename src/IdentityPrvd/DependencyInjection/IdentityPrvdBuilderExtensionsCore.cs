@@ -30,7 +30,6 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

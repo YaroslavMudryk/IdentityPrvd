@@ -1,7 +1,6 @@
 ﻿using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
-using IdentityPrvd.DependencyInjection.Auth;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Services.Location;

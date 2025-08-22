@@ -11,3 +11,9 @@ public class ExternalProviderOptions
     public List<string> Scopes { get; set; } = [];
     public Dictionary<string, string> AdditionalOptions { get; set; } = [];
 }
+
+public class AppleExternalProviderOptions : ExternalProviderOptions
+{
+    public string TeamId { get; set; }
+    public string KeyId { get; set; }
+}

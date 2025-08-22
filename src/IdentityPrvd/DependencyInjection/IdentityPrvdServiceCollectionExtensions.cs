@@ -10,7 +10,7 @@ public static class IdentityPrvdServiceCollectionExtensions
 
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services)
     {
-        var builder = new IdentityPrvdBuilder(services);
+        _ = new IdentityPrvdBuilder(services);
         return services;
     }
 
@@ -24,18 +24,25 @@ public static class IdentityPrvdServiceCollectionExtensions
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration)
     {
         var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
-        var builder = new IdentityPrvdBuilder(services)
-        {
-            Options = identityOptions
-        };
+        ModifyOptions(identityOptions, configuration);
+        _ = new IdentityPrvdBuilder(services, identityOptions);
         return services;
     }
 
     public static IServiceCollection AddIdentityPrvd(this IServiceCollection services, IConfiguration configuration, Action<IdentityPrvdBuilder> builder)
     {
         var identityOptions = configuration.GetSection("IdentityPrvd").Get<IdentityPrvdOptions>();
+        ModifyOptions(identityOptions, configuration);
         var identityBuilder = new IdentityPrvdBuilder(services, identityOptions);
         builder.Invoke(identityBuilder);
         return services;
+    }
+
+    private static void ModifyOptions(IdentityPrvdOptions identityOptions, IConfiguration configuration)
+    {
+        if (identityOptions.ExternalProviders.ContainsKey("Apple"))
+        {
+            identityOptions.ExternalProviders["Apple"] = configuration.GetSection("IdentityPrvd:ExternalProviders:Apple").Get<AppleExternalProviderOptions>();
+        }
     }
 }

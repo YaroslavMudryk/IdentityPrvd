@@ -17,7 +17,6 @@ public class Program
 
         builder.Services.AddIdentityPrvd(builder.Configuration, builder =>
         {
-            builder.Options.User.ConfirmCodeValidInMinutes = 10;
             builder
                 .UseSha512Hasher()
                 .UseAesProtectionService()
@@ -33,7 +32,8 @@ public class Program
                         .AddCustomProvider<SamsungProvider>()
                         .AddSteam()
                         .AddTwitter()
-                        .AddDiscord();
+                        .AddDiscord()
+                        .AddApple();
                 })
                 .UseRedisSessionManagerStore(builder.Options.Connections.Redis)
                 .UseDbContext<IdentityPrvdContext>(options =>
