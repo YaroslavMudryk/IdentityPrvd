@@ -33,7 +33,8 @@ public class Program
                         .AddSteam()
                         .AddTwitter()
                         .AddDiscord()
-                        .AddApple();
+                        .AddApple()
+                        .AddSpotify();
                 })
                 .UseRedisSessionManagerStore(builder.Options.Connections.Redis)
                 .UseDbContext<IdentityPrvdContext>(options =>

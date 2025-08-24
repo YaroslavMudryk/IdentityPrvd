@@ -3,7 +3,6 @@ using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting.Internal;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -53,16 +52,16 @@ public sealed class AppleProvider : ICustomExternalProvider
         IServiceProvider builder = authBuilder.Services.BuildServiceProvider();
         var webHostEnvironment = builder.GetRequiredService<IWebHostEnvironment>();
 
-        authBuilder.AddApple(o =>
+        authBuilder.AddApple(options =>
         {
             var providerOptions = identityOptions.ExternalProviders[Provider] as AppleExternalProviderOptions;
-            o.ClientId = providerOptions.ClientId;
-            o.KeyId = providerOptions.KeyId;
-            o.TeamId = providerOptions.TeamId;
-            o.UsePrivateKey(key => webHostEnvironment.ContentRootFileProvider.GetFileInfo($"AuthKey_{providerOptions.KeyId}.p8"));
-            o.CallbackPath = "/signin-apple";
-            o.SignInScheme = "cookie";
-            o.SaveTokens = true;
+            options.ClientId = providerOptions.ClientId;
+            options.KeyId = providerOptions.KeyId;
+            options.TeamId = providerOptions.TeamId;
+            options.UsePrivateKey(key => webHostEnvironment.ContentRootFileProvider.GetFileInfo($"AuthKey_{providerOptions.KeyId}.p8"));
+            options.CallbackPath = "/signin-apple";
+            options.SignInScheme = "cookie";
+            options.SaveTokens = true;
         });
     }
 }
