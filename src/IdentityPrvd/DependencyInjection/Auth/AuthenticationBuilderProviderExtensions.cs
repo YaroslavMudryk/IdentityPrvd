@@ -1,3 +1,4 @@
+using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -18,7 +19,7 @@ public static class AuthenticationBuilderProviderExtensions
             o.ClientId = provider.ClientId;
             o.ClientSecret = provider.ClientSecret;
             o.CallbackPath = string.IsNullOrWhiteSpace(provider.CallbackPath) ? $"/signin-{providerName.ToLower()}" : provider.CallbackPath;
-            o.SignInScheme = "cookie";
+            o.SignInScheme = AppConstants.DefaultExternalProvider;
             if (provider.Scopes != null)
             {
                 foreach (var scope in provider.Scopes)

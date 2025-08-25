@@ -1,4 +1,5 @@
 using AspNet.Security.OAuth.Twitter;
+using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
@@ -54,7 +55,7 @@ public sealed class TwitterProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-twitter";
-            o.SignInScheme = "cookie";
+            o.SignInScheme = AppConstants.DefaultExternalProvider;
             if (providerOptions.Scopes != null && providerOptions.Scopes.Count > 0)
             {
                 foreach (var scope in providerOptions.Scopes)

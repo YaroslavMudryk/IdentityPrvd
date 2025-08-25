@@ -1,4 +1,5 @@
-﻿using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
+﻿using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +53,7 @@ public class SpotifyProvider : ICustomExternalProvider
             options.ClientId = providerOptions.ClientId;
             options.ClientSecret = providerOptions.ClientSecret;
             options.CallbackPath = "/signin-spotify";
-            options.SignInScheme = "cookie";
+            options.SignInScheme = AppConstants.DefaultExternalProvider;
             options.Scope.Add("user-read-private");
             options.Scope.Add("user-read-email");
             options.SaveTokens = true;

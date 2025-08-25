@@ -1,4 +1,5 @@
 ﻿using AspNet.Security.OAuth.Discord;
+using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
@@ -64,7 +65,7 @@ public sealed class DiscordProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-discord";
-            o.SignInScheme = "cookie";
+            o.SignInScheme = AppConstants.DefaultExternalProvider;
             o.Scope.Add("identify");
             o.Scope.Add("email");
             o.Scope.Add("openid");

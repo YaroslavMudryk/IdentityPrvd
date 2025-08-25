@@ -1,4 +1,5 @@
-﻿using IdentityPrvd.Common.Helpers;
+﻿using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
@@ -55,7 +56,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         services.AddAuthorization();
 
         builder.AuthenticationBuilder
-            .AddCookie("cookie")
+            .AddCookie(AppConstants.DefaultExternalProvider)
             .AddJwtBearer(jwt =>
             {
                 jwt.RequireHttpsMetadata = false;

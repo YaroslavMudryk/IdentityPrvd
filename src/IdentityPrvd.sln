@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityPrvd.WebApi", "Iden
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityPrvd", "IdentityPrvd\IdentityPrvd.csproj", "{AB063C3B-42E8-4889-95FF-3FD3B3529F7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityPrvd.Tests", "IdentityPrvd.Tests\IdentityPrvd.Tests.csproj", "{551524F8-BCBA-4998-A882-5CD6C4959CEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AB063C3B-42E8-4889-95FF-3FD3B3529F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB063C3B-42E8-4889-95FF-3FD3B3529F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB063C3B-42E8-4889-95FF-3FD3B3529F7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{551524F8-BCBA-4998-A882-5CD6C4959CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{551524F8-BCBA-4998-A882-5CD6C4959CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{551524F8-BCBA-4998-A882-5CD6C4959CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{551524F8-BCBA-4998-A882-5CD6C4959CEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

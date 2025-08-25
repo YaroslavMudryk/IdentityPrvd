@@ -1,4 +1,5 @@
 using AspNet.Security.OAuth.BattleNet;
+using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
@@ -61,7 +62,7 @@ public sealed class BattleNetProvider : ICustomExternalProvider
             options.ClientId = providerOptions.ClientId;
             options.ClientSecret = providerOptions.ClientSecret;
             options.CallbackPath = "/signin-battlenet";
-            options.SignInScheme = "cookie";
+            options.SignInScheme = AppConstants.DefaultExternalProvider;
             options.SaveTokens = true;
         });
     }

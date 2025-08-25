@@ -1,4 +1,5 @@
 using AspNet.Security.OAuth.GitHub;
+using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
@@ -65,7 +66,7 @@ public sealed class GitHubProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-github";
-            o.SignInScheme = "cookie";
+            o.SignInScheme = AppConstants.DefaultExternalProvider;
             if (providerOptions.Scopes != null && providerOptions.Scopes.Count > 0)
             {
                 foreach (var scope in providerOptions.Scopes)

@@ -1,4 +1,5 @@
-﻿using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
+﻿using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -60,7 +61,7 @@ public sealed class AppleProvider : ICustomExternalProvider
             options.TeamId = providerOptions.TeamId;
             options.UsePrivateKey(key => webHostEnvironment.ContentRootFileProvider.GetFileInfo($"AuthKey_{providerOptions.KeyId}.p8"));
             options.CallbackPath = "/signin-apple";
-            options.SignInScheme = "cookie";
+            options.SignInScheme = AppConstants.DefaultExternalProvider;
             options.SaveTokens = true;
         });
     }

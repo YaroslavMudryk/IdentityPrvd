@@ -14,14 +14,20 @@ public interface IIdentityPrvdBuilder
     AuthenticationBuilder AuthenticationBuilder { get; }
 }
 
-public class IdentityPrvdBuilder(IServiceCollection services) : IIdentityPrvdBuilder
+public class IdentityPrvdBuilder : IIdentityPrvdBuilder
 {
-    public IdentityPrvdBuilder(IServiceCollection services, IdentityPrvdOptions options) : this(services)
+    public IdentityPrvdBuilder(IServiceCollection services) : this(services, new IdentityPrvdOptions())
     {
-        services.AddScoped(_ => options);
-        Options = options ?? throw new ArgumentNullException(nameof(options));
-        AuthenticationBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
 
+    }
+
+    public IdentityPrvdBuilder(IServiceCollection services, IdentityPrvdOptions options)
+    {
+        Services = services ?? throw new ArgumentNullException(nameof(services));
+        Options = options ?? throw new ArgumentNullException(nameof(options));
+        services.AddScoped(_ => options);
+        AuthenticationBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+        
         this.AddCoreServices()
             .AddRequiredServices()
             .AddAuthentication()
@@ -41,7 +47,7 @@ public class IdentityPrvdBuilder(IServiceCollection services) : IIdentityPrvdBui
             .UseFakeLocationService();
     }
 
-    public IServiceCollection Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
+    public IServiceCollection Services { get; }
     public IConfiguration Configuration => Services.BuildServiceProvider().GetRequiredService<IConfiguration>();
     public IdentityPrvdOptions Options { get; set; } = new IdentityPrvdOptions();
     public AuthenticationBuilder AuthenticationBuilder { get; }

@@ -1,3 +1,4 @@
+using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
@@ -47,7 +48,7 @@ public sealed class SteamProvider : ICustomExternalProvider
         {
             o.ApplicationKey = identityOptions.ExternalProviders[Provider].ClientId;
             o.CallbackPath = "/signin-steam";
-            o.SignInScheme = "cookie";
+            o.SignInScheme = AppConstants.DefaultExternalProvider;
             o.SaveTokens = true;
         });
     }
