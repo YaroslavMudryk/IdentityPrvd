@@ -8,6 +8,7 @@ using IdentityPrvd.Features.Authentication.ChangeLogin;
 using IdentityPrvd.Features.Authentication.ChangePassword;
 using IdentityPrvd.Features.Authentication.ExternalSignin;
 using IdentityPrvd.Features.Authentication.LinkExternalSignin;
+using IdentityPrvd.Features.Authentication.QrSignin;
 using IdentityPrvd.Features.Authentication.RestorePassword;
 using IdentityPrvd.Features.Authentication.Signin;
 using IdentityPrvd.Features.Authentication.SigninOptions;
@@ -98,6 +99,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddRestorePasswordDependencies();
         builder.Services.AddContactsDependencies();
         builder.Services.AddDevicesDependencies();
+        builder.Services.AddQrSigninDependencies();
         return builder;
     }
 

@@ -32,6 +32,8 @@
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="9.23.90" />
     <PackageReference Include="Otp.NET" Version="1.4.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-rc.1.efcore.9.0.0" />
+    <PackageReference Include="QRCoder-ImageSharp" Version="0.10.0" />
+    <PackageReference Include="QRCoder.Core" Version="1.0.3" />
     <PackageReference Include="Redis.OM" Version="1.0.1" />
     <PackageReference Include="Redis.OM.Identity" Version="0.1.2" />
     <PackageReference Include="Redis.OM.Vectorizers" Version="1.0.1" />

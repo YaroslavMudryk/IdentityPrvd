@@ -17,4 +17,8 @@
     <ProjectReference Include="..\IdentityPrvd\IdentityPrvd.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

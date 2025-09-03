@@ -66,7 +66,10 @@ public class RedisSessionManagerStore(
 
     public async Task<SessionInfo> GetSessionAsync(string sessionId)
     {
-        return _currentSession ??= await _sessions.Where(s => s.SessionId == sessionId).FirstOrDefaultAsync();
+        if (_currentSession != null && _currentSession.SessionId == sessionId)
+            return _currentSession;
+
+        return await _sessions.Where(s => s.SessionId == sessionId).FirstOrDefaultAsync();
     }
 
     public async Task<(bool IsSuccess, string ErrorMessage)> UpdateSessionAsync(SessionInfo sessionInfo)

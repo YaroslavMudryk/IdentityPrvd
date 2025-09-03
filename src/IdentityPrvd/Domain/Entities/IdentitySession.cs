@@ -13,6 +13,7 @@ public class IdentitySession : BaseModel
     public SessionStatus Status { set; get; }
     public string VerificationId { get; set; }
     public DateTime? VerificationExpire { get; set; }
+    public Ulid? AuthorizedBy { get; set; }
     public string Language { set; get; }
     public Ulid? DeactivatedBySessionId { set; get; }
     public DateTime? DeactivatedAt { set; get; }

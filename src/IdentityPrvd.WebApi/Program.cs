@@ -43,6 +43,16 @@ public class Program
                 });
         });
 
+        builder.Services.AddCors(s =>
+        {
+            s.AddDefaultPolicy(policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
+
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -53,6 +63,8 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
+        app.UseCors();
+        app.UseWebSockets();
         app.UseIdentityPrvd();
 
         app.Run();

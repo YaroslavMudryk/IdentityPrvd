@@ -31,7 +31,7 @@ public class DefaultAuthSchemes(
                     Provider = scheme.Name,
                     IsAvailable = false,
                     IsConfigured = false,
-                    Icon = provider.Icon,
+                    Icon = null,
                 });
         }
 
