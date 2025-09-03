@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Data.Queries;
+using IdentityPrvd.Services.Security;
 
 namespace IdentityPrvd.Features.Authentication.ExternalSignin.Dtos.Validators;
 
@@ -8,6 +9,7 @@ public class ExternalSigninDtoValidator : AbstractValidator<ExternalSigninDto>
 {
     public ExternalSigninDtoValidator(
         IClientsQuery clientsQuery,
+        IHasher hasher,
         TimeProvider timeProvider)
     {
         RuleFor(s => s.Provider)
@@ -54,8 +56,7 @@ public class ExternalSigninDtoValidator : AbstractValidator<ExternalSigninDto>
                     {
                         var clientSecret = await clientsQuery.GetClientSecretAsync(dto.ClientId);
 
-                        var verifySecret = true; // verify secret
-                        if (!verifySecret)
+                        if (!hasher.Verify(clientSecret.Value, dto.ClientSecret))
                             throw new BadRequestException("Secret is invalid");
                     }
                 }

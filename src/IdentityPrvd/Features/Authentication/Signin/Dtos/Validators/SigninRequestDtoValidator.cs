@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
+using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Options;
@@ -85,11 +86,10 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
 
             if (client.ClientSecretRequired)
             {
-                var secret = await clientsQuery.GetClientSecretNullableAsync(dto.ClientId)
+                var clientSecret = await clientsQuery.GetClientSecretNullableAsync(client.Id.GetIdAsString())
                     ?? throw new NotFoundException($"Not found secret for clientId:{dto.ClientId}");
 
-                var verifySecret = true; // verify secret
-                if (!verifySecret)
+                if (!hasher.Verify(clientSecret.Value, dto.ClientSecret))
                     throw new BadRequestException("Secret is invalid");
             }
 

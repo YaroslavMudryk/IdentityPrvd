@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Data.Queries;
+using IdentityPrvd.Services.Security;
 
 namespace IdentityPrvd.Features.Authentication.QrSignin.Dtos.Validators;
 
@@ -8,6 +9,7 @@ public class QrRequestDtoValidator : AbstractValidator<QrRequestDto>
 {
     public QrRequestDtoValidator(
         TimeProvider timeProvider,
+        IHasher hasher,
         IClientsQuery clientsQuery)
     {
         RuleFor(x => x).MustAsync(async (dto, _) =>
@@ -25,11 +27,10 @@ public class QrRequestDtoValidator : AbstractValidator<QrRequestDto>
 
             if (client.ClientSecretRequired)
             {
-                var secret = await clientsQuery.GetClientSecretNullableAsync(dto.ClientId)
+                var clientSecret = await clientsQuery.GetClientSecretNullableAsync(dto.ClientId)
                     ?? throw new NotFoundException($"Not found secret for clientId:{dto.ClientId}");
 
-                var verifySecret = true; // verify secret
-                if (!verifySecret)
+                if (!hasher.Verify(clientSecret.Value, dto.ClientSecret))
                     throw new BadRequestException("Secret is invalid");
             }
 
