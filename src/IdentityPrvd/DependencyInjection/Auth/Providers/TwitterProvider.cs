@@ -55,7 +55,7 @@ public sealed class TwitterProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-twitter";
-            o.SignInScheme = AppConstants.DefaultExternalProvider;
+            o.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             if (providerOptions.Scopes != null && providerOptions.Scopes.Count > 0)
             {
                 foreach (var scope in providerOptions.Scopes)

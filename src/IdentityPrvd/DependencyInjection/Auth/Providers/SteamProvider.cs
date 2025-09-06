@@ -48,7 +48,7 @@ public sealed class SteamProvider : ICustomExternalProvider
         {
             o.ApplicationKey = identityOptions.ExternalProviders[Provider].ClientId;
             o.CallbackPath = "/signin-steam";
-            o.SignInScheme = AppConstants.DefaultExternalProvider;
+            o.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             o.SaveTokens = true;
         });
     }

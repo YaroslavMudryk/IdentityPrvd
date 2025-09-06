@@ -65,7 +65,7 @@ public sealed class DiscordProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-discord";
-            o.SignInScheme = AppConstants.DefaultExternalProvider;
+            o.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             o.Scope.Add("identify");
             o.Scope.Add("email");
             o.Scope.Add("openid");

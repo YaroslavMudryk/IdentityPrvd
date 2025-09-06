@@ -18,12 +18,12 @@ Use the checkboxes to mark progress.
 | Authentication | GET | `/api/identity/signin-options` | [✅] | [✅] | [❌] |
 | Authentication | POST | `/api/identity/signup` | [✅] | [✅] | [❌] |
 | Authentication | POST | `/api/identity/signup/confirm` | [✅] | [✅] | [❌] |
-| Authentication | GET | `/api/identity/signin-external` | [✅] | [❌] | [❌] |
-| Authentication | GET | `/api/identity/signin-external-callback` | [✅] | [❌] | [❌] |
-| Authentication | GET | `/api/identity/linked-external-signin` | [✅] | [❌] | [❌] |
-| Authentication | GET | `/api/identity/link-external-signin` | [✅] | [❌] | [❌] |
-| Authentication | GET | `/api/identity/link-external-signin-callback` | [✅] | [❌] | [❌] |
-| Authentication | DELETE | `/api/identity/unlink-external-signin` | [✅] | [❌] | [❌] |
+| Authentication | GET | `/api/identity/signin-external` | [✅] | [✅] | [❌] |
+| Authentication | GET | `/api/identity/signin-external-callback` | [✅] | [✅] | [❌] |
+| Authentication | GET | `/api/identity/linked-external-signin` | [✅] | [✅] | [❌] |
+| Authentication | GET | `/api/identity/link-external-signin` | [✅] | [✅] | [❌] |
+| Authentication | GET | `/api/identity/link-external-signin-callback` | [✅] | [✅] | [❌] |
+| Authentication | DELETE | `/api/identity/unlink-external-signin` | [✅] | [✅] | [❌] |
 | Authentication | GET | `/api/identity/sso` | [✅] | [✅] | [❌] |
 | QR Signin | GET (WebSocket) | `/auth` | [✅] | [❌] | [❌] |
 | QR Signin | POST | `/api/identity/qr` | [✅] | [❌] | [❌] |
@@ -52,5 +52,3 @@ Use the checkboxes to mark progress.
 | Authorization (Roles) | POST | `/api/identity/roles` | [✅] | [❌] | [❌] |
 | Authorization (Roles) | PUT | `/api/identity/roles/{roleId}` | [✅] | [❌] | [❌] |
 | Authorization (Roles) | DELETE | `/api/identity/roles/{roleId}` | [✅] | [❌] | [❌] |
-
-

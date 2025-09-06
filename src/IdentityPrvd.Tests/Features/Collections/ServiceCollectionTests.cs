@@ -62,7 +62,7 @@ public class ServiceCollectionTests
 
         var schemes = await authProvider.GetAllSchemesAsync();
         schemes.Select(s => s.Name).Should().ContainInConsecutiveOrder(
-            [AppConstants.DefaultExternalProvider, JwtBearerDefaults.AuthenticationScheme, "Google", "Microsoft", "Facebook", "Twitter"]);
+            [AppConstants.DefaultExternalProviderScheme, JwtBearerDefaults.AuthenticationScheme, "Google", "Microsoft", "Facebook", "Twitter"]);
         schemes.Count().Should().Be(6);
     }
 
@@ -87,7 +87,7 @@ public class ServiceCollectionTests
         var authProvider = serviceProvider.GetService<IAuthenticationSchemeProvider>();
         var schemes = await authProvider!.GetAllSchemesAsync();
         schemes.Select(s => s.Name).Should().ContainInConsecutiveOrder(
-            [AppConstants.DefaultExternalProvider, JwtBearerDefaults.AuthenticationScheme, "Steam", "Spotify", "GitHub"]);
+            [AppConstants.DefaultExternalProviderScheme, JwtBearerDefaults.AuthenticationScheme, "Steam", "Spotify", "GitHub"]);
         schemes.Count().Should().Be(5);
     }
 

@@ -1,4 +1,5 @@
-﻿using IdentityPrvd.Options;
+﻿using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 
 namespace IdentityPrvd.Services.AuthSchemes;
@@ -15,7 +16,7 @@ public class DefaultAuthSchemes(
 
         foreach (var scheme in schemes)
         {
-            if (scheme.Name == "Bearer" || scheme.Name == "cookie")
+            if (scheme.Name == AppConstants.DefaultScheme || scheme.Name == AppConstants.DefaultExternalProviderScheme)
                 continue;
 
             if (identityOptions.ExternalProviders.TryGetValue(scheme.Name, out var provider))

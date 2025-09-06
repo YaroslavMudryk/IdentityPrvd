@@ -62,7 +62,7 @@ public sealed class MicrosoftProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-microsoft";
-            o.SignInScheme = AppConstants.DefaultExternalProvider;
+            o.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             o.SaveTokens = true;
         });
     }

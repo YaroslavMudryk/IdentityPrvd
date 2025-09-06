@@ -57,7 +57,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         services.AddAuthorization();
 
         builder.AuthenticationBuilder
-            .AddCookie(AppConstants.DefaultExternalProvider)
+            .AddCookie(AppConstants.DefaultExternalProviderScheme)
             .AddJwtBearer(jwt =>
             {
                 jwt.RequireHttpsMetadata = false;

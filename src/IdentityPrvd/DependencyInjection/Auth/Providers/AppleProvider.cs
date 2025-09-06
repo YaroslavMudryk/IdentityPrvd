@@ -61,7 +61,7 @@ public sealed class AppleProvider : ICustomExternalProvider
             options.TeamId = providerOptions.TeamId;
             options.UsePrivateKey(key => webHostEnvironment.ContentRootFileProvider.GetFileInfo($"AuthKey_{providerOptions.KeyId}.p8"));
             options.CallbackPath = "/signin-apple";
-            options.SignInScheme = AppConstants.DefaultExternalProvider;
+            options.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             options.SaveTokens = true;
         });
     }

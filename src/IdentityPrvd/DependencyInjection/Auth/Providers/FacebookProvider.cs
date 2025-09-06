@@ -64,7 +64,7 @@ public sealed class FacebookProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-facebook";
-            o.SignInScheme = AppConstants.DefaultExternalProvider;
+            o.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             o.SaveTokens = true;
         });
     }

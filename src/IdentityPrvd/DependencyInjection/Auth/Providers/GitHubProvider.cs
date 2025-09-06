@@ -66,7 +66,7 @@ public sealed class GitHubProvider : ICustomExternalProvider
             o.ClientId = providerOptions.ClientId;
             o.ClientSecret = providerOptions.ClientSecret;
             o.CallbackPath = "/signin-github";
-            o.SignInScheme = AppConstants.DefaultExternalProvider;
+            o.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             if (providerOptions.Scopes != null && providerOptions.Scopes.Count > 0)
             {
                 foreach (var scope in providerOptions.Scopes)

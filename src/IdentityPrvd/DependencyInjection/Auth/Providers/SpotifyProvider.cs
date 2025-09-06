@@ -53,7 +53,7 @@ public class SpotifyProvider : ICustomExternalProvider
             options.ClientId = providerOptions.ClientId;
             options.ClientSecret = providerOptions.ClientSecret;
             options.CallbackPath = "/signin-spotify";
-            options.SignInScheme = AppConstants.DefaultExternalProvider;
+            options.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             options.Scope.Add("user-read-private");
             options.Scope.Add("user-read-email");
             options.SaveTokens = true;

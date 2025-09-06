@@ -19,7 +19,7 @@ public static class AuthenticationBuilderProviderExtensions
             o.ClientId = provider.ClientId;
             o.ClientSecret = provider.ClientSecret;
             o.CallbackPath = string.IsNullOrWhiteSpace(provider.CallbackPath) ? $"/signin-{providerName.ToLower()}" : provider.CallbackPath;
-            o.SignInScheme = AppConstants.DefaultExternalProvider;
+            o.SignInScheme = AppConstants.DefaultExternalProviderScheme;
             if (provider.Scopes != null)
             {
                 foreach (var scope in provider.Scopes)
