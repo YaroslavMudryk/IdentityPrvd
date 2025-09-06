@@ -5,7 +5,7 @@ namespace IdentityPrvd.Infrastructure.Caching;
 public interface ISessionManagerStore
 {
     Task InitializeAsync();
-    Task<SessionInfo> GetSessionAsync(string sessionId);
+    Task<SessionInfo> GetSessionAsync(string sessionId, bool currentSession = false);
     Task<IList<SessionInfo>> GetUserSessionsAsync(string userId);
     Task<(bool IsSuccess, string ErrorMessage)> AddSessionAsync(SessionInfo sessionInfo);
     Task<(bool IsSuccess, string ErrorMessage)> UpdateSessionAsync(SessionInfo sessionInfo);

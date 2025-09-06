@@ -37,7 +37,7 @@ public class SessionManager(
     {
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
-        var session = await sessionStore.GetSessionAsync(sessionId);
+        var session = await sessionStore.GetSessionAsync(sessionId, true);
         if (session == null)
         {
             logger.LogWarning("Session not found for user {UserId} with session ID {SessionId}", userId, sessionId);

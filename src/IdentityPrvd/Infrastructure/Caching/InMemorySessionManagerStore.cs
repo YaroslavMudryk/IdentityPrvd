@@ -12,7 +12,7 @@ public class InMemorySessionManagerStore(IServiceProvider serviceProvider) : ISe
 {
     private List<SessionInfo> _activeSessions = [];
 
-    public async Task<SessionInfo> GetSessionAsync(string sessionId)
+    public async Task<SessionInfo> GetSessionAsync(string sessionId, bool currentSession = false)
     {
         return await Task.FromResult(_activeSessions.FirstOrDefault(s => s.SessionId == sessionId)!);
     }

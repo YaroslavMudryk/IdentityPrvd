@@ -64,12 +64,15 @@ public class RedisSessionManagerStore(
         return (true, "Session deleted successfully.");
     }
 
-    public async Task<SessionInfo> GetSessionAsync(string sessionId)
+    public async Task<SessionInfo> GetSessionAsync(string sessionId, bool currentSession = false)
     {
         if (_currentSession != null && _currentSession.SessionId == sessionId)
             return _currentSession;
 
-        return await _sessions.Where(s => s.SessionId == sessionId).FirstOrDefaultAsync();
+        var session = await _sessions.Where(s => s.SessionId == sessionId).FirstOrDefaultAsync();
+        if (currentSession)
+            _currentSession = session;
+        return session;
     }
 
     public async Task<(bool IsSuccess, string ErrorMessage)> UpdateSessionAsync(SessionInfo sessionInfo)
