@@ -1,4 +1,5 @@
-﻿using IdentityPrvd.Common.Exceptions;
+﻿using FluentValidation;
+using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
@@ -13,10 +14,13 @@ public class RestorePasswordOrchestrator(
     IPasswordStore passwordStore,
     IUserStore userStore,
     ITransactionManager transactionManager,
+    IValidator<RestorePasswordDto> validator,
     IHasher hasher)
 {
     public async Task RestorePasswordAsync(RestorePasswordDto dto)
     {
+        await validator.ValidateAndThrowAsync(dto);
+
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
@@ -47,7 +51,7 @@ public class RestorePasswordOrchestrator(
         if (restoreToConfirm.IsActivated)
             throw new BadRequestException("Verify is already activated");
 
-        if (restoreToConfirm.ActiveFrom < utcNow || restoreToConfirm.ActiveTo > utcNow)
+        if (restoreToConfirm.ActiveFrom > utcNow || restoreToConfirm.ActiveTo < utcNow)
             throw new BadRequestException("Verify out of time");
 
         if (!hasher.Verify(restoreToConfirm.Code, dto.Code))

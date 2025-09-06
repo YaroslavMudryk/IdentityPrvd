@@ -31,6 +31,6 @@ public class EfConfirmStore(IdentityPrvdContext dbContext) : IConfirmStore
         throw new ArgumentException("Entities must be in modified state or unchanged state to be updated.");
     }
 
-    public async Task<IdentityConfirm> GetConfirmByCodeAsync(string code)
-        => await dbContext.Confirms.FirstOrDefaultAsync(s => s.Code == code);
+    public async Task<IdentityConfirm> GetConfirmByCodeAsync(string verifyId)
+        => await dbContext.Confirms.FirstOrDefaultAsync(s => s.VerifyId == verifyId);
 }

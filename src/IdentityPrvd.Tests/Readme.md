@@ -31,9 +31,9 @@ Use the checkboxes to mark progress.
 | QR Signin | POST | `/api/identity/qr/confirm` | [✅] | [❌] | [❌] |
 | Account | POST | `/api/identity/change-login` | [✅] | [❌] | [❌] |
 | Account | POST | `/api/identity/change-password` | [✅] | [❌] | [❌] |
-| Password restore | POST | `/api/identity/start-restore-password` | [✅] | [❌] | [❌] |
-| Password restore | POST | `/api/identity/restore-password` | [✅] | [❌] | [❌] |
-| Security | POST | `/api/identity/refresh-token` | [✅] | [❌] | [❌] |
+| Password restore | POST | `/api/identity/start-restore-password` | [✅] | [✅] | [❌] |
+| Password restore | POST | `/api/identity/restore-password` | [✅] | [✅] | [❌] |
+| Security | POST | `/api/identity/refresh-token` | [✅] | [✅] | [❌] |
 | Security | GET | `/api/identity/sessions` | [✅] | [✅] | [❌] |
 | Security | DELETE | `/api/identity/revoke-sessions` | [✅] | [✅] | [❌] |
 | Security (MFA) | POST | `/api/identity/mfa` | [✅] | [✅] | [❌] |

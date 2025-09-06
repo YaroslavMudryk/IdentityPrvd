@@ -16,10 +16,9 @@ public class RefreshTokenOrchestrator(
     IValidator<RefreshTokenDto> validator,
     TimeProvider timeProvider,
     IdentityPrvdOptions identityOptions,
-    IRefreshTokenStore refreshTokenRepo,
+    IRefreshTokenStore refreshTokenStore,
     ITokenService tokenService,
-    ITransactionManager transactionManager,
-    IRefreshTokensQuery refreshTokensQuery)
+    ITransactionManager transactionManager)
 {
     public async Task<SigninResponseDto> SigninByRefreshTokenAsync(RefreshTokenDto dto)
     {
@@ -29,9 +28,9 @@ public class RefreshTokenOrchestrator(
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
-        var oldRefreshToken = await refreshTokensQuery.GetRefreshTokenWithSessionNullableAsync(dto.Token);
+        var oldRefreshToken = await refreshTokenStore.GetRefreshTokenWithSessionByValueAsync(dto.Token);
         oldRefreshToken.UsedAt = utcNow;
-        await refreshTokenRepo.UpdateAsync(oldRefreshToken);
+        await refreshTokenStore.UpdateAsync(oldRefreshToken);
 
         var newRefreshToken = new IdentityRefreshToken
         {
@@ -39,7 +38,7 @@ public class RefreshTokenOrchestrator(
             Value = Generator.GetRefreshToken(),
             ExpiredAt = utcNow.AddDays(identityOptions.Token.RefreshLifeTimeInDays)
         };
-        await refreshTokenRepo.AddAsync(newRefreshToken);
+        await refreshTokenStore.AddAsync(newRefreshToken);
 
         var jwtToken = await tokenService.GetUserTokenAsync(oldRefreshToken.Session.UserId, oldRefreshToken.SessionId.GetIdAsString());
         await transaction.CommitAsync();

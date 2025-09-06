@@ -38,7 +38,7 @@ public class StartRestorePasswordOrchestrator(
         };
         await confirmStore.AddAsync(confirm);
 
-        await SendRestorePasswordAsync(userToRestorePassword.Login, confirm);
+        await SendRestorePasswordAsync(userToRestorePassword.Login, code);
 
         return new StartedRestorePasswordDto
         {
@@ -48,12 +48,12 @@ public class StartRestorePasswordOrchestrator(
         };
     }
 
-    private async Task SendRestorePasswordAsync(string login, IdentityConfirm confirm)
+    private async Task SendRestorePasswordAsync(string login, string code)
     {
         if (LoginExtensions.IsEmail(login))
-            await emailService.SendEmailAsync(login, "Restore password", confirm.Code);
+            await emailService.SendEmailAsync(login, "Restore password", code);
         else
-            await smsService.SendSmsAsync(login, confirm.Code);
+            await smsService.SendSmsAsync(login, code);
     }
 
     private static string GetCode(string login)

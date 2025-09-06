@@ -7,6 +7,7 @@ namespace IdentityPrvd.Data.Stores;
 public interface IRefreshTokenStore
 {
     Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdAsync(Ulid sessionId);
+    Task<IdentityRefreshToken> GetRefreshTokenWithSessionByValueAsync(string token);
     Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdsAsync(Ulid[] sessionIds);
     Task<IdentityRefreshToken> AddAsync(IdentityRefreshToken refreshToken);
     Task<IdentityRefreshToken> UpdateAsync(IdentityRefreshToken refreshToken);
@@ -57,5 +58,13 @@ public class EfRefreshTokenStore(IdentityPrvdContext dbContext) : IRefreshTokenS
         return await dbContext.RefreshTokens
             .Where(s => sessionIds.Contains(s.SessionId) && s.UsedAt == null)
             .ToListAsync();
+    }
+
+    public async Task<IdentityRefreshToken> GetRefreshTokenWithSessionByValueAsync(string token)
+    {
+        return await dbContext.RefreshTokens
+            .Include(s => s.Session)
+            .FirstOrDefaultAsync(rt => rt.Value == token)
+            ?? throw new KeyNotFoundException("Refresh token not found.");
     }
 }
