@@ -8,6 +8,7 @@ using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
+using IdentityPrvd.Domain.ValueObjects;
 using IdentityPrvd.Features.Authentication.QrSignin.Dtos;
 using IdentityPrvd.Features.Shared.Dtos;
 using IdentityPrvd.Mappers;
@@ -27,6 +28,7 @@ public interface IQrCodeService
 {
     Task<QrCodeDto> GenerateQrCodeAsync(QrRequestDto requestDto);
     Task<ConfirmQrDto> ConfirmQrCodeAsync(string verificationId);
+    Task<ClientInfo> GetQrCodeDetailsAsync(string verificationId);
 }
 
 public class QrCodeService(
@@ -43,6 +45,15 @@ public class QrCodeService(
     ISessionManager sessionManager,
     IWebSocketConnectionManager manager) : IQrCodeService
 {
+    public async Task<ClientInfo> GetQrCodeDetailsAsync(string verificationId)
+    {
+        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+
+        var qrSocket = manager.GetVerification(verificationId);
+        return await Task.FromResult(qrSocket.QrRequest.Client);
+    }
+
     public async Task<ConfirmQrDto> ConfirmQrCodeAsync(string verificationId)
     {
         var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();

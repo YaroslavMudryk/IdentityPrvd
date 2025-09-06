@@ -48,14 +48,27 @@ public class CreateQrSigninEndpoint : IEndpoint
     }
 }
 
+public class GetQrSigninDetailsEndpoint : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapGet("/api/identity/qr/{verificationId}",
+            async (string verificationId, IQrCodeService qrCodeService) =>
+            {
+                var qrCodeStatus = await qrCodeService.GetQrCodeDetailsAsync(verificationId);
+                return Results.Ok(qrCodeStatus.MapToResponse());
+            }).WithTags("QrSignin");
+    }
+}
+
 public class ConfirmQrSigninEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/identity/qr/confirm",
-            async (string verificationId, IQrCodeService qrCodeService) =>
+            async (QrConfirmDto confirm, IQrCodeService qrCodeService) =>
             {
-                var authResult = await qrCodeService.ConfirmQrCodeAsync(verificationId);
+                var authResult = await qrCodeService.ConfirmQrCodeAsync(confirm.VerificationId);
                 return Results.Ok(authResult.MapToResponse());
             }).WithTags("QrSignin");
     }
