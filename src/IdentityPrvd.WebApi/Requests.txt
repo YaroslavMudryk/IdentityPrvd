@@ -9,7 +9,7 @@ signin
 {
   "login": "admin@mail.com",
   "password": "Password1!",
-  "language": "uk",
+  "language": "ua",
   "clientId": "1jjd-Pt0B-QFdk-x3Vw",
   "clientSecret": "lTiv0Fn0PcWqAsjQGmHrBfsrEZuSfvMjDlST6311QjEfEolUl8qjOPCEUX0JJhXMCaJFJr",
   "appVersion": "0.0.1",

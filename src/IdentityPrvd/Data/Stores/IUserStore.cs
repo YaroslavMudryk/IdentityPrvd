@@ -7,8 +7,10 @@ namespace IdentityPrvd.Data.Stores;
 public interface IUserStore
 {
     Task<IdentityUser> GetUserAysnc(Ulid userId);
+    Task<IdentityUser> GetUserByLoginAsync(string login);
     Task<IdentityUser> AddAsync(IdentityUser user);
     Task<IdentityUser> UpdateAsync(IdentityUser user);
+    Task<IdentityUser> UpdateAsync(IdentityUser user, bool attached = false);
 }
 
 public class EfUserStore(IdentityPrvdContext dbContext) : IUserStore
@@ -33,4 +35,14 @@ public class EfUserStore(IdentityPrvdContext dbContext) : IUserStore
 
         throw new ArgumentException("Entity must be in modified state or unchanged state to be updated.");
     }
+
+    public async Task<IdentityUser> UpdateAsync(IdentityUser user, bool attach = false)
+    {
+        if (attach)
+            dbContext.Users.Attach(user);
+        return await UpdateAsync(user);
+    }
+
+    public async Task<IdentityUser> GetUserByLoginAsync(string login)
+        => await dbContext.Users.FirstOrDefaultAsync(s => s.Login == login);
 }

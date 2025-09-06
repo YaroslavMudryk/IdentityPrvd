@@ -84,11 +84,11 @@ public static class IdentityPrvdSeedLoader
             Description = "IdentityPrvd Client",
             IsActive = true,
             Image = "/assets/images/logo.png",
-            ClientSecretRequired = true,
-            ClientSecrets = [new IdentityClientSecret {
-                Value = hasher.GetHash("lTiv0Fn0PcWqAsjQGmHrBfsrEZuSfvMjDlST6311QjEfEolUl8qjOPCEUX0JJhXMCaJFJr"),
-                ClientId = clientId
-            }]
+            ClientSecretRequired = false,
+            //ClientSecrets = [new IdentityClientSecret {
+            //    Value = hasher.GetHash("lTiv0Fn0PcWqAsjQGmHrBfsrEZuSfvMjDlST6311QjEfEolUl8qjOPCEUX0JJhXMCaJFJr"),
+            //    ClientId = clientId
+            //}]
         };
     }
 

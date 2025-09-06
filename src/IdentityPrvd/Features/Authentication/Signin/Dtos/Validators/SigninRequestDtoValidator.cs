@@ -3,8 +3,11 @@ using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Data.Queries;
+using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Security;
+using System.Text.RegularExpressions;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Dtos.Validators;
 
@@ -12,6 +15,7 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
 {
     public SigninRequestDtoValidator(
         IUsersQuery usersQuery,
+        IUserStore userStore,
         IClientsQuery clientsQuery,
         IHasher hasher,
         IUserSecureService userSecureService,
@@ -22,14 +26,49 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         RuleFor(x => x.Login)
             .NotEmpty()
             .WithMessage("Login is required.")
-            .EmailAddress()
+            .Must((login) =>
+            {
+                if (options.User.LoginType == LoginType.Email)
+                {
+                    var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+                    if (!emailRegex.IsMatch(login))
+                        throw new BadRequestException("Login must be a valid email address");
+                }
+                else if (options.User.LoginType == LoginType.Phone)
+                {
+                    var phoneRegex = new Regex(@"^\+?[1-9]\d{1,14}$");
+                    if (!phoneRegex.IsMatch(login))
+                        throw new BadRequestException("Login must be a valid phone number");
+                }
+                else if (options.User.LoginType == LoginType.Any)
+                {
+                    if (string.IsNullOrWhiteSpace(login))
+                        throw new BadRequestException("Login is required");
+
+                    if (login.Length < 4)
+                        throw new BadRequestException("Login must be at least 4 characters long");
+                }
+
+                return true;
+            })
             .WithMessage("Email must be a valid email address.");
 
         RuleFor(x => x.Password)
-            .NotEmpty()
-            .WithMessage("Password is required.")
-            .MinimumLength(6)
-            .WithMessage("Password must be at least 6 characters long.");
+            .Custom((password, context) =>
+            {
+                if (string.IsNullOrWhiteSpace(password))
+                    context.AddFailure("password", "Password is required");
+
+                if (password.Length < 6)
+                    context.AddFailure("password", "Password must be at least 6 characters long");
+
+                if (!string.IsNullOrEmpty(options.Password.Regex))
+                {
+                    var passwordRegex = new Regex(options.Password.Regex);
+                    if (!passwordRegex.IsMatch(password))
+                        throw new BadRequestException($"{options.Password.RegexErrorMessage}");
+                }
+            });
 
         RuleFor(x => x.Language)
             .Must((language) =>
@@ -57,15 +96,12 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
 
             if (user.CanBeBlocked)
             {
-                if (userHelper.IsBlocked(user))
-                {
-                    throw new BadRequestException("User is blocked until " + user.BlockedUntil!.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-                }
+                await CheckBlockUserStatusAsync(userStore, timeProvider, user);
 
                 if (user.FailedLoginAttemptsCount >= 5)
                 {
-                    user.FailedLoginAttemptsCount = 0;
-                    user.BlockedUntil = utcNow.AddHours(1);
+                    await userSecureService.IncrementFailedLoginByBlockAsync(user, utcNow);
+                    throw new BadRequestException("User is blocked until " + user.BlockedUntil!.Value.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
             }
 
@@ -95,5 +131,25 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
 
             return true;
         });
+    }
+
+
+    private static async Task CheckBlockUserStatusAsync(IUserStore userStore, TimeProvider timeProvider, IdentityUser identityUser)
+    {
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+
+        if (identityUser.BlockedUntil == null)
+            return;
+
+        if (identityUser.BlockedUntil.HasValue)
+        {
+            if (identityUser.BlockedUntil.Value > utcNow)
+                throw new BadRequestException("User is blocked until " + identityUser.BlockedUntil!.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            else
+            {
+                identityUser.BlockedUntil = null;
+                await userStore.UpdateAsync(identityUser, true);
+            }
+        }
     }
 }
