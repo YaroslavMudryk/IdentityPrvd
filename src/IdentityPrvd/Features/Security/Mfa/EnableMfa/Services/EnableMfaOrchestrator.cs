@@ -32,7 +32,7 @@ public class EnableMfaOrchestrator(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
-        var userId = Ulid.Parse(currentUser.UserId);
+        var userId = currentUser.UserId.GetIdAsUlid();
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
         MfaResponse response = null;
@@ -63,7 +63,7 @@ public class EnableMfaOrchestrator(
             var secret = Base32Encoding.ToString(KeyGeneration.GenerateRandomKey(10));
             var mfaId = Ulid.NewUlid();
             var recoveryCodes = Generator.GetRecoveryCodes();
-            var mfaRecoveryCode = GetMfaRecoveryCodes(mfaId, recoveryCodes);
+            var mfaRecoveryCodes = GetMfaRecoveryCodes(mfaId, recoveryCodes);
             var newMfa = new IdentityMfa
             {
                 Id = mfaId,
@@ -71,7 +71,7 @@ public class EnableMfaOrchestrator(
                 Secret = protectionService.EncryptData(secret),
                 UserId = user.Id,
                 Type = MfaType.Totp,
-                RecoveryCodes = [.. mfaRecoveryCode]
+                RecoveryCodes = [.. mfaRecoveryCodes]
             };
             await mfaStore.AddAsync(newMfa);
             return new MfaResponse

@@ -13,7 +13,7 @@ Use the checkboxes to mark progress.
 | Group | Method | Path | Implemented | Manually tested | Has tests |
 |---|---|---|---|---|---|
 | Authentication | POST | `/api/identity/signin` | [✅] | [✅] | [❌] |
-| Authentication | POST | `/api/identity/signin-mfa` | [✅] | [❌] | [❌] |
+| Authentication | POST | `/api/identity/signin-mfa` | [✅] | [✅] | [❌] |
 | Authentication | POST | `/api/identity/signout` | [✅] | [✅] | [❌] |
 | Authentication | GET | `/api/identity/signin-options` | [✅] | [✅] | [❌] |
 | Authentication | POST | `/api/identity/signup` | [✅] | [✅] | [❌] |
@@ -35,9 +35,9 @@ Use the checkboxes to mark progress.
 | Password restore | POST | `/api/identity/restore-password` | [✅] | [❌] | [❌] |
 | Security | POST | `/api/identity/refresh-token` | [✅] | [❌] | [❌] |
 | Security | GET | `/api/identity/sessions` | [✅] | [✅] | [❌] |
-| Security | DELETE | `/api/identity/revoke-sessions` | [✅] | [❌] | [❌] |
-| Security (MFA) | POST | `/api/identity/mfa` | [✅] | [❌] | [❌] |
-| Security (MFA) | DELETE | `/api/identity/mfa` | [✅] | [❌] | [❌] |
+| Security | DELETE | `/api/identity/revoke-sessions` | [✅] | [✅] | [❌] |
+| Security (MFA) | POST | `/api/identity/mfa` | [✅] | [✅] | [❌] |
+| Security (MFA) | DELETE | `/api/identity/mfa` | [✅] | [✅] | [❌] |
 | Personal (Contacts) | GET | `/api/identity/contacts` | [✅] | [❌] | [❌] |
 | Personal (Contacts) | POST | `/api/identity/contacts` | [✅] | [❌] | [❌] |
 | Personal (Contacts) | DELETE | `/api/identity/contacts/{id}` | [✅] | [❌] | [❌] |
