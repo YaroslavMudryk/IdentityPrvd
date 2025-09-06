@@ -162,7 +162,7 @@
 
             // 3) Відкриваємо WebSocket
             const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-            const ws = new WebSocket(`wss://localhost:7030/auth?verificationId=${data.verificationId}`);
+            const ws = new WebSocket(`wss://localhost:7030/auth/qr?verificationId=${data.verificationId}`);
 
             // 4) По повідомленню — зберігаємо токен, закриваємо WS, показуємо токен на сторінці
             ws.onmessage = evt => {

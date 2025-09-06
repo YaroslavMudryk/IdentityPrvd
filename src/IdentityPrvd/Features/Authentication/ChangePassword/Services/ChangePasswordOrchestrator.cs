@@ -71,10 +71,12 @@ public class ChangePasswordOrchestrator(
             IsActive = true,
             ActivatedAt = utcNow,
             Hint = dto.Hint,
+            UserId = activePassword.UserId,
             PasswordHash = passwordHash
         };
         userFromDb.PasswordHash = passwordHash;
 
+        await passwordStore.UpdateAsync(activePassword);
         await passwordStore.AddAsync(newUserPassword);
 
         if (options.User.ForceSignoutEverywhere || dto.SignoutEverywhere)

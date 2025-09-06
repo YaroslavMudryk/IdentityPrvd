@@ -25,12 +25,12 @@ Use the checkboxes to mark progress.
 | Authentication | GET | `/api/identity/link-external-signin-callback` | [✅] | [✅] | [❌] |
 | Authentication | DELETE | `/api/identity/unlink-external-signin` | [✅] | [✅] | [❌] |
 | Authentication | GET | `/api/identity/sso` | [✅] | [✅] | [❌] |
-| QR Signin | GET (WebSocket) | `/auth` | [✅] | [❌] | [❌] |
-| QR Signin | POST | `/api/identity/qr` | [✅] | [❌] | [❌] |
-| QR Signin | GET | `/api/identity/qr/{verificationId}` | [✅] | [❌] | [❌] |
-| QR Signin | POST | `/api/identity/qr/confirm` | [✅] | [❌] | [❌] |
-| Account | POST | `/api/identity/change-login` | [✅] | [❌] | [❌] |
-| Account | POST | `/api/identity/change-password` | [✅] | [❌] | [❌] |
+| QR Signin | GET (WebSocket) | `/auth` | [✅] | [✅❌] | [❌] |
+| QR Signin | POST | `/api/identity/qr` | [✅] | [✅] | [❌] |
+| QR Signin | GET | `/api/identity/qr/{verificationId}` | [✅] | [✅] | [❌] |
+| QR Signin | POST | `/api/identity/qr/confirm` | [✅] | [✅] | [❌] |
+| Account | POST | `/api/identity/change-login` | [✅] | [✅] | [❌] |
+| Account | POST | `/api/identity/change-password` | [✅] | [✅] | [❌] |
 | Password restore | POST | `/api/identity/start-restore-password` | [✅] | [✅] | [❌] |
 | Password restore | POST | `/api/identity/restore-password` | [✅] | [✅] | [❌] |
 | Security | POST | `/api/identity/refresh-token` | [✅] | [✅] | [❌] |

@@ -12,6 +12,7 @@ public interface IPasswordStore
     Task<List<IdentityPassword>> GetUserActivePasswordsAsync(Ulid userId);
     Task<IdentityPassword> AddAsync(IdentityPassword password);
     Task UpdateRangeAsync(IEnumerable<IdentityPassword> passwords);
+    Task<IdentityPassword> UpdateAsync(IdentityPassword password);
 }
 
 public class EfPasswordStore(IdentityPrvdContext dbContext) : IPasswordStore
@@ -47,4 +48,15 @@ public class EfPasswordStore(IdentityPrvdContext dbContext) : IPasswordStore
         await dbContext.Passwords
         .Where(s => s.UserId == userId && s.IsActive)
         .ToListAsync();
+
+    public async Task<IdentityPassword> UpdateAsync(IdentityPassword password)
+    {
+        if (dbContext.Entry(password).State is EntityState.Modified or EntityState.Unchanged)
+        {
+            await dbContext.SaveChangesAsync();
+            return password;
+        }
+
+        throw new ArgumentException("Entities must be in modified state or unchanged state to be updated.");
+    }
 }

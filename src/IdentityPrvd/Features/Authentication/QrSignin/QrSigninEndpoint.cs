@@ -13,7 +13,7 @@ public class QrSigninEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/auth",
+        app.MapGet("/auth/qr",
             [AllowAnonymous] async (HttpContext context, IWebSocketConnectionManager manager) =>
             {
                 if (!context.WebSockets.IsWebSocketRequest)
