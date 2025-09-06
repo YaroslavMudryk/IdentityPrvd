@@ -1,6 +1,5 @@
 using IdentityPrvd.DependencyInjection;
 using IdentityPrvd.DependencyInjection.Auth;
-using IdentityPrvd.DependencyInjection.Auth.Providers;
 using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Seeding;
 using Microsoft.EntityFrameworkCore;
@@ -21,21 +20,7 @@ public class Program
                 .UseSha512Hasher()
                 .UseAesProtectionService()
                 .UseIpApiLocationService()
-                .UseExternalProviders(providerBuilder =>
-                {
-                    providerBuilder
-                        .AddBattleNet()
-                        .AddFacebook()
-                        .AddGitHub()
-                        .AddGoogle()
-                        .AddMicrosoft()
-                        .AddCustomProvider<SamsungProvider>()
-                        .AddSteam()
-                        .AddTwitter()
-                        .AddDiscord()
-                        .AddApple()
-                        .AddSpotify();
-                })
+                .UseExternalProviders()
                 .UseRedisSessionManagerStore(builder.Options.Connections.Redis)
                 .UseDbContext<IdentityPrvdContext>(options =>
                 {

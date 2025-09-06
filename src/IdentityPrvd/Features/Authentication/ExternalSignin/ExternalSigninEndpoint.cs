@@ -48,6 +48,6 @@ public class ExternalSigninCallbackEndpoint : IEndpoint
             {
                 var responseDto = await orc.SigninExternalProviderAsync(await providerManager.AuthenticateAsync(context, provider));
                 return Results.Redirect($"{returnUrl}?accessToken={responseDto.AccessToken}&refreshToken={responseDto.RefreshToken}&expiredIn={responseDto.ExpiredIn}");
-            }).WithTags("External signin", "IdentityPrvd").WithName("SigninExternalCallback");
+            }).WithTags("External signin").WithName("SigninExternalCallback");
     }
 }

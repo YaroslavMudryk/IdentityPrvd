@@ -14,38 +14,38 @@ public class SignupRequestDtoValidator : AbstractValidator<SignupRequestDto>
     {
         RuleFor(s => s)
             .MustAsync(async (dto, token) =>
-        {
-            if (options.User.LoginType == LoginType.Email)
             {
-                var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-                if (!emailRegex.IsMatch(dto.Login))
-                    throw new BadRequestException("Login must be a valid email address");
-            }
-            else if (options.User.LoginType == LoginType.Phone)
-            {
-                var phoneRegex = new Regex(@"^\+?[1-9]\d{1,14}$");
-                if (!phoneRegex.IsMatch(dto.Login))
-                    throw new BadRequestException("Login must be a valid phone number");
-            }
-            else if (options.User.LoginType == LoginType.Any)
-            {
-                if (string.IsNullOrWhiteSpace(dto.Login))
-                    throw new BadRequestException("Login is required");
+                if (options.User.LoginType == LoginType.Email)
+                {
+                    var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+                    if (!emailRegex.IsMatch(dto.Login))
+                        throw new BadRequestException("Login must be a valid email address");
+                }
+                else if (options.User.LoginType == LoginType.Phone)
+                {
+                    var phoneRegex = new Regex(@"^\+?[1-9]\d{1,14}$");
+                    if (!phoneRegex.IsMatch(dto.Login))
+                        throw new BadRequestException("Login must be a valid phone number");
+                }
+                else if (options.User.LoginType == LoginType.Any)
+                {
+                    if (string.IsNullOrWhiteSpace(dto.Login))
+                        throw new BadRequestException("Login is required");
                 
-                if (dto.Login.Length < 5)
-                    throw new BadRequestException("Login must be at least 5 characters long");
-            }
+                    if (dto.Login.Length < 4)
+                        throw new BadRequestException("Login must be at least 4 characters long");
+                }
 
-            var isExistUser = await usersQuery.IsExistUserByLoginAsync(dto.Login);
-            if (isExistUser)
-                throw new BadRequestException("User with this login already exists");
+                var isExistUser = await usersQuery.IsExistUserByLoginAsync(dto.Login);
+                if (isExistUser)
+                    throw new BadRequestException("User with this login already exists");
 
-            isExistUser = await usersQuery.IsExistUserByUserNameAsync(dto.UserName);
-            if (isExistUser)
-                throw new BadRequestException("User with this userName already exists");
+                isExistUser = await usersQuery.IsExistUserByUserNameAsync(dto.UserName);
+                if (isExistUser)
+                    throw new BadRequestException("User with this userName already exists");
 
-            return true;
-        });
+                return true;
+            });
 
         RuleFor(s => s.Password)
             .NotEmpty()

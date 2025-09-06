@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
@@ -11,6 +12,7 @@ using IdentityPrvd.Features.Authentication.Signup.Dtos;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
+using Microsoft.AspNetCore.Http;
 
 namespace IdentityPrvd.Features.Authentication.Signup.Services;
 
@@ -77,12 +79,12 @@ public class SignupOrchestrator(
                 ActiveFrom = utcNow,
                 ActiveTo = utcNow.AddMinutes(options.User.ConfirmCodeValidInMinutes),
                 VerifyId = Guid.NewGuid().ToString("N"),
-                Code = Generator.GetString(6),
+                Code = codeToConfirm,
                 UserId = user.Id,
                 Type = ConfirmType.User,
             };
             await confirmStore.AddAsync(confirmCode);
-            await SendVerificationAsync(codeToConfirm, user.Login);
+            await SendVerificationAsync(confirmCode.Code, user.Login);
         }
 
         await transaction.CommitAsync();
@@ -111,7 +113,9 @@ public class SignupOrchestrator(
     {
         if (LoginExtensions.IsPhone(login))
             await smsService.SendSmsAsync(login, code);
-        else
+        else if (LoginExtensions.IsEmail(login))
             await emailService.SendEmailAsync(login, "Confirmation account", code);
+        else
+            throw new HttpResponseException("With random login can't be confirmed account", StatusCodes.Status400BadRequest);
     }
 }

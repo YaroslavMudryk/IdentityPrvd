@@ -41,7 +41,7 @@ public class RestorePasswordOrchestrator(
 
     private async Task<IdentityConfirm> GetVerifyAsync(RestorePasswordDto dto, DateTime utcNow)
     {
-        var restoreToConfirm = await confirmStore.GetConfirmByVerifyIdAsync(dto.VerifyId)
+        var restoreToConfirm = await confirmStore.GetConfirmByCodeAsync(dto.VerifyId)
             ?? throw new BadRequestException("Restore verify id is not correct");
 
         if (restoreToConfirm.IsActivated)
