@@ -25,7 +25,7 @@ public class IdentityUser : BaseModel
     public List<IdentityQr> Qrs { get; set; } = [];
     public List<IdentityBan> Bans { get; set; } = [];
     public List<IdentityMfa> Mfas { get; set; } = [];
-    public List<IdentityConfirm> Confirms { get; set; } = [];
+    public List<IdentityCode> Confirms { get; set; } = [];
     public List<IdentityUserRole> UserRoles { get; set; } = [];
     public List<IdentityFailedLoginAttempt> FailedLoginAttempts { get; set; } = [];
     public List<IdentitySession> Sessions { get; set; } = [];

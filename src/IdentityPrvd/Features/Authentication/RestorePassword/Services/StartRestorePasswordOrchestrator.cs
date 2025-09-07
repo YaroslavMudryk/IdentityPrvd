@@ -26,9 +26,9 @@ public class StartRestorePasswordOrchestrator(
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
         var code = GetCode(userToRestorePassword.Login);
-        var confirm = new IdentityConfirm
+        var confirm = new IdentityCode
         {
-            Type = ConfirmType.RestorePassword,
+            Type = CodeType.RestorePassword,
             UserId = userToRestorePassword.Id,
             ActiveFrom = utcNow,
             ActiveTo = utcNow.AddMinutes(15),

@@ -18,7 +18,7 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
     public DbSet<IdentityClient> Clients { get; set; } = null!;
     public DbSet<IdentityClientSecret> ClientSecrets { get; set; } = null!;
     public DbSet<IdentityClientClaim> ClientClaims { get; set; } = null!;
-    public DbSet<IdentityConfirm> Confirms { get; set; } = null!;
+    public DbSet<IdentityCode> Confirms { get; set; } = null!;
     public DbSet<IdentityContact> Contacts { get; set; } = null!;
     public DbSet<IdentityDevice> Devices { get; set; } = null!;
     public DbSet<IdentityFailedLoginAttempt> FailedLoginAttempts { get; set; } = null!;
@@ -82,7 +82,7 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
         });
 
         // Configure IdentityConfirm
-        modelBuilder.Entity<IdentityConfirm>(builder =>
+        modelBuilder.Entity<IdentityCode>(builder =>
         {
             builder.HasKey(c => c.Id);
             builder.HasQueryFilter(d => d.DeletedAt == null);

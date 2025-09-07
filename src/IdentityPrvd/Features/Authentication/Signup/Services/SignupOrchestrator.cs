@@ -74,14 +74,14 @@ public class SignupOrchestrator(
         if (options.User.ConfirmRequired)
         {
             var codeToConfirm = GetCodeToConfirm(user.Login);
-            var confirmCode = new IdentityConfirm
+            var confirmCode = new IdentityCode
             {
                 ActiveFrom = utcNow,
                 ActiveTo = utcNow.AddMinutes(options.User.ConfirmCodeValidInMinutes),
                 VerifyId = Guid.NewGuid().ToString("N"),
                 Code = codeToConfirm,
                 UserId = user.Id,
-                Type = ConfirmType.User,
+                Type = CodeType.UserConfirm,
             };
             await confirmStore.AddAsync(confirmCode);
             await SendVerificationAsync(confirmCode.Code, user.Login);

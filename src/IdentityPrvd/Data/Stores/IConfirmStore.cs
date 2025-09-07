@@ -6,21 +6,21 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IConfirmStore
 {
-    Task<IdentityConfirm> AddAsync(IdentityConfirm confirm);
-    Task<IdentityConfirm> UpdateAsync(IdentityConfirm confirm);
-    Task<IdentityConfirm> GetConfirmByCodeAsync(string verifyId);
+    Task<IdentityCode> AddAsync(IdentityCode confirm);
+    Task<IdentityCode> UpdateAsync(IdentityCode confirm);
+    Task<IdentityCode> GetConfirmByCodeAsync(string verifyId);
 }
 
 public class EfConfirmStore(IdentityPrvdContext dbContext) : IConfirmStore
 {
-    public async Task<IdentityConfirm> AddAsync(IdentityConfirm confirm)
+    public async Task<IdentityCode> AddAsync(IdentityCode confirm)
     {
         await dbContext.Confirms.AddAsync(confirm);
         await dbContext.SaveChangesAsync();
         return confirm;
     }
 
-    public async Task<IdentityConfirm> UpdateAsync(IdentityConfirm confirm)
+    public async Task<IdentityCode> UpdateAsync(IdentityCode confirm)
     {
         if (dbContext.Entry(confirm).State is EntityState.Modified or EntityState.Unchanged)
         {
@@ -31,6 +31,6 @@ public class EfConfirmStore(IdentityPrvdContext dbContext) : IConfirmStore
         throw new ArgumentException("Entities must be in modified state or unchanged state to be updated.");
     }
 
-    public async Task<IdentityConfirm> GetConfirmByCodeAsync(string verifyId)
+    public async Task<IdentityCode> GetConfirmByCodeAsync(string verifyId)
         => await dbContext.Confirms.FirstOrDefaultAsync(s => s.VerifyId == verifyId);
 }
