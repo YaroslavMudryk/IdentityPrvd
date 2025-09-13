@@ -41,24 +41,16 @@ public class ServerSideSessionMiddleware(
 
                         var options = context.RequestServices.GetRequiredService<IdentityPrvdOptions>();
                         if (options.TrackSessionActivity)
-                        {
                             await sessionManager.MarkSessionLastActivityAsync(userId, sessionId);
-                        }
                     }
                     else
-                    {
                         await RespondUnauthorizedAsync(context);
-                    }
                 }
                 else
-                {
                     await RespondUnauthorizedAsync(context);
-                }
             }
             else
-            {
                 await RespondUnauthorizedAsync(context);
-            }
         }
         else
         {
