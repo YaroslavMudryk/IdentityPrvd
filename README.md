@@ -307,6 +307,43 @@ app.Run();
 - Replace transactions via `UseTransaction<TTransactionManager>()`.
 - Replace only a subset of stores or queries using `IdentityPrvdOptions.Database.Map*` helpers.
 
+### Add custom claims to generated JWT (Token claims interceptor)
+
+You can plug into token creation and add custom claims via a contributor. Implement `ITokenClaimsContributor` and register it with the builder.
+
+```csharp
+using System.Security.Claims;
+using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Services.Security;
+
+public class MyCustomClaimsContributor : ITokenClaimsContributor
+{
+	public Task ContributeAsync(TokenClaimsContext context, CancellationToken cancellationToken = default)
+	{
+		// Example: add tenant and feature flags
+		context.Claims.Add(new Claim("tenant", "acme"));
+		context.Claims.Add(new Claim("feature:beta", "true"));
+
+		// Example: add something based on provider or user
+		if (context.Provider == "Google")
+			context.Claims.Add(new Claim("login_provider", "google"));
+
+		// Always available:
+		// context.UserId, context.SessionId, context.Provider, context.Claims
+		return Task.CompletedTask;
+	}
+}
+
+// Registration (e.g., in Program.cs when building services)
+builder.Services.AddIdentityPrvd(builder.Configuration, b =>
+{
+	// ... other configuration
+	b.AddTokenClaimsContributor<MyCustomClaimsContributor>();
+});
+```
+
+Contributors are called during token generation in `TokenService` for both regular and external sign-in flows. Multiple contributors can be registered; they will be executed in registration order.
+
 ## Notes
 
 - Defaults are optimized for development: fake notifiers, fake hasher/protection unless overridden.

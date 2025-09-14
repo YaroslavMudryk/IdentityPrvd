@@ -15,7 +15,8 @@ namespace IdentityPrvd.Services.Security;
 public class TokenService(
     IdentityPrvdContext dbContext,
     IdentityPrvdOptions identityOptions,
-    TimeProvider timeProvider) : ITokenService
+    TimeProvider timeProvider,
+    IEnumerable<ITokenClaimsContributor> claimsContributors) : ITokenService
 {
     public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId)
     {
@@ -31,6 +32,15 @@ public class TokenService(
             .ToListAsync();
 
         claims.AddRange(roles.Select(role => new Claim(IdentityClaims.Types.Roles, role)));
+
+        if (claimsContributors.Any())
+        {
+            var context = new TokenClaimsContext(userId, sessionId, claims);
+            foreach (var contributor in claimsContributors)
+            {
+                await contributor.ContributeAsync(context);
+            }
+        }
 
         return GenerateJwtToken(claims);
     }
@@ -50,6 +60,15 @@ public class TokenService(
             .ToListAsync();
 
         claims.AddRange(roles.Select(role => new Claim(IdentityClaims.Types.Roles, role)));
+
+        if (claimsContributors.Any())
+        {
+            var context = new TokenClaimsContext(userId, sessionId, claims, provider);
+            foreach (var contributor in claimsContributors)
+            {
+                await contributor.ContributeAsync(context);
+            }
+        }
 
         return GenerateJwtToken(claims);
     }

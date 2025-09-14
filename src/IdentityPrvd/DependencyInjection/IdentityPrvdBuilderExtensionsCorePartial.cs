@@ -65,6 +65,24 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return AddService<IHasher, THasher>(builder, lifetime);
     }
 
+    public static IIdentityPrvdBuilder AddTokenClaimsContributor<TContributor>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TContributor : class, ITokenClaimsContributor
+    {
+        if (lifetime == ServiceLifetime.Singleton)
+        {
+            builder.Services.AddSingleton<ITokenClaimsContributor, TContributor>();
+        }
+        else if (lifetime == ServiceLifetime.Transient)
+        {
+            builder.Services.AddTransient<ITokenClaimsContributor, TContributor>();
+        }
+        else
+        {
+            builder.Services.AddScoped<ITokenClaimsContributor, TContributor>();
+        }
+
+        return builder;
+    }
+
     public static IIdentityPrvdBuilder UseTransaction<TTransactionManager>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TTransactionManager : class, ITransactionManager
     {
         return AddService<ITransactionManager, TTransactionManager>(builder, lifetime);
