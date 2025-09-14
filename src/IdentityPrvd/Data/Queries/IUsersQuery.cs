@@ -27,8 +27,6 @@ public class EfUsersQuery(IdentityPrvdContext dbContext) : IUsersQuery
 
     public async Task<IdentityUser> GetUserByLoginNullableAsync(string login)
     {
-        return (await dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Login == login))!;
+        return (await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(s => s.Login == login))!;
     }
 }

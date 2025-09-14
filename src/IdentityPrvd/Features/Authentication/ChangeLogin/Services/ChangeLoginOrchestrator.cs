@@ -2,17 +2,18 @@
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Contexts;
+using IdentityPrvd.Data.Queries;
+using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Features.Authentication.ChangeLogin.Dtos;
-using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Security;
-using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.Features.Authentication.ChangeLogin.Services;
 
 public class ChangeLoginOrchestrator(
     IUserContext userContext,
-    IdentityPrvdContext dbContext,
+    IUserStore userStore,
+    IUsersQuery usersQuery,
     IdentityPrvdOptions options,
     IHasher hasher)
 {
@@ -24,7 +25,7 @@ public class ChangeLoginOrchestrator(
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
         var userId = currentUser.UserId.GetIdAsUlid();
 
-        var userFromDb = await dbContext.Users.FindAsync(userId);
+        var userFromDb = await userStore.GetUserAsync(userId);
 
         VerifyLoginType(dto.NewLogin, options);
 
@@ -34,15 +35,14 @@ public class ChangeLoginOrchestrator(
             if (!passwordVerified)
                 throw new BadRequestException("Your password is invalid");
         }
-
-        var existsUser = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(s => s.Login == dto.NewLogin);
+        var existsUser = await usersQuery.GetUserByLoginNullableAsync(dto.NewLogin);
         if (existsUser != null)
             if (existsUser.Id != userId)
                 throw new BadRequestException("This login is busy");
 
         userFromDb.Login = dto.NewLogin;
 
-        await dbContext.SaveChangesAsync();
+        await userStore.UpdateAsync(userFromDb);
     }
 
     private static void VerifyLoginType(string newLogin, IdentityPrvdOptions options)

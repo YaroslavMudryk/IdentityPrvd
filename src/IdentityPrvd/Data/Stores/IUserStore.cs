@@ -6,7 +6,7 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IUserStore
 {
-    Task<IdentityUser> GetUserAysnc(Ulid userId);
+    Task<IdentityUser> GetUserAsync(Ulid userId);
     Task<IdentityUser> GetUserByLoginAsync(string login);
     Task<IdentityUser> AddAsync(IdentityUser user);
     Task<IdentityUser> UpdateAsync(IdentityUser user);
@@ -15,7 +15,7 @@ public interface IUserStore
 
 public class EfUserStore(IdentityPrvdContext dbContext) : IUserStore
 {
-    public async Task<IdentityUser> GetUserAysnc(Ulid userId)
+    public async Task<IdentityUser> GetUserAsync(Ulid userId)
         => await dbContext.Users.FindAsync(userId);
 
     public async Task<IdentityUser> AddAsync(IdentityUser user)

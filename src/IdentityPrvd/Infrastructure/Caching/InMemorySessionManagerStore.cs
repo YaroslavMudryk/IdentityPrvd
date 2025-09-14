@@ -1,6 +1,5 @@
 ﻿using IdentityPrvd.Common.Extensions;
-using IdentityPrvd.Domain.Enums;
-using IdentityPrvd.Infrastructure.Database.Context;
+using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
 using Microsoft.EntityFrameworkCore;
@@ -69,9 +68,9 @@ public class InMemorySessionManagerStore(IServiceProvider serviceProvider) : ISe
     public async Task InitializeAsync()
     {
         using var scope = serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<IdentityPrvdContext>();
+        var sessionsQuery = scope.ServiceProvider.GetRequiredService<ISessionsQuery>();
         var tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
-        var activeSessions = await dbContext.Sessions.AsNoTracking().Where(s => s.Status == SessionStatus.Active).ToListAsync();
+        var activeSessions = await sessionsQuery.GetAllActiveSessionsAsync();
 
         foreach (var session in activeSessions)
         {

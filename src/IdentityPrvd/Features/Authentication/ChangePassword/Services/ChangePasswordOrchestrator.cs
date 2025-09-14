@@ -36,7 +36,7 @@ public class ChangePasswordOrchestrator(
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
-        var userFromDb = await userStore.GetUserAysnc(userId);
+        var userFromDb = await userStore.GetUserAsync(userId);
 
         if (!string.IsNullOrEmpty(userFromDb.PasswordHash))
         {

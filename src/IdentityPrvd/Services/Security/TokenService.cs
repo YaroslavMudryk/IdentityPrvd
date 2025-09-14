@@ -1,10 +1,9 @@
 ﻿using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Extensions;
+using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Features.Shared.Dtos;
-using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,9 +12,11 @@ using System.Text;
 namespace IdentityPrvd.Services.Security;
 
 public class TokenService(
-    IdentityPrvdContext dbContext,
     IdentityPrvdOptions identityOptions,
     TimeProvider timeProvider,
+    IUserRolesQuery userRolesQuery,
+    IRoleClaimsQuery roleClaimsQuery,
+    IClientClaimsQuery clientClaimsQuery,
     IEnumerable<ITokenClaimsContributor> claimsContributors) : ITokenService
 {
     public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId)
@@ -26,10 +27,7 @@ public class TokenService(
             new(IdentityClaims.Types.SessionId, sessionId),
         };
 
-        var roles = await dbContext.UserRoles
-            .Where(ur => ur.UserId == userId)
-            .Select(ur => ur.Role.Name)
-            .ToListAsync();
+        var roles = await userRolesQuery.GetUserRoleNamesAsync(userId);
 
         claims.AddRange(roles.Select(role => new Claim(IdentityClaims.Types.Roles, role)));
 
@@ -54,10 +52,7 @@ public class TokenService(
             new(IdentityClaims.Types.AuthMethod, provider)
         };
 
-        var roles = await dbContext.UserRoles
-            .Where(ur => ur.UserId == userId)
-            .Select(ur => ur.Role.Name)
-            .ToListAsync();
+        var roles = await userRolesQuery.GetUserRoleNamesAsync(userId);
 
         claims.AddRange(roles.Select(role => new Claim(IdentityClaims.Types.Roles, role)));
 
@@ -75,11 +70,8 @@ public class TokenService(
 
     public async Task<Dictionary<string, List<string>>> GetUserPermissionsAsync(Ulid userId, string clientId)
     {
-        var userRoleIds = await dbContext.UserRoles.AsNoTracking().Where(s => s.UserId == userId).Select(s => s.RoleId).ToListAsync();
-        var userClientId = await dbContext.Clients.AsNoTracking().Where(s => s.ClientId == clientId).Select(s => s.Id).FirstOrDefaultAsync();
-
-        var roleClaims = await dbContext.RoleClaims.AsNoTracking().Where(s => userRoleIds.Contains(s.RoleId)).Select(s => s.Claim).ToListAsync();
-        var clientClaims = await dbContext.ClientClaims.AsNoTracking().Where(s => s.ClientId == userClientId).Select(s => s.Claim).ToListAsync();
+        var roleClaims = await roleClaimsQuery.GetClaimsByUserIdAsync(userId);
+        var clientClaims = await clientClaimsQuery.GetClaimsByClientIdAsync(clientId);
 
         return roleClaims.GroupUnionCollectionBy(clientClaims, c => c.Id, c => c.Type, c => c.Value);
     }

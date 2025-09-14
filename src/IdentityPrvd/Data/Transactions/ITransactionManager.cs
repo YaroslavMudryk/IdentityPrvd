@@ -1,5 +1,4 @@
-﻿
-namespace IdentityPrvd.Data.Transactions;
+﻿namespace IdentityPrvd.Data.Transactions;
 
 public interface ITransactionManager
 {

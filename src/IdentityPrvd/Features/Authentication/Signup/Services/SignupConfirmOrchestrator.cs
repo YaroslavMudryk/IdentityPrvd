@@ -23,7 +23,7 @@ public class SignupConfirmOrchestrator(
         confirm.IsActivated = true;
         confirm.ActivatedAt = utcNow;
         await confirmStore.UpdateAsync(confirm);
-        var user = await userStore.GetUserAysnc(confirm.UserId);
+        var user = await userStore.GetUserAsync(confirm.UserId);
         user.IsConfirmed = true;
         user.ConfirmedAt = utcNow;
         user.ConfirmedBy = user.Id.GetIdAsString();

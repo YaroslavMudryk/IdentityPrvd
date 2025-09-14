@@ -11,13 +11,11 @@ using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Domain.ValueObjects;
 using IdentityPrvd.Features.Authentication.Signin.Dtos;
 using IdentityPrvd.Features.Shared.Dtos;
-using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Mappers;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
-using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Services;
 
@@ -33,7 +31,7 @@ public class SigninOrchestrator(
     TimeProvider timeProvider,
     IdentityPrvdOptions identityOptions,
     ISessionStore sessionRepo,
-    IdentityPrvdContext dbContext,
+    IMfasQuery mfasQuery,
     IValidator<SigninRequestDto> validator)
 {
     public async Task<SigninResponseDto> SigninAsync(SigninRequestDto dto)
@@ -48,7 +46,7 @@ public class SigninOrchestrator(
 
         var response = new SigninResponseDto();
 
-        var userMfa = await dbContext.Mfas.AsNoTracking().FirstOrDefaultAsync(s => s.UserId == user.Id);
+        var userMfa = await mfasQuery.GetMfaByUserIdAsync(user.Id);
         if (userMfa == null)
             response = await SigninAsync(user, dto, client, location);
         else

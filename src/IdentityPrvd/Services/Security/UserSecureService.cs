@@ -1,24 +1,30 @@
-﻿using IdentityPrvd.Domain.Entities;
-using IdentityPrvd.Infrastructure.Database.Context;
+﻿using IdentityPrvd.Data.Stores;
+using IdentityPrvd.Data.Transactions;
+using IdentityPrvd.Domain.Entities;
 
 namespace IdentityPrvd.Services.Security;
 
 public class UserSecureService(
-    IdentityPrvdContext dbContext) : IUserSecureService
+    ITransactionManager transactionManager,
+    IUserStore userStore,
+    IBanStore banStore,
+    IFailedLoginAttemptStore failedLoginAttemptStore) : IUserSecureService
 {
     public async Task IncrementFailedLoginByBlockAsync(IdentityUser user, DateTime utcNow)
     {
+        await using var transaction = await transactionManager.BeginTransactionAsync();
+
         user.FailedLoginAttemptsCount = 0;
         user.BlockedUntil = utcNow.AddHours(1);
-        dbContext.Users.Update(user);
-        await dbContext.Bans.AddAsync(new IdentityBan
+        await userStore.UpdateAsync(user);
+        await banStore.AddAsync(new IdentityBan
         {
             Cause = "Failed login attempts counts to 5",
             UserId = user.Id,
             Start = utcNow,
             End = user.BlockedUntil.Value,
         });
-        await dbContext.FailedLoginAttempts.AddAsync(new IdentityFailedLoginAttempt
+        await failedLoginAttemptStore.AddAsync(new IdentityFailedLoginAttempt
         {
             UserId = user.Id,
             Client = default!,
@@ -26,14 +32,17 @@ public class UserSecureService(
             Login = user.Login,
             Password = string.Empty, // Password is not stored for security reasons
         });
-        await dbContext.SaveChangesAsync();
+
+        await transaction.CommitAsync();
     }
 
     public async Task IncrementFailedLoginByPasswordAsync(IdentityUser user, DateTime utcNow)
     {
+        await using var transaction = await transactionManager.BeginTransactionAsync();
+
         user.FailedLoginAttemptsCount++;
-        dbContext.Users.Update(user);
-        await dbContext.FailedLoginAttempts.AddAsync(new IdentityFailedLoginAttempt
+        await userStore.UpdateAsync(user);
+        await failedLoginAttemptStore.AddAsync(new IdentityFailedLoginAttempt
         {
             UserId = user.Id,
             Client = default!,
@@ -41,6 +50,7 @@ public class UserSecureService(
             Login = user.Login,
             Password = string.Empty, // Password is not stored for security reasons
         });
-        await dbContext.SaveChangesAsync();
+
+        await transaction.CommitAsync();
     }
 }

@@ -78,7 +78,7 @@ public class RestorePasswordOrchestrator(
 
     private async Task SetupUserPasswordAsync(Ulid userId, string passwordHash)
     {
-        var userForUpdate = await userStore.GetUserAysnc(userId);
+        var userForUpdate = await userStore.GetUserAsync(userId);
         userForUpdate.PasswordHash = passwordHash;
         await userStore.UpdateAsync(userForUpdate);
     }
