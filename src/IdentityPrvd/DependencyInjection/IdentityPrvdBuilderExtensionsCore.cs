@@ -32,6 +32,7 @@ using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
+using IdentityPrvd.Services.SystemStatus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -111,6 +112,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddScoped<IAuthSchemes, DefaultAuthSchemes>();
         builder.Services.AddScoped<IMfaService, TotpMfaService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
+        builder.Services.AddScoped<ISystemStatus, DefaultSystemStatus>();
         return builder;
     }
 

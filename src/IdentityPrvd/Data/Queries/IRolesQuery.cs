@@ -17,6 +17,7 @@ public interface IRolesQuery
     Task<IdentityRole> GetRoleByIdAsync(Ulid roleId);
     Task<int> GetUsersCountByRoleIdAsync(Ulid roleId);
     Task<int> GetClaimsCountByRoleIdAsync(Ulid roleId);
+    Task<bool> IsExistsRoleAsync();
 }
 
 public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
@@ -74,4 +75,7 @@ public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
 
     public async Task<IdentityRole> GetRoleByNameAsync(string name) =>
         await dbContext.Roles.AsNoTracking().Where(s => s.NameNormalized == name).FirstOrDefaultAsync();
+
+    public async Task<bool> IsExistsRoleAsync() =>
+        await dbContext.Roles.AsNoTracking().AnyAsync();
 }

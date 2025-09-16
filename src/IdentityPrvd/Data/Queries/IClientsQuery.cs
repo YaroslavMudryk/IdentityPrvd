@@ -11,6 +11,7 @@ public interface IClientsQuery
     Task<IdentityClientSecret> GetClientSecretAsync(string clientId);
     Task<IdentityClient> GetClientByIdNullableAsync(string clientId);
     Task<IdentityClientSecret> GetClientSecretNullableAsync(string clientId);
+    Task<bool> IsExistsClientAsync();
 }
 
 public class EfClientsQuery(IdentityPrvdContext dbContext) : IClientsQuery
@@ -34,4 +35,7 @@ public class EfClientsQuery(IdentityPrvdContext dbContext) : IClientsQuery
         await dbContext.Clients
         .AsNoTracking()
         .SingleOrDefaultAsync(s => s.ClientId == clientId);
+
+    public async Task<bool> IsExistsClientAsync() =>
+        await dbContext.Clients.AsNoTracking().AnyAsync();
 }
