@@ -41,6 +41,7 @@ public class CreateRoleOrchestrator(
 
         var newRoleClaims = dto.ClaimIds.Select(claimId => new IdentityRoleClaim
         {
+            Id = Ulid.NewUlid(),
             RoleId = newRole.Id,
             ClaimId = claimId.GetIdAsUlid(),
             ActiveFrom = DateTime.MinValue,

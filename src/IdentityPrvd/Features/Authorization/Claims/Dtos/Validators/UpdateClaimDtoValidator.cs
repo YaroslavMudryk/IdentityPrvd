@@ -27,8 +27,10 @@ public class UpdateClaimDtoValidator : AbstractValidator<UpdateClaimDto>
         RuleFor(x => x)
             .MustAsync(async (dto, token) =>
             {
-                var claimByTypeAndValue = await claimsQuery.GetClaimByTypeAndValueAsync(dto.Type, dto.Value) ??
-                    throw new NotFoundException($"Claim with id:{dto.Id} not found");
+                var claimByTypeAndValue = await claimsQuery.GetClaimByTypeAndValueAsync(dto.Type, dto.Value);
+
+                if (claimByTypeAndValue is null)
+                    return true;
 
                 if (claimByTypeAndValue.Id != dto.Id)
                     throw new BadRequestException("Claim with the same type and value already exists");
