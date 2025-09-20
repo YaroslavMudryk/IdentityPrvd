@@ -39,11 +39,12 @@ Use the checkboxes to mark progress.
 | Security (MFA) | POST | `/api/identity/mfa` | [✅] | [✅] | [❌] |
 | Security (MFA) | DELETE | `/api/identity/mfa` | [✅] | [✅] | [❌] |
 | Personal (Contacts) | GET | `/api/identity/contacts` | [✅] | [✅] | [❌] |
-| Personal (Contacts) | POST | `/api/identity/contacts` | [✅] | [❌] | [❌] |
-| Personal (Contacts) | DELETE | `/api/identity/contacts/{id}` | [✅] | [❌] | [❌] |
+| Personal (Contacts) | POST | `/api/identity/contacts` | [✅] | [✅] | [❌] |
+| Personal (Contacts) | DELETE | `/api/identity/contacts/{id}` | [✅] | [✅] | [❌] |
 | Personal (Devices) | GET | `/api/identity/devices` | [✅] | [✅] | [❌] |
-| Personal (Devices) | POST | `/api/identity/devices/verify` | [✅] | [❌] | [❌] |
-| Personal (Devices) | DELETE | `/api/identity/devices/unverify/{deviceId}` | [✅] | [❌] | [❌] |
+| Personal (Devices) | POST | `/api/identity/devices/verify` | [✅] | [✅] | [❌] |
+| Personal (Devices) | POST | `/api/identity/devices/unverify/{deviceId}` | [✅] | [✅] | [❌] |
+| Personal (Devices) | DELETE | `/api/identity/devices/{deviceId}` | [✅] | [✅] | [❌] |
 | Authorization (Claims) | GET | `/api/identity/claims` | [✅] | [❌] | [❌] |
 | Authorization (Claims) | POST | `/api/identity/claims` | [✅] | [❌] | [❌] |
 | Authorization (Claims) | PUT | `/api/identity/claims/{claimId}` | [✅] | [❌] | [❌] |

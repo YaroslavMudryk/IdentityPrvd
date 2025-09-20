@@ -23,6 +23,7 @@ public class UnverifyDeviceOrchestrator(
             throw new BadRequestException("Not your device");
 
         deviceToUnverify.Verified = false;
+        deviceToUnverify.VerifiedAt = null;
         deviceToUnverify.UnverifiedBySessionId = currentUser.SessionId;
         deviceToUnverify.UnverifiedAt = timeProvider.GetUtcNow().UtcDateTime;
 

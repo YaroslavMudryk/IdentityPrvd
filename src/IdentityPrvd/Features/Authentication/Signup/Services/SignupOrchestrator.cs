@@ -20,6 +20,7 @@ public class SignupOrchestrator(
     IUserStore userStore,
     IUserRoleStore userRoleStore,
     IConfirmStore confirmStore,
+    IContactStore contactStore,
     IPasswordStore passwordStore,
     IRolesQuery rolesQuery,
     IUserContext userContext,
@@ -70,6 +71,22 @@ public class SignupOrchestrator(
             UserId = user.Id,
         };
         await passwordStore.AddAsync(password);
+
+        if (options.User.MapLoginAsContact && options.User.LoginType != LoginType.Any)
+        {
+            var contact = new IdentityContact
+            {
+                UserId = user.Id,
+                Value = user.Login,
+                IsMain = true,
+                Type = LoginExtensions.IsEmail(user.Login) ? ContactType.Email : ContactType.Phone,
+                ConfirmedAt = utcNow,
+                CanBeDeleted = false,
+                IsConfirmed = true,
+                Title = LoginExtensions.IsEmail(user.Login)? "Email" : "Phone"
+            };
+            await contactStore.AddAsync(contact);
+        }
 
         if (options.User.ConfirmRequired)
         {

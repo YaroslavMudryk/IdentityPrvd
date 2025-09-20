@@ -10,6 +10,7 @@ public static class DevicesDependencies
         services.AddScoped<GetDevicesOrchestrator>();
         services.AddScoped<VerifyDeviceOrchestrator>();
         services.AddScoped<UnverifyDeviceOrchestrator>();
+        services.AddScoped<DeleteDeviceOrchestrator>();
 
         return services;
     }

@@ -9,6 +9,7 @@ public class UserOptions
     public bool VerifyPasswordOnChangeLogin { get; set; } = false;
     public bool UseOldPasswords { get; set; } = true;
     public bool ForceSignoutEverywhere { get; set; } = false;
+    public bool MapLoginAsContact { get; set; } = true;
 }
 
 public enum LoginType
