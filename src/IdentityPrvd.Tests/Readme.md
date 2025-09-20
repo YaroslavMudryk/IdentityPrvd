@@ -45,11 +45,11 @@ Use the checkboxes to mark progress.
 | Personal (Devices) | POST | `/api/identity/devices/verify` | [✅] | [✅] | [❌] |
 | Personal (Devices) | POST | `/api/identity/devices/unverify/{deviceId}` | [✅] | [✅] | [❌] |
 | Personal (Devices) | DELETE | `/api/identity/devices/{deviceId}` | [✅] | [✅] | [❌] |
-| Authorization (Claims) | GET | `/api/identity/claims` | [✅] | [❌] | [❌] |
+| Authorization (Claims) | GET | `/api/identity/claims` | [✅] | [✅] | [❌] |
 | Authorization (Claims) | POST | `/api/identity/claims` | [✅] | [❌] | [❌] |
 | Authorization (Claims) | PUT | `/api/identity/claims/{claimId}` | [✅] | [❌] | [❌] |
 | Authorization (Claims) | DELETE | `/api/identity/claims/{claimId}` | [✅] | [❌] | [❌] |
-| Authorization (Roles) | GET | `/api/identity/roles` | [✅] | [❌] | [❌] |
-| Authorization (Roles) | POST | `/api/identity/roles` | [✅] | [❌] | [❌] |
-| Authorization (Roles) | PUT | `/api/identity/roles/{roleId}` | [✅] | [❌] | [❌] |
-| Authorization (Roles) | DELETE | `/api/identity/roles/{roleId}` | [✅] | [❌] | [❌] |
+| Authorization (Roles) | GET | `/api/identity/roles` | [✅] | [✅] | [❌] |
+| Authorization (Roles) | POST | `/api/identity/roles` | [✅] | [✅] | [❌] |
+| Authorization (Roles) | PUT | `/api/identity/roles/{roleId}` | [✅] | [✅] | [❌] |
+| Authorization (Roles) | DELETE | `/api/identity/roles/{roleId}` | [✅] | [✅] | [❌] |

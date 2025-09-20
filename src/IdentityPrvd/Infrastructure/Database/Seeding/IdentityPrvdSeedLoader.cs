@@ -114,7 +114,7 @@ public static class IdentityPrvdSeedLoader
             Id = Ulid.NewUlid(),
             Name = DefaultsRoles.SuperAdmin,
             NameNormalized = DefaultsRoles.SuperAdmin.ToUpper(),
-            IsDefault = false
+            IsDefault = true
         };
         yield return new IdentityRole
         {
@@ -128,7 +128,7 @@ public static class IdentityPrvdSeedLoader
             Id = Ulid.NewUlid(),
             Name = DefaultsRoles.User,
             NameNormalized = DefaultsRoles.User.ToUpper(),
-            IsDefault = true
+            IsDefault = false
         };
     }
 }

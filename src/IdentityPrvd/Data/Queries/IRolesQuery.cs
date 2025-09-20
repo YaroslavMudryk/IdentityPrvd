@@ -9,7 +9,7 @@ namespace IdentityPrvd.Data.Queries;
 
 public interface IRolesQuery
 {
-    Task<Ulid> GetDefaultRoleRoleIdAsync();
+    Task<Ulid> GetDefaultRoleIdAsync();
     Task<IdentityRole> GetDefaultRoleAsync();
     Task<IReadOnlyList<RoleDto>> GetRolesAsync(bool withStats = true);
     Task<RoleDto> GetRoleAsync(Ulid roleId);
@@ -22,7 +22,7 @@ public interface IRolesQuery
 
 public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
 {
-    public async Task<Ulid> GetDefaultRoleRoleIdAsync()
+    public async Task<Ulid> GetDefaultRoleIdAsync()
     {
         var defaultRole = await dbContext.Roles.AsNoTracking().FirstOrDefaultAsync(s => s.IsDefault);
         return defaultRole!.Id;

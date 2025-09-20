@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
@@ -41,7 +42,7 @@ public class CreateRoleOrchestrator(
         var newRoleClaims = dto.ClaimIds.Select(claimId => new IdentityRoleClaim
         {
             RoleId = newRole.Id,
-            ClaimId = claimId,
+            ClaimId = claimId.GetIdAsUlid(),
             ActiveFrom = DateTime.MinValue,
             ActiveTo = DateTime.MaxValue,
             IsActive = true

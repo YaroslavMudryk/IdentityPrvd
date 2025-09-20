@@ -59,7 +59,7 @@ public class SignupOrchestrator(
         var userRole = new IdentityUserRole
         {
             UserId = user.Id,
-            RoleId = await rolesQuery.GetDefaultRoleRoleIdAsync()
+            RoleId = await rolesQuery.GetDefaultRoleIdAsync()
         };
         await userRoleStore.AddAsync(userRole);
 
