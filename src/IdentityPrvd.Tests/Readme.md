@@ -33,6 +33,7 @@ Use the checkboxes to mark progress.
 | Account | POST | `/api/identity/change-password` | [✅] | [✅] | [❌] |
 | Password restore | POST | `/api/identity/start-restore-password` | [✅] | [✅] | [❌] |
 | Password restore | POST | `/api/identity/restore-password` | [✅] | [✅] | [❌] |
+| Security | POST | `/api/system/initialize` | [✅] | [✅] | [❌] |
 | Security | POST | `/api/identity/refresh-token` | [✅] | [✅] | [❌] |
 | Security | GET | `/api/identity/sessions` | [✅] | [✅] | [❌] |
 | Security | DELETE | `/api/identity/revoke-sessions` | [✅] | [✅] | [❌] |

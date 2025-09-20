@@ -9,6 +9,33 @@ public class Generator
     private static string _numbersChars = "0123456789";
     private static string _chars = $"{_upperChars}{_numbersChars}{_lowerChars}";
 
+    public static string GetAdminEmail()
+    {
+        return "admin@mailsecret.com";
+    }
+
+    public static string GetAdminPhone()
+    {
+        return "+10000000000";
+    }
+
+    public static string GetPassword()
+    {
+        var random = new Random();
+        var passwordChars = new char[12];
+        // Ensure at least one character from each category
+        passwordChars[0] = _upperChars[random.Next(_upperChars.Length)];
+        passwordChars[1] = _lowerChars[random.Next(_lowerChars.Length)];
+        passwordChars[2] = _numbersChars[random.Next(_numbersChars.Length)];
+        // Fill the remaining characters randomly
+        for (int i = 3; i < passwordChars.Length; i++)
+        {
+            passwordChars[i] = _chars[random.Next(_chars.Length)];
+        }
+        // Shuffle the characters to avoid predictable patterns
+        return new string(passwordChars.OrderBy(x => random.Next()).ToArray());
+    }
+
     public static string CreateAppId()
     {
         return GetUniqCode(4);

@@ -18,6 +18,7 @@ using IdentityPrvd.Features.Authorization.Claims;
 using IdentityPrvd.Features.Authorization.Roles;
 using IdentityPrvd.Features.Personal.Contacts;
 using IdentityPrvd.Features.Personal.Devices;
+using IdentityPrvd.Features.Security.Initialize;
 using IdentityPrvd.Features.Security.Mfa.DisableMfa;
 using IdentityPrvd.Features.Security.Mfa.EnableMfa;
 using IdentityPrvd.Features.Security.RefreshToken;
@@ -101,6 +102,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddContactsDependencies();
         builder.Services.AddDevicesDependencies();
         builder.Services.AddQrSigninDependencies();
+        builder.Services.AddInitializeDependencies();
         return builder;
     }
 

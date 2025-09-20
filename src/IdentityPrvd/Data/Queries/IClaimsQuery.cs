@@ -15,6 +15,7 @@ public interface IClaimsQuery
     Task<int> GetClientsCountByClaimIdAsync(Ulid claimId);
     Task<List<IdentityClaim>> GetClaimsByIdsAsync(Ulid[] claimIds);
     Task<IdentityClaim> GetClaimByTypeAndValueAsync(string type, string value);
+    Task<bool> IsExistsClaimAsync();
 }
 
 public class EfClaimsQuery(IdentityPrvdContext dbContext) : IClaimsQuery
@@ -52,4 +53,7 @@ public class EfClaimsQuery(IdentityPrvdContext dbContext) : IClaimsQuery
 
     public async Task<List<IdentityClaim>> GetClaimsByIdsAsync(Ulid[] claimIds) =>
         await dbContext.Claims.AsNoTracking().Where(s => claimIds.Contains(s.Id)).ToListAsync();
+
+    public async Task<bool> IsExistsClaimAsync() =>
+        await dbContext.Claims.AsNoTracking().AnyAsync();
 }

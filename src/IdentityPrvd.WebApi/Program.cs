@@ -1,7 +1,6 @@
 using IdentityPrvd.DependencyInjection;
 using IdentityPrvd.DependencyInjection.Auth;
 using IdentityPrvd.Infrastructure.Database.Context;
-using IdentityPrvd.Infrastructure.Database.Seeding;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.WebApi;
@@ -24,6 +23,7 @@ public class Program
                 .UseRedisSessionManagerStore(builder.Options.Connections.Redis)
                 .UseDbContext<IdentityPrvdContext>(options =>
                 {
+                    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                     options.UseNpgsql(builder.Options.Connections.Db);
                 });
         });
@@ -40,11 +40,6 @@ public class Program
 
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
-        {
-            await IdentityPrvdSeedLoader.InitializeAsync(app.Services);
-        }
-        
         app.UseSwagger();
         app.UseSwaggerUI();
 
@@ -52,6 +47,6 @@ public class Program
         app.UseWebSockets();
         app.UseIdentityPrvd();
 
-        app.Run();
+        await app.RunAsync();
     }
 }
