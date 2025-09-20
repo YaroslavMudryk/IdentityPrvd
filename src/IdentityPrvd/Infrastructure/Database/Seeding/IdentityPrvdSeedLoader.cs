@@ -1,5 +1,6 @@
 ﻿using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Contexts;
+using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
@@ -15,6 +16,7 @@ public static class IdentityPrvdSeedLoader
     {
         using var scope = serviceProvider.CreateScope();
         var utcNow = scope.ServiceProvider.GetRequiredService<TimeProvider>().GetUtcNow().UtcDateTime;
+        var transactionManager = scope.ServiceProvider.GetRequiredService<ITransactionManager>();
         var dbContext = scope.ServiceProvider.GetRequiredService<IdentityPrvdContext>();
         var sessionStore = scope.ServiceProvider.GetRequiredService<ISessionManagerStore>();
         var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();
@@ -24,6 +26,8 @@ public static class IdentityPrvdSeedLoader
         ((CurrentContext)currentContext).CorrelationId = Guid.NewGuid().ToString("N");
 
         await dbContext.Database.EnsureCreatedAsync();
+
+        await using var transaction = await transactionManager.BeginTransactionAsync();
 
         var itemsCountAdded = 0;
         if (!await dbContext.Roles.AnyAsync())
@@ -51,6 +55,7 @@ public static class IdentityPrvdSeedLoader
         }
 
         await sessionStore.InitializeAsync();
+        await transaction.CommitAsync();
     }
 
     private static async Task MapRolesAndClaimsAsync(IdentityPrvdContext dbContext)
