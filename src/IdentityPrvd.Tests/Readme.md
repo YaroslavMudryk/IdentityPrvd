@@ -50,6 +50,11 @@ Use the checkboxes to mark progress.
 | Authorization (Claims) | POST | `/api/identity/claims` | [✅] | [✅] | [❌] |
 | Authorization (Claims) | PUT | `/api/identity/claims/{claimId}` | [✅] | [✅] | [❌] |
 | Authorization (Claims) | DELETE | `/api/identity/claims/{claimId}` | [✅] | [✅] | [❌] |
+| Authorization (Clients) | GET | `/api/identity/clients` | [✅] | [❌] | [❌] |
+| Authorization (Clients) | GET | `/api/identity/clients/{clientId}` | [✅] | [❌] | [❌] |
+| Authorization (Clients) | POST | `/api/identity/clients` | [✅] | [❌] | [❌] |
+| Authorization (Clients) | PUT | `/api/identity/clients/{clientId}` | [✅] | [❌] | [❌] |
+| Authorization (Clients) | DELETE | `/api/identity/clients/{clientId}` | [✅] | [❌] | [❌] |
 | Authorization (Roles) | GET | `/api/identity/roles` | [✅] | [✅] | [❌] |
 | Authorization (Roles) | POST | `/api/identity/roles` | [✅] | [✅] | [❌] |
 | Authorization (Roles) | PUT | `/api/identity/roles/{roleId}` | [✅] | [✅] | [❌] |

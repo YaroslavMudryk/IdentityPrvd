@@ -34,12 +34,9 @@ public record BasicAuthenticatedUser(string UserId, string SessionId, IEnumerabl
         throw new UnauthorizedException();
     }
 
-    public void IsIsRoles(string[] roles)
+    public bool IsIsRoles(string[] roles)
     {
-        if (Claims.Any(s => s.Type == IdentityClaims.Types.Roles && roles.Contains(s.Value)))
-            return;
-
-        throw new UnauthorizedException();
+        return Claims.Any(s => s.Type == IdentityClaims.Types.Roles && roles.Contains(s.Value));
     }
 
     public void EnsureUserHasPermissionsOrRoles(string type, string value, string[] roles)
