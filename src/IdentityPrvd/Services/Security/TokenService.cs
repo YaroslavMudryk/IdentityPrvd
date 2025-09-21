@@ -19,7 +19,7 @@ public class TokenService(
     IClientClaimsQuery clientClaimsQuery,
     IEnumerable<ITokenClaimsContributor> claimsContributors) : ITokenService
 {
-    public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId)
+    public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId, string audience = null)
     {
         var claims = new List<Claim>
         {
@@ -40,10 +40,10 @@ public class TokenService(
             }
         }
 
-        return GenerateJwtToken(claims);
+        return GenerateJwtToken(claims, audience);
     }
 
-    public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId, string provider)
+    public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId, string provider, string audience = null)
     {
         var claims = new List<Claim>
         {
@@ -65,7 +65,7 @@ public class TokenService(
             }
         }
 
-        return GenerateJwtToken(claims);
+        return GenerateJwtToken(claims, audience);
     }
 
     public async Task<Dictionary<string, List<string>>> GetUserPermissionsAsync(Ulid userId, string clientId)
@@ -76,7 +76,7 @@ public class TokenService(
         return roleClaims.GroupUnionCollectionBy(clientClaims, c => c.Id, c => c.Type, c => c.Value);
     }
 
-    private JwtToken GenerateJwtToken(List<Claim> claims)
+    private JwtToken GenerateJwtToken(List<Claim> claims, string audience)
     {
         ClaimsIdentity claimsIdentity = new(claims, JwtBearerDefaults.AuthenticationScheme, ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
@@ -85,7 +85,7 @@ public class TokenService(
         var expiredAt = utcNow.Add(TimeSpan.FromMinutes(identityOptions.Token.LifeTimeInMinutes));
         var jwt = new JwtSecurityToken(
                     issuer: identityOptions.Token.Issuer,
-                    audience: identityOptions.Token.Audience,
+                    audience: audience == null ? identityOptions.Token.Audience : audience,
                     notBefore: utcNow,
                     claims: claimsIdentity.Claims,
                     expires: expiredAt,
