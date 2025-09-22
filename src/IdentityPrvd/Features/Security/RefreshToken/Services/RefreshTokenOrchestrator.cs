@@ -40,7 +40,7 @@ public class RefreshTokenOrchestrator(
         };
         await refreshTokenStore.AddAsync(newRefreshToken);
 
-        var jwtToken = await tokenService.GetUserTokenAsync(oldRefreshToken.Session.UserId, oldRefreshToken.SessionId.GetIdAsString());
+        var jwtToken = await tokenService.GetUserTokenAsync(oldRefreshToken.Session.UserId, oldRefreshToken.SessionId.GetIdAsString(), oldRefreshToken.Session.App.Name);
         await transaction.CommitAsync();
 
         return new SigninResponseDto

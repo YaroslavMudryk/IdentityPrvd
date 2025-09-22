@@ -52,7 +52,7 @@ public class SigninMfaOrchestrator(
         };
         await refreshTokenStore.AddAsync(refreshToken);
 
-        var userToken = await tokenService.GetUserTokenAsync(sessionToActivate.UserId, sessionToActivate.Id.GetIdAsString());
+        var userToken = await tokenService.GetUserTokenAsync(sessionToActivate.UserId, sessionToActivate.Id.GetIdAsString(), sessionToActivate.App.Name);
 
         var userPermissions = await tokenService.GetUserPermissionsAsync(sessionToActivate.UserId, sessionToActivate.App.Id.GetIdAsString());
 

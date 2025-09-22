@@ -95,7 +95,7 @@ public class InitializeOrchestrator(
 
         await sessionRepo.AddAsync(newSession);
 
-        var jwtToken = await tokenService.GetUserTokenAsync(user.Id, sessionId.GetIdAsString());
+        var jwtToken = await tokenService.GetUserTokenAsync(user.Id, sessionId.GetIdAsString(), newSession.App.Name);
 
         var userPermissions = await tokenService.GetUserPermissionsAsync(user.Id, dbContext.Clients.Local.FirstOrDefault().ClientId);
 

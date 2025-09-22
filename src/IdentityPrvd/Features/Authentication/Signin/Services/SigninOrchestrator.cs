@@ -122,7 +122,7 @@ public class SigninOrchestrator(
 
         await sessionRepo.AddAsync(newSession);
 
-        var jwtToken = await tokenService.GetUserTokenAsync(user.Id, sessionId.GetIdAsString());
+        var jwtToken = await tokenService.GetUserTokenAsync(user.Id, sessionId.GetIdAsString(), client.Name);
 
         var userPermissions = await tokenService.GetUserPermissionsAsync(user.Id, dto.ClientId);
 

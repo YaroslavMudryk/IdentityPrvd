@@ -139,7 +139,7 @@ public class QrCodeService(
 
         await sessionStore.AddAsync(newSession);
 
-        var jwtToken = await tokenService.GetUserTokenAsync(userId, sessionId.GetIdAsString());
+        var jwtToken = await tokenService.GetUserTokenAsync(userId, sessionId.GetIdAsString(), client.Name);
 
         var userPermissions = await tokenService.GetUserPermissionsAsync(userId, qrSocket.QrRequest.ClientId);
 
