@@ -47,7 +47,7 @@ public class ExternalSigninCallbackEndpoint : IEndpoint
             [AllowAnonymous] async ([FromQuery(Name = "returnUrl")] string returnUrl, [FromQuery(Name = "provider")] string provider, HttpContext context, ExternalSigninOrchestrator orc, ExternalProviderManager providerManager) =>
             {
                 var responseDto = await orc.SigninExternalProviderAsync(await providerManager.AuthenticateAsync(context, provider));
-                return Results.Redirect($"{returnUrl}?accessToken={responseDto.AccessToken}&refreshToken={responseDto.RefreshToken}&expiredIn={responseDto.ExpiredIn}");
+                return Results.Redirect($"{returnUrl}?accessToken={responseDto.AccessToken}&refreshToken={responseDto.RefreshToken}&expireIn={responseDto.ExpireIn}");
             }).WithTags("External signin").WithName("SigninExternalCallback");
     }
 }

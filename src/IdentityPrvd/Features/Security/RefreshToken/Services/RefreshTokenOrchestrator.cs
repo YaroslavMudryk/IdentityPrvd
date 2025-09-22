@@ -47,7 +47,7 @@ public class RefreshTokenOrchestrator(
         {
             AccessToken = jwtToken.Token,
             RefreshToken = newRefreshToken.Value,
-            ExpiredIn = 3600,
+            ExpireIn = identityOptions.Token.LifeTimeInMinutes * 60,
         };
     }
 }

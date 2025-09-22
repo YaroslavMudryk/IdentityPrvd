@@ -96,7 +96,7 @@ public class TokenService(
         return new JwtToken
         {
             Token = encodedJwt,
-            ExpiredAt = expiredAt,
+            ExpireIn = identityOptions.Token.LifeTimeInMinutes * 60,
             SessionId = claims.FirstOrDefault(s => s.Type == IdentityClaims.Types.SessionId)!.Value
         };
     }

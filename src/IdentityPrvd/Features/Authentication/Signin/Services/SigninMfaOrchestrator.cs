@@ -72,7 +72,7 @@ public class SigninMfaOrchestrator(
         {
             AccessToken = userToken.Token,
             RefreshToken = refreshToken.Value,
-            ExpiredIn = identityOptions.Token.LifeTimeInMinutes / 60,
+            ExpireIn = identityOptions.Token.LifeTimeInMinutes * 60,
         };
     }
 }
