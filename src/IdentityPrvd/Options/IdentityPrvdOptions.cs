@@ -1,4 +1,6 @@
-﻿namespace IdentityPrvd.Options;
+﻿using IdentityPrvd.Common.Constants;
+
+namespace IdentityPrvd.Options;
 
 /// <summary>
 /// Configuration options for IdentityPrvd
@@ -21,6 +23,7 @@ public class IdentityPrvdOptions
     public IdentityConnectionOptions Connections { get; set; }
     public TokenOptions Token { get; set; }
     public Dictionary<string, ExternalProviderOptions> ExternalProviders { get; set; }
+    public Dictionary<string, EndpointOptions> Endpoints { get; set; } = HttpEndpoints.Default;
     public LanguageOptions Language { get; set; }
     public UserOptions User { get; set; }
     public AppOptions App { get; set; }
