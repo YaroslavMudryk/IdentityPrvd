@@ -41,15 +41,4 @@
     <PackageReference Include="Ulid" Version="1.4.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Factories\" />
-    <Folder Include="Features\Authorization\Permissions\" />
-    <Folder Include="Features\Shared\Dtos\" />
-    <Folder Include="Features\Shared\Services\" />
-    <Folder Include="Features\Shared\Validators\" />
-    <Folder Include="Infrastructure\Authentication\JwtBearer\" />
-    <Folder Include="Infrastructure\Authentication\Session\" />
-    <Folder Include="Infrastructure\Authentication\OAuth\" />
-  </ItemGroup>
-
 </Project>

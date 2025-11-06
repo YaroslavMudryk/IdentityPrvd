@@ -15,6 +15,7 @@ using IdentityPrvd.Features.Authentication.SigninOptions;
 using IdentityPrvd.Features.Authentication.Signout;
 using IdentityPrvd.Features.Authentication.Signup;
 using IdentityPrvd.Features.Authorization.Claims;
+using IdentityPrvd.Features.Authorization.Clients;
 using IdentityPrvd.Features.Authorization.Roles;
 using IdentityPrvd.Features.Personal.Contacts;
 using IdentityPrvd.Features.Personal.Devices;
@@ -103,6 +104,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddDevicesDependencies();
         builder.Services.AddQrSigninDependencies();
         builder.Services.AddInitializeDependencies();
+        builder.Services.AddClientsDependencies();
         return builder;
     }
 

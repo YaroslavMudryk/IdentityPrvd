@@ -40,13 +40,13 @@ public class SeedConstants
         };
     }
 
-    public static IEnumerable<IdentityClient> GetClients(IHasher hasher)
+    public static IEnumerable<IdentityClient> GetClients(IHasher hasher, string audience = "IdentityPrvd")
     {
         var clientId = Ulid.NewUlid();
         yield return new IdentityClient
         {
             Id = clientId,
-            Name = "IdentityPrvd",
+            Name = audience,
             ShortName = "IdentityPrvd",
             ClientId = "1jjd-Pt0B-QFdk-x3Vw",
             ActiveFrom = DateTime.MinValue,

@@ -152,7 +152,7 @@ public class InitializeOrchestrator(
         }
         if (!await dbContext.Clients.AnyAsync())
         {
-            await dbContext.Clients.AddRangeAsync(SeedConstants.GetClients(hasher));
+            await dbContext.Clients.AddRangeAsync(SeedConstants.GetClients(hasher, identityOptions.Token.Audience));
             itemsCountAdded++;
         }
         if (itemsCountAdded > 0)
