@@ -22,7 +22,7 @@ public class SeedConstants
             Id = Ulid.NewUlid(),
             Name = DefaultsRoles.SuperAdmin,
             NameNormalized = DefaultsRoles.SuperAdmin.ToUpper(),
-            IsDefault = true
+            IsDefault = false
         };
         yield return new IdentityRole
         {
@@ -36,7 +36,7 @@ public class SeedConstants
             Id = Ulid.NewUlid(),
             Name = DefaultsRoles.User,
             NameNormalized = DefaultsRoles.User.ToUpper(),
-            IsDefault = false
+            IsDefault = true
         };
     }
 

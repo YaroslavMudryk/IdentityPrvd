@@ -1,5 +1,4 @@
-﻿using IdentityPrvd.Contexts;
-using IdentityPrvd.Domain.Entities;
+﻿using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Features.Security.Sessions.GetSessions.Dtos;
 using IdentityPrvd.Infrastructure.Database.Context;
@@ -22,7 +21,7 @@ public class EfSessionsQuery(IdentityPrvdContext dbContext) : ISessionsQuery
         return await dbContext.Sessions
             .Where(s => s.UserId == userId && (s.Status == SessionStatus.Active || s.Status == SessionStatus.New))
             .OrderByDescending(s => s.CreatedAt)
-            .ProjectToDto()
+            .Select(s => s.MapDto())
             .ToListAsync();
     }
 

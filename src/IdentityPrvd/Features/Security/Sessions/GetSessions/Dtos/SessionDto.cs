@@ -1,5 +1,4 @@
 ﻿using IdentityPrvd.Domain.Enums;
-using IdentityPrvd.Domain.ValueObjects;
 
 namespace IdentityPrvd.Features.Security.Sessions.GetSessions.Dtos;
 
@@ -7,16 +6,10 @@ public class SessionDto
 {
     public Ulid Id { get; set; }
     public DateTime CreatedAt { get; set; }
-    public AppInfo App { get; set; }
-    public LocationInfo Location { set; get; }
-    public ClientInfo Client { set; get; }
-    public SessionType Type { get; set; }
-    public bool ViaMfa { get; set; }
+    public string App { get; set; }
+    public string Location { set; get; }
+    public string Client { set; get; }
     public SessionStatus Status { set; get; }
-    public string Language { set; get; }
-    public Ulid? DeactivatedBySessionId { set; get; }
-    public DateTime? DeactivatedAt { set; get; }
     public DateTime? LastActivityAt { set; get; }
-    public DateTime UpdatedAt { get; set; }
-    public Ulid? DeviceId { get; set; }
+    public string Image { get; set; }
 }

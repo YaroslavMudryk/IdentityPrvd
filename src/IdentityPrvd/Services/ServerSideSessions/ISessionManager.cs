@@ -9,6 +9,7 @@ public interface ISessionManager
     Task<bool> IsActiveSessionAsync(string userId, string sessionId);
     Task<Dictionary<string, List<string>>> GetSessionPermissionsAsync(string sessionId);
     Task<IList<SessionInfo>> GetUserSessionsAsync(string userId);
+    Task<SessionInfo> GetUserSessionAsync(string sessionId);
     Task AddNewSessionAsync(SessionInfo sessionInfo);
     Task UpdateSessionAsync(SessionInfo sessionInfo);
     Task DeleteSessionAsync(string userId, string sessionId);
@@ -126,5 +127,10 @@ public class SessionManager(
             throw new BadRequestException("Some sessions does not belong to current user");
 
         await sessionStore.DeleteSessionsAsync(sessions);
+    }
+
+    public async Task<SessionInfo> GetUserSessionAsync(string sessionId)
+    {
+        return (await sessionStore.GetSessionsByIdsAsync([sessionId])).FirstOrDefault();
     }
 }

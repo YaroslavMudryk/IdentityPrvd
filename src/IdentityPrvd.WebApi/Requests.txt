@@ -22,7 +22,7 @@ signin
     },
     "os": {
       "name": "Android",
-      "version": "15",
+      "version": "16",
       "platform": "arm64"
     }
   }

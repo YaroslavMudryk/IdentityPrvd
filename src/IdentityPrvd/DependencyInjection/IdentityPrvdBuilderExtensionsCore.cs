@@ -23,6 +23,7 @@ using IdentityPrvd.Features.Security.Initialize;
 using IdentityPrvd.Features.Security.Mfa.DisableMfa;
 using IdentityPrvd.Features.Security.Mfa.EnableMfa;
 using IdentityPrvd.Features.Security.RefreshToken;
+using IdentityPrvd.Features.Security.Sessions.GetSession;
 using IdentityPrvd.Features.Security.Sessions.GetSessions;
 using IdentityPrvd.Features.Security.Sessions.RevokeSessions;
 using IdentityPrvd.Infrastructure.Caching;
@@ -90,6 +91,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddRefreshTokenDependencies();
         builder.Services.AddSignoutDependencies();
         builder.Services.AddGetSessionsDependencies();
+        builder.Services.AddGetSessionDependencies();
         builder.Services.AddRevokeSessionsDependencies();
         builder.Services.AddEnableMfaDependencies();
         builder.Services.AddDisableMfaDependencies();
