@@ -29,6 +29,7 @@ public class IdentityPrvdOptions
     public PasswordOptions Password { get; set; }
     public ProtectionOptions Protection { get; set; }
     public bool TrackSessionActivity { get; set; } = true;
+    public bool SingleSessionPerUser { get; set; } = false;
 
     public void ValidateAndThrowIfNeeded()
     {

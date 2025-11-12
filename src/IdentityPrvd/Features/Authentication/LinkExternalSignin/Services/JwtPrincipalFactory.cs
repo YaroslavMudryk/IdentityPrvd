@@ -22,9 +22,8 @@ public class JwtPrincipalFactory
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = true,
             ValidIssuer = issuer,
-            ValidateAudience = true,
-            ValidAudience = audience,
             ValidateLifetime = true,
+            ValidateAudience = false,
             ClockSkew = TimeSpan.Zero
         };
 

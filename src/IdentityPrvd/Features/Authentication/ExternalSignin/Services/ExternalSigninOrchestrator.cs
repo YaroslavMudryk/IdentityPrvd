@@ -8,6 +8,7 @@ using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Features.Shared.Dtos;
+using IdentityPrvd.Features.Shared.Services;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Security;
@@ -31,7 +32,8 @@ public class ExternalSigninOrchestrator(
     ITransactionManager transactionManager,
     TimeProvider timeProvider,
     IUserLoginsQuery externalSigninQuery,
-    ExternalUserExstractorService externalUserExstractor)
+    ExternalUserExstractorService externalUserExstractor,
+    ISessionControlService sessionControlService)
 {
     public async Task<SigninResponseDto> SigninExternalProviderAsync(AuthenticateResult authResult)
     {
@@ -48,6 +50,9 @@ public class ExternalSigninOrchestrator(
         var userPermissions = await tokenService.GetUserPermissionsAsync(userToLogin.Id, dto.ClientId);
 
         await AddSessionToManagerAsync(session, userPermissions);
+
+        await sessionControlService.CloseOtherSessionsIfRequiredAsync(userToLogin.Id, session.Id);
+
         await transaction.CommitAsync();
 
         return CreateSigninResponse(jwtToken, session.Tokens.First());

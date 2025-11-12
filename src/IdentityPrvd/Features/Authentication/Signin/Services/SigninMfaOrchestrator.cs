@@ -7,6 +7,7 @@ using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Features.Authentication.Signin.Dtos;
 using IdentityPrvd.Features.Shared.Dtos;
+using IdentityPrvd.Features.Shared.Services;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
@@ -22,7 +23,8 @@ public class SigninMfaOrchestrator(
     ITokenService tokenService,
     ISessionManager sessionManager,
     IdentityPrvdOptions identityOptions,
-    ITransactionManager transactionManager)
+    ITransactionManager transactionManager,
+    ISessionControlService sessionControlService)
 {
     public async Task<SigninResponseDto> SinginMfaAsync(SigninMfaRequestDto dto)
     {
@@ -65,6 +67,8 @@ public class SigninMfaOrchestrator(
             SessionId = sessionToActivate.Id.ToString(),
             UserId = sessionToActivate.UserId.ToString(),
         });
+
+        await sessionControlService.CloseOtherSessionsIfRequiredAsync(sessionToActivate.UserId, sessionToActivate.Id);
 
         await transaction.CommitAsync();
 
