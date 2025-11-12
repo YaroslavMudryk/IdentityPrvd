@@ -32,7 +32,8 @@ public class SigninOrchestrator(
     IdentityPrvdOptions identityOptions,
     ISessionStore sessionRepo,
     IMfasQuery mfasQuery,
-    IValidator<SigninRequestDto> validator)
+    IValidator<SigninRequestDto> validator,
+    ISessionControlService sessionControlService)
 {
     public async Task<SigninResponseDto> SigninAsync(SigninRequestDto dto)
     {
@@ -135,6 +136,8 @@ public class SigninOrchestrator(
             SessionId = newSession.Id.ToString(),
             UserId = newSession.UserId.ToString(),
         });
+
+        await sessionControlService.CloseOtherSessionsIfRequiredAsync(user.Id, sessionId);
 
         return new SigninResponseDto
         {

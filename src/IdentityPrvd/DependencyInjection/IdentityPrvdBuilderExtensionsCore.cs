@@ -119,6 +119,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddScoped<IMfaService, TotpMfaService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<ISystemStatus, DefaultSystemStatus>();
+        builder.Services.AddScoped<ISessionControlService, SessionControlService>();
         return builder;
     }
 

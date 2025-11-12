@@ -22,7 +22,8 @@ public class SigninMfaOrchestrator(
     ITokenService tokenService,
     ISessionManager sessionManager,
     IdentityPrvdOptions identityOptions,
-    ITransactionManager transactionManager)
+    ITransactionManager transactionManager,
+    ISessionControlService sessionControlService)
 {
     public async Task<SigninResponseDto> SinginMfaAsync(SigninMfaRequestDto dto)
     {
@@ -65,6 +66,8 @@ public class SigninMfaOrchestrator(
             SessionId = sessionToActivate.Id.ToString(),
             UserId = sessionToActivate.UserId.ToString(),
         });
+
+        await sessionControlService.CloseOtherSessionsIfRequiredAsync(sessionToActivate.UserId, sessionToActivate.Id);
 
         await transaction.CommitAsync();
 

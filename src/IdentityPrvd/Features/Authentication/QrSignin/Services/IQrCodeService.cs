@@ -43,7 +43,8 @@ public class QrCodeService(
     ILocationService locationService,
     ITokenService tokenService,
     ISessionManager sessionManager,
-    IWebSocketConnectionManager manager) : IQrCodeService
+    IWebSocketConnectionManager manager,
+    ISessionControlService sessionControlService) : IQrCodeService
 {
     public async Task<ClientInfo> GetQrCodeDetailsAsync(string verificationId)
     {
@@ -152,6 +153,8 @@ public class QrCodeService(
             SessionId = newSession.Id.ToString(),
             UserId = newSession.UserId.ToString(),
         });
+
+        await sessionControlService.CloseOtherSessionsIfRequiredAsync(userId, sessionId);
 
         await transaction.CommitAsync();
 
