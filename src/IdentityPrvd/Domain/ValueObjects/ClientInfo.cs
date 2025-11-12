@@ -1,5 +1,4 @@
-﻿using Extensions.DeviceDetector.Models;
-using System.Text;
+﻿using System.Text;
 
 namespace IdentityPrvd.Domain.ValueObjects;
 
@@ -11,40 +10,33 @@ public class ClientInfo
 
     public override string ToString()
     {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
         if (Browser == null)
         {
             stringBuilder.Append(Device.Brand);
-            stringBuilder.Append(" ");
+            stringBuilder.Append(' ');
             stringBuilder.Append(Device.Model);
             if (Os != null)
             {
                 stringBuilder.Append(" (");
                 stringBuilder.Append(Os.Name);
-                stringBuilder.Append(" ");
+                stringBuilder.Append(' ');
                 stringBuilder.Append(Os.Version);
-                stringBuilder.Append(")");
+                stringBuilder.Append(')');
             }
         }
         else
         {
             stringBuilder.Append(Browser.Name);
-            stringBuilder.Append(" ");
+            stringBuilder.Append(' ');
             stringBuilder.Append(Browser.Version);
-            if (Browser.Engine != null)
-            {
-                stringBuilder.Append(" [");
-                stringBuilder.Append(Browser.Engine);
-                stringBuilder.Append("]");
-            }
-
             if (Os != null)
             {
                 stringBuilder.Append(" (");
                 stringBuilder.Append(Os.Name);
-                stringBuilder.Append(" ");
+                stringBuilder.Append(' ');
                 stringBuilder.Append(Os.Version);
-                stringBuilder.Append(")");
+                stringBuilder.Append(')');
             }
         }
 
