@@ -26,6 +26,7 @@ using IdentityPrvd.Features.Security.RefreshToken;
 using IdentityPrvd.Features.Security.Sessions.GetSession;
 using IdentityPrvd.Features.Security.Sessions.GetSessions;
 using IdentityPrvd.Features.Security.Sessions.RevokeSessions;
+using IdentityPrvd.Features.Shared.Services;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
 using IdentityPrvd.Infrastructure.Database.Transactions;
@@ -70,9 +71,8 @@ public static partial class IdentityPrvdBuilderExtensionsCore
                     ClockSkew = TimeSpan.Zero,
                     ValidateIssuer = true,
                     ValidIssuer = options.Token.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = options.Token.Audience,
                     ValidateLifetime = true,
+                    ValidateAudience = false,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.Token.SecretKey!)),
                     ValidateIssuerSigningKey = true,
                 };

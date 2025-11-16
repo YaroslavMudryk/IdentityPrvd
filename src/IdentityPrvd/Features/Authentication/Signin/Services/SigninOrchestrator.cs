@@ -11,6 +11,7 @@ using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Domain.ValueObjects;
 using IdentityPrvd.Features.Authentication.Signin.Dtos;
 using IdentityPrvd.Features.Shared.Dtos;
+using IdentityPrvd.Features.Shared.Services;
 using IdentityPrvd.Mappers;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;

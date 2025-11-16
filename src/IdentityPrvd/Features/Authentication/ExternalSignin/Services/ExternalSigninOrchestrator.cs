@@ -8,6 +8,7 @@ using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Features.Shared.Dtos;
+using IdentityPrvd.Features.Shared.Services;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Security;

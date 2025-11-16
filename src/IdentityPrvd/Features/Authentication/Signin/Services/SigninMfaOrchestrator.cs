@@ -7,6 +7,7 @@ using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Features.Authentication.Signin.Dtos;
 using IdentityPrvd.Features.Shared.Dtos;
+using IdentityPrvd.Features.Shared.Services;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;

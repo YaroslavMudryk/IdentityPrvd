@@ -3,6 +3,7 @@ using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Services.Security;
+using IdentityPrvd.Features.Shared.Services;
 
 namespace IdentityPrvd.Features.Authentication.Signout.Services;
 
@@ -35,6 +36,7 @@ public class SignoutOrchestrator(
     public async Task HandleSignoutEverywhereAsync(BasicAuthenticatedUser currentUser)
     {
         await sessionControlService.CloseAllSessionsByUserIdAsync(currentUser.UserId.GetIdAsUlid());
+        await sessionControlService.CloseActiveUserSessionsAsync(currentUser.UserId.GetIdAsUlid());
     }
 
     public async Task HandleSignoutAsync(BasicAuthenticatedUser currentUser)
