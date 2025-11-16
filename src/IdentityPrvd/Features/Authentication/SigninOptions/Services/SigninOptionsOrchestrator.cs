@@ -12,7 +12,8 @@ public class SigninOptionsOrchestrator(
 
         return new SigninOptionsDto
         {
-            PasswordSignin = true,
+            Password = true,
+            Passwordless = true,
             ExternalProviders = [.. schemes.Select(s => s.Provider)]
         };
     }
