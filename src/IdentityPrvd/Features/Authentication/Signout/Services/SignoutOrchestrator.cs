@@ -2,19 +2,18 @@
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Transactions;
-using IdentityPrvd.Services.Security;
 using IdentityPrvd.Features.Shared.Services;
 
 namespace IdentityPrvd.Features.Authentication.Signout.Services;
 
 public class SignoutOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     ITransactionManager transactionManager,
     ISessionControlService sessionControlService)
 {
     public async Task SignoutAsync(bool everywhere)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
@@ -35,7 +34,6 @@ public class SignoutOrchestrator(
 
     public async Task HandleSignoutEverywhereAsync(BasicAuthenticatedUser currentUser)
     {
-        await sessionControlService.CloseAllSessionsByUserIdAsync(currentUser.UserId.GetIdAsUlid());
         await sessionControlService.CloseActiveUserSessionsAsync(currentUser.UserId.GetIdAsUlid());
     }
 

@@ -8,14 +8,14 @@ using IdentityPrvd.Features.Authorization.Claims.Dtos;
 namespace IdentityPrvd.Features.Authorization.Claims.Services;
 
 public class UpdateClaimOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IValidator<UpdateClaimDto> validator,
     IClaimsQuery query,
     IClaimStore store)
 {
     public async Task<ClaimDto> UpdateClaimAsync(Ulid claimId, UpdateClaimDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
              IdentityClaims.Types.Claims, IdentityClaims.Values.Update,
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

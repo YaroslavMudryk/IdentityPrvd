@@ -9,14 +9,14 @@ using IdentityPrvd.Features.Authorization.Claims.Dtos;
 namespace IdentityPrvd.Features.Authorization.Claims.Services;
 
 public class CreateClaimOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IValidator<CreateClaimDto> validator,
     IClaimsQuery query,
     IClaimStore repo)
 {
     public async Task<ClaimDto> CreateClaimAsync(CreateClaimDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Claims, IdentityClaims.Values.Create,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

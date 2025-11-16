@@ -23,11 +23,11 @@ public class EnableMfaOrchestrator(
     IdentityPrvdOptions identityOptions,
     IMfaService mfaService,
     ITransactionManager transactionManager,
-    IUserContext userContext)
+    IIdentityContext identityContext)
 {
     public async Task<MfaResponse> EnableMfaAsync(MfaDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

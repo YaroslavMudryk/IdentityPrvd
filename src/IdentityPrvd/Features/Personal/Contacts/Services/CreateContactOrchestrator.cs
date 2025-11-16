@@ -11,13 +11,13 @@ using IdentityPrvd.Mappers;
 namespace IdentityPrvd.Features.Personal.Contacts.Services;
 
 public class CreateContactOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IContactsQuery contactQuery,
     IContactStore contactStore)
 {
     public async Task<ContactDto> CreateContactAsync(CreateContactDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var userId = currentUser.UserId.GetIdAsUlid();

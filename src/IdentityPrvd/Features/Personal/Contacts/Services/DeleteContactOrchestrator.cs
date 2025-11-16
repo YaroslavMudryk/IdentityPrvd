@@ -7,12 +7,12 @@ using IdentityPrvd.Data.Stores;
 namespace IdentityPrvd.Features.Personal.Contacts.Services;
 
 public class DeleteContactOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IContactStore contactStore)
 {
     public async Task DeleteContactAsync(Ulid id)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var contactToDelete = await contactStore.GetAsync(id);

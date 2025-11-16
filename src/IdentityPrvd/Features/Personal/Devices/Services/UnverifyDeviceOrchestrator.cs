@@ -7,13 +7,13 @@ using IdentityPrvd.Data.Stores;
 namespace IdentityPrvd.Features.Personal.Devices.Services;
 
 public class UnverifyDeviceOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IDeviceStore deviceStore,
     TimeProvider timeProvider)
 {
     public async Task UnverifyDeviceAsync(Ulid deviceId, bool deleteDevice = false)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var userId = currentUser.UserId;

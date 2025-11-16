@@ -19,11 +19,10 @@ public static class IdentityPrvdSeedLoader
         var transactionManager = scope.ServiceProvider.GetRequiredService<ITransactionManager>();
         var dbContext = scope.ServiceProvider.GetRequiredService<IdentityPrvdContext>();
         var sessionStore = scope.ServiceProvider.GetRequiredService<ISessionManagerStore>();
-        var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();
-        var currentContext = scope.ServiceProvider.GetRequiredService<ICurrentContext>();
+        var identityContext = scope.ServiceProvider.GetRequiredService<IIdentityContext>();
         var hasher = scope.ServiceProvider.GetRequiredService<IHasher>();
-        ((UserContext)userContext).CurrentUser = new ServiceUser("Seed");
-        ((CurrentContext)currentContext).CorrelationId = Guid.NewGuid().ToString("N");
+        ((IdentityContext)identityContext).CurrentUser = new ServiceUser("Seed");
+        ((IdentityContext)identityContext).CorrelationId = Guid.NewGuid().ToString("N");
 
         await dbContext.Database.EnsureCreatedAsync();
 

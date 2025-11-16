@@ -5,19 +5,19 @@ using Microsoft.AspNetCore.Http;
 
 namespace IdentityPrvd.Infrastructure.Middleware;
 
-public class CorrelationContextMiddleware(ICurrentContext currentContext) : IMiddleware
+public class CorrelationContextMiddleware(IIdentityContext identityContext) : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        ArgumentNullException.ThrowIfNull(currentContext);
+        ArgumentNullException.ThrowIfNull(identityContext);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
         var correlationId = context.GetOrAssignCorrelationId();
 
-        ((CurrentContext)currentContext).IpAddress = context.Connection.LocalIpAddress != null ?
+        ((IdentityContext)identityContext).IpAddress = context.Connection.LocalIpAddress != null ?
             context.Connection.LocalIpAddress.ToString() : context.Connection.RemoteIpAddress != null ? context.Connection.RemoteIpAddress.ToString() : "localhost";
-        ((CurrentContext)currentContext).CorrelationId = correlationId;
+        ((IdentityContext)identityContext).CorrelationId = correlationId;
 
         context.Response.OnStarting(() =>
         {

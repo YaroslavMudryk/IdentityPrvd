@@ -10,7 +10,7 @@ using System.Security.Claims;
 namespace IdentityPrvd.Features.Authentication.LinkExternalSignin.Services;
 
 public class LinkExternalSigninOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IUserLoginsQuery userLoginQuery,
     IUserLoginStore userLoginStore)
 {
@@ -19,7 +19,7 @@ public class LinkExternalSigninOrchestrator(
         if (!authResult.Succeeded)
             throw new BadRequestException("Authentication failed with external provider");
 
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
 
         var provider = authResult.Principal.Identity.AuthenticationType;
         var userId = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);

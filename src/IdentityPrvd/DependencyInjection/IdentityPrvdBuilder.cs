@@ -32,7 +32,7 @@ public class IdentityPrvdBuilder : IIdentityPrvdBuilder
             .AddRequiredServices()
             .AddAuthentication()
             .AddMiddlewares()
-            .AddContexts()
+            .AddContext()
             .AddEndpoints()
             .AddDefaultDbContext()
             .AddSessionServices()

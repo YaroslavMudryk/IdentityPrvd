@@ -28,7 +28,7 @@ public class InitializeOrchestrator(
     IdentityPrvdContext dbContext,
     ITransactionManager transactionManager,
     IDetector detector,
-    ICurrentContext currentContext,
+    IIdentityContext identityContext,
     ISystemStatus systemStatus,
     ITokenService tokenService,
     ILocationService locationService,
@@ -77,7 +77,7 @@ public class InitializeOrchestrator(
             ExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.RefreshLifeTimeInDays)
         };
 
-        var location = await locationService.GetIpInfoAsync(currentContext.IpAddress);
+        var location = await locationService.GetIpInfoAsync(identityContext.IpAddress);
         var newSession = new IdentitySession
         {
             Id = sessionId,

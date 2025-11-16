@@ -23,7 +23,7 @@ namespace IdentityPrvd.Features.Authentication.Signin.Services;
 public class SigninOrchestrator(
     ITokenService tokenService,
     ISessionManager sessionManager,
-    ICurrentContext currentContext,
+    IIdentityContext identityContext,
     IUsersQuery usersQuery,
     IClientsQuery clientsQuery,
     ILocationService locationService,
@@ -44,7 +44,7 @@ public class SigninOrchestrator(
         var user = await usersQuery.GetUserByLoginNullableAsync(dto.Login);
         var client = await clientsQuery.GetClientByIdNullableAsync(dto.ClientId);        
         InitClient(dto);
-        var location = await locationService.GetIpInfoAsync(currentContext.IpAddress);
+        var location = await locationService.GetIpInfoAsync(identityContext.IpAddress);
 
         var response = new SigninResponseDto();
 

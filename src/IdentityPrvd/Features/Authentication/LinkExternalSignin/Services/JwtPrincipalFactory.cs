@@ -1,5 +1,4 @@
 ﻿using IdentityPrvd.Options;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,7 +13,6 @@ public class JwtPrincipalFactory
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(options.Token.SecretKey!);
         var issuer = options.Token.Issuer;
-        var audience = options.Token.Audience;
 
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -29,8 +27,7 @@ public class JwtPrincipalFactory
 
         try
         {
-            SecurityToken validatedToken;
-            var principal = tokenHandler.ValidateToken(jwtToken, tokenValidationParameters, out validatedToken);
+            var principal = tokenHandler.ValidateToken(jwtToken, tokenValidationParameters, out SecurityToken validatedToken);
 
             return principal;
         }

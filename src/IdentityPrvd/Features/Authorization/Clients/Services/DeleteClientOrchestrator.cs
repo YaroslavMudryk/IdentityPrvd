@@ -11,11 +11,11 @@ public class DeleteClientOrchestrator(
     IClientStore clientStore,
     IClientClaimStore clientClaimStore,
     IClientSecretStore clientSecretStore,
-    IUserContext userContext)
+    IIdentityContext identityContext)
 {
     public async Task DeleteAsync(Ulid clientId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Clients, IdentityClaims.Values.Delete,
             [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
@@ -25,7 +25,7 @@ public class DeleteClientOrchestrator(
         var clientToDelete = await clientStore.GetAsync(clientId)
             ?? throw new NotFoundException($"Client with id:{clientId} not found");
         if (clientToDelete.CreatedBy != currentUser.UserId
-            && !currentUser.IsIsRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]))
+            && !currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]))
             throw new UnauthorizedException("You can only delete clients you have created unless you are an admin or super admin");
 
         await clientClaimStore.DeleteByClientIdAsync(clientToDelete.Id);

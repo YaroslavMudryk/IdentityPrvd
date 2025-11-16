@@ -10,14 +10,14 @@ namespace IdentityPrvd.Features.Security.Mfa.DisableMfa.Services;
 public class DisableMfaOrchestrator(
     IMfaStore mfaStore,
     IMfaService mfaService,
-    IUserContext userContext)
+    IIdentityContext identityContext)
 {
     public async Task DisableMfaAsync(string code)
     {
         if (string.IsNullOrWhiteSpace(code))
             throw new BadRequestException("Code must be a value");
 
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

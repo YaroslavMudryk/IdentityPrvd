@@ -22,7 +22,7 @@ public class ExternalSigninOrchestrator(
     ISessionManager sessionManager,
     IdentityPrvdOptions identityOptions,
     ILocationService locationService,
-    ICurrentContext currentContext,
+    IIdentityContext identityContext,
     IRolesQuery rolesQuery,
     IUserStore userRepo,
     IClientsQuery clientsQuery,
@@ -101,7 +101,7 @@ public class ExternalSigninOrchestrator(
         
         var refreshToken = ExternalSigninEntityFactory.CreateRefreshToken(sessionId, refreshTokenValue, refreshTokenExpiredAt);
         var client = await clientsQuery.GetClientByIdAsync(dto.ClientId);
-        var location = await locationService.GetIpInfoAsync(currentContext.IpAddress);
+        var location = await locationService.GetIpInfoAsync(identityContext.IpAddress);
 
         var session = ExternalSigninEntityFactory.CreateIdentitySession(sessionId, userToLogin.Id, dto, client, location, refreshToken, sessionExpireAt);
 

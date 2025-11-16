@@ -8,16 +8,16 @@ namespace IdentityPrvd.Features.Authorization.Clients.Services;
 
 public class GetClientsOrchestrator(
     IClientsQuery clientsQuery,
-    IUserContext userContext)
+    IIdentityContext identityContext)
 {
     public async Task<IReadOnlyList<ClientDto>> GetClientsAsync()
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Clients, IdentityClaims.Values.View,
             [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
 
-        if (currentUser.IsIsRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]))
+        if (currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]))
             return await clientsQuery.GetAllClientsAsync();
         else
             return await clientsQuery.GetClientsByCreatorIdAsync(currentUser.UserId.GetIdAsUlid());

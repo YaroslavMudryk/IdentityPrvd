@@ -10,20 +10,20 @@ using IdentityPrvd.Services.ServerSideSessions;
 namespace IdentityPrvd.Features.Security.Sessions.GetSession.Services;
 
 public class GetSessionOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     ISessionManager sessionManager,
     ISessionsQuery sessionsQuery)
 {
     public async Task<SessionDetailDto> GetUserSessionAsync(Ulid sessionId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
         var dbSession = await sessionsQuery.GetSessionAsync(sessionId);
 
-        if (!currentUser.IsIsRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin])
+        if (!currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin])
             && dbSession.UserId.GetIdAsString() != currentUser.UserId)
             throw new UnauthorizedException("Not your session");
 

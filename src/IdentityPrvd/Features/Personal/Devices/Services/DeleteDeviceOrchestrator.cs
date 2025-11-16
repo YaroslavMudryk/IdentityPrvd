@@ -7,12 +7,12 @@ using IdentityPrvd.Data.Stores;
 namespace IdentityPrvd.Features.Personal.Devices.Services;
 
 public class DeleteDeviceOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IDeviceStore deviceStore)
 {
     public async Task DeleteDeviceAsync(Ulid deviceId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var userId = currentUser.UserId;

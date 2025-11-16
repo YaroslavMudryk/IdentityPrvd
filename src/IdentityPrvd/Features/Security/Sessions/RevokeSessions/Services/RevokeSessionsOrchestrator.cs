@@ -10,7 +10,7 @@ using IdentityPrvd.Services.ServerSideSessions;
 namespace IdentityPrvd.Features.Security.Sessions.RevokeSessions.Services;
 
 public class RevokeSessionsOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     ISessionManager sessionManager,
     SessionRevocationValidator revocationValidator,
     ISessionStore sessionStore,
@@ -20,7 +20,7 @@ public class RevokeSessionsOrchestrator(
 {
     public async Task<int> RevokeSessionsAsync(Ulid[] sessionIds)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

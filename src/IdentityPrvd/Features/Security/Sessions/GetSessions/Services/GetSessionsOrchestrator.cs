@@ -8,13 +8,13 @@ using IdentityPrvd.Services.ServerSideSessions;
 namespace IdentityPrvd.Features.Security.Sessions.GetSessions.Services;
 
 public class GetSessionsOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     ISessionManager sessionManager,
     ISessionsQuery sessionsQuery)
 {
     public async Task<IReadOnlyList<SessionDto>> GetUserSessionsAsync()
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

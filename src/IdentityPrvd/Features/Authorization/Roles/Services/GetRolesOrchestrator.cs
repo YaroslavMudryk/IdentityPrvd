@@ -6,12 +6,12 @@ using IdentityPrvd.Features.Authorization.Roles.Dtos;
 namespace IdentityPrvd.Features.Authorization.Roles.Services;
 
 public class GetRolesOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IRolesQuery query)
 {
     public async Task<IReadOnlyList<RoleDto>> GetRolesAsync()
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
              IdentityClaims.Types.Role, IdentityClaims.Values.ViewAll,
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

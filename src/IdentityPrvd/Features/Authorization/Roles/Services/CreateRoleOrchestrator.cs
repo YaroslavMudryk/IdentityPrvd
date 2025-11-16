@@ -11,7 +11,7 @@ using IdentityPrvd.Features.Authorization.Roles.Dtos;
 namespace IdentityPrvd.Features.Authorization.Roles.Services;
 
 public class CreateRoleOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IRolesQuery query,
     IRoleStore roleRepo,
     ITransactionManager transactionManager,
@@ -21,7 +21,7 @@ public class CreateRoleOrchestrator(
 {
     public async Task<RoleDto> CreateRoleAsync(CreateRoleDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
              IdentityClaims.Types.Role, IdentityClaims.Values.Create,
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

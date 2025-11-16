@@ -7,13 +7,13 @@ using IdentityPrvd.Domain.Entities;
 namespace IdentityPrvd.Features.Security.Sessions.RevokeSessions.Services;
 
 public class SessionRevocationValidator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     ISessionsQuery sessionsQuery,
     TimeProvider timeProvider)
 {
     public async Task EnsureRevocationAllowedAsync(List<IdentitySession> sessions)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         var currentSession = await sessionsQuery.GetSessionAsync(currentUser.SessionId.GetIdAsUlid());
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;

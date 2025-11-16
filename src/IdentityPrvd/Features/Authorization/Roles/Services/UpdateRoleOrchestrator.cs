@@ -11,7 +11,7 @@ using IdentityPrvd.Features.Authorization.Roles.Dtos;
 namespace IdentityPrvd.Features.Authorization.Roles.Services;
 
 public class UpdateRoleOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IValidator<UpdateRoleDto> validator,
     IRolesQuery query,
     IRoleStore roleStore,
@@ -21,7 +21,7 @@ public class UpdateRoleOrchestrator(
 {
     public async Task<RoleDto> UpdateRoleAsync(Ulid roleId, UpdateRoleDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
              IdentityClaims.Types.Role, IdentityClaims.Values.Update,
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

@@ -16,11 +16,11 @@ public class CreateClientOrchestrator(
     ITransactionManager transactionManager,
     IHasher hasher,
     IClientStore clientStore,
-    IUserContext userContext)
+    IIdentityContext identityContext)
 {
     public async Task<ClientDto> CreateAsync(CreateClientDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Clients, IdentityClaims.Values.Create,
             [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);

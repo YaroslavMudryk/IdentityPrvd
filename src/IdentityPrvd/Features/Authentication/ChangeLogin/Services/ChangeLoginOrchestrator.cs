@@ -11,7 +11,7 @@ using IdentityPrvd.Services.Security;
 namespace IdentityPrvd.Features.Authentication.ChangeLogin.Services;
 
 public class ChangeLoginOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IUserStore userStore,
     IUsersQuery usersQuery,
     IdentityPrvdOptions options,
@@ -19,7 +19,7 @@ public class ChangeLoginOrchestrator(
 {
     public async Task ChangeLoginAsync(ChangeLoginDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

@@ -12,17 +12,17 @@ namespace IdentityPrvd.Features.Authorization.Clients.Services;
 public class GetClientOrchestrator(
     IClientsQuery clientsQuery,
     IClientClaimsQuery clientClaimsQuery,
-    IUserContext userContext)
+    IIdentityContext identityContext)
 {
     public async Task<ClientDto> GetClientAsync(Ulid clientId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Clients, IdentityClaims.Values.View,
             [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
         var client = await clientsQuery.GetClientByIdNullableAsync(clientId.GetIdAsString()) ?? throw new NotFoundException($"Client with id:{clientId} not found");
 
-        if (!currentUser.IsIsRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]) &&
+        if (!currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]) &&
             client.CreatedBy != currentUser.UserId)
             throw new UnauthorizedException("You do not have permission to access this client");
 

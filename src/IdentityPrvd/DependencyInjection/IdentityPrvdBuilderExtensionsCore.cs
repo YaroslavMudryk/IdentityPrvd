@@ -130,10 +130,9 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return builder;
     }
 
-    internal static IIdentityPrvdBuilder AddContexts(this IIdentityPrvdBuilder builder)
+    internal static IIdentityPrvdBuilder AddContext(this IIdentityPrvdBuilder builder)
     {
-        builder.Services.AddScoped<IUserContext, UserContext>();
-        builder.Services.AddScoped<ICurrentContext, CurrentContext>();
+        builder.Services.AddScoped<IIdentityContext, IdentityContext>();
         return builder;
     }
 

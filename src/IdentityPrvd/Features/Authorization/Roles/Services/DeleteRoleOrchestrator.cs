@@ -13,11 +13,11 @@ public class DeleteRoleOrchestrator(
     IRoleClaimStore roleClaimStore,
     IRolesQuery rolesQuery,
     ITransactionManager transactionManager,
-    IUserContext userContext)
+    IIdentityContext identityContext)
 {
     public async Task DeleteRoleAsync(Ulid roleId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
              IdentityClaims.Types.Role, IdentityClaims.Values.Delete,
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

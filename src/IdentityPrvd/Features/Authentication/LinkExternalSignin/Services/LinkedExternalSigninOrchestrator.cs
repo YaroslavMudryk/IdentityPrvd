@@ -7,13 +7,13 @@ using IdentityPrvd.Services.AuthSchemes;
 namespace IdentityPrvd.Features.Authentication.LinkExternalSignin.Services;
 
 public class LinkedExternalSigninOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IAuthSchemes authSchemes,
     IUserLoginsQuery userLoginsQuery)
 {
     public async Task<List<ExternalProviderDto>> GetLinkedExternalSigninsAsync()
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         var userLogins = await userLoginsQuery.GetUserLoginsAsync(currentUser.UserId.GetIdAsUlid());
 
         var externalProviders = await authSchemes.GetAllSchemesAsync();

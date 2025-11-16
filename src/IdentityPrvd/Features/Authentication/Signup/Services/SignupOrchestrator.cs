@@ -23,7 +23,7 @@ public class SignupOrchestrator(
     IContactStore contactStore,
     IPasswordStore passwordStore,
     IRolesQuery rolesQuery,
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IHasher hasher,
     IEmailService emailService,
     ISmsService smsService,
@@ -51,7 +51,7 @@ public class SignupOrchestrator(
             CanBeBlocked = true,
             IsConfirmed = !options.User.ConfirmRequired,
             ConfirmedAt = !options.User.ConfirmRequired ? utcNow : null,
-            ConfirmedBy = !options.User.ConfirmRequired ? userContext.GetBy<ServiceUser>() : null
+            ConfirmedBy = !options.User.ConfirmRequired ? identityContext.GetBy<ServiceUser>() : null
         };
 
         await userStore.AddAsync(user);

@@ -1,10 +1,12 @@
-﻿using IdentityPrvd.Common.Exceptions;
+using IdentityPrvd.Common.Exceptions;
 
 namespace IdentityPrvd.Contexts;
 
-public class UserContext : IUserContext
+public class IdentityContext : IIdentityContext
 {
     public CurrentUser CurrentUser { get; set; } = UninitializedUser.Instance;
+    public string IpAddress { get; set; } = string.Empty;
+    public string CorrelationId { get; set; } = string.Empty;
 
     public TUser AssumeAuthenticated<TUser>() where TUser : CurrentUser
     {

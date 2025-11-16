@@ -6,13 +6,13 @@ using IdentityPrvd.Data.Transactions;
 namespace IdentityPrvd.Features.Authorization.Claims.Services;
 
 public class DeleteClaimOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     ITransactionManager transactionManager,
     IClaimStore repo)
 {
     public async Task DeleteClaimAsync(Ulid claimId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Claims, IdentityClaims.Values.Delete,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

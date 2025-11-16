@@ -7,12 +7,12 @@ using IdentityPrvd.Features.Personal.Contacts.Dtos;
 namespace IdentityPrvd.Features.Personal.Contacts.Services;
 
 public class GetContactsOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IContactsQuery query)
 {
     public async Task<List<ContactDto>> GetContactsAsync()
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         return await query.GetUserContactsAsync(currentUser.UserId.GetIdAsUlid());

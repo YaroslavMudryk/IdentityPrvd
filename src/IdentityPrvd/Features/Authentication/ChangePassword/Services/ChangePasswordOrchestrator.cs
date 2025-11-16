@@ -14,7 +14,7 @@ using IdentityPrvd.Services.ServerSideSessions;
 namespace IdentityPrvd.Features.Authentication.ChangePassword.Services;
 
 public class ChangePasswordOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IdentityPrvdOptions options,
     TimeProvider timeProvider,
     IUserStore userStore,
@@ -27,7 +27,7 @@ public class ChangePasswordOrchestrator(
 {
     public async Task ChangePasswordAsync(ChangePasswordDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);

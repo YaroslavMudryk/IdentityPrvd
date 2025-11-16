@@ -10,14 +10,14 @@ using IdentityPrvd.Mappers;
 namespace IdentityPrvd.Features.Personal.Devices.Services;
 
 public class VerifyDeviceOrchestrator(
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IDeviceStore deviceStore,
     IDevicesQuery devicesQuery,
     TimeProvider timeProvider)
 {
     public async Task<DeviceDto> VerifyDeviceAsync(VerifyDeviceDto dto)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var userId = currentUser.UserId;

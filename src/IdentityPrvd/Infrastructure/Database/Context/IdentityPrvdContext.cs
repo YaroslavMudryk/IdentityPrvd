@@ -331,6 +331,6 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
 
     private string GetCurrentUser()
     {
-        return this.GetService<IUserContext>().GetBy<BasicAuthenticatedUser>();
+        return this.GetService<IIdentityContext>().GetBy<BasicAuthenticatedUser>();
     }
 }

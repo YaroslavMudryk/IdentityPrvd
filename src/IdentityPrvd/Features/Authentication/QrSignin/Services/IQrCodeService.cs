@@ -35,12 +35,11 @@ public interface IQrCodeService
 public class QrCodeService(
     IdentityPrvdOptions identityOptions,
     TimeProvider timeProvider,
-    IUserContext userContext,
+    IIdentityContext identityContext,
     IClientsQuery clientsQuery,
     IValidator<QrRequestDto> validator,
     ITransactionManager transactionManager,
     ISessionStore sessionStore,
-    ICurrentContext currentContext,
     ILocationService locationService,
     ITokenService tokenService,
     ISessionManager sessionManager,
@@ -49,7 +48,7 @@ public class QrCodeService(
 {
     public async Task<ClientInfo> GetQrCodeDetailsAsync(string verificationId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var qrSocket = manager.GetVerification(verificationId);
@@ -58,7 +57,7 @@ public class QrCodeService(
 
     public async Task<ConfirmQrDto> ConfirmQrCodeAsync(string verificationId)
     {
-        var currentUser = userContext.AssumeAuthenticated<BasicAuthenticatedUser>();
+        var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var qrSocket = manager.GetVerification(verificationId);
@@ -120,7 +119,7 @@ public class QrCodeService(
         };
 
         var userId = currentUser.UserId.GetIdAsUlid();
-        var location = await locationService.GetIpInfoAsync(currentContext.IpAddress);
+        var location = await locationService.GetIpInfoAsync(identityContext.IpAddress);
 
         var newSession = new IdentitySession
         {

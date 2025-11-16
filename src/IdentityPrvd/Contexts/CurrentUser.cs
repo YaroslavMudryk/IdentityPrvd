@@ -34,7 +34,7 @@ public record BasicAuthenticatedUser(string UserId, string SessionId, IEnumerabl
         throw new UnauthorizedException();
     }
 
-    public bool IsIsRoles(string[] roles)
+    public bool IsInRoles(string[] roles)
     {
         return Claims.Any(s => s.Type == IdentityClaims.Types.Roles && roles.Contains(s.Value));
     }

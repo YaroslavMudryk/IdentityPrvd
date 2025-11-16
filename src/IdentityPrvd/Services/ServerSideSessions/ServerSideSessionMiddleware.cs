@@ -11,12 +11,12 @@ namespace IdentityPrvd.Services.ServerSideSessions;
 
 public class ServerSideSessionMiddleware(
     ISessionManager sessionManager,
-    IUserContext userContext) : IMiddleware
+    IIdentityContext identityContext) : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         ArgumentNullException.ThrowIfNull(sessionManager);
-        ArgumentNullException.ThrowIfNull(userContext);
+        ArgumentNullException.ThrowIfNull(identityContext);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
@@ -32,10 +32,10 @@ public class ServerSideSessionMiddleware(
                     var isActive = await sessionManager.IsActiveSessionAsync(userId, sessionId);
                     if (isActive)
                     {
-                        if (((UserContext)userContext).CurrentUser is UninitializedUser)
+                        if (identityContext.CurrentUser is UninitializedUser)
                         {
                             var user = context.User.GetCurrentUser(await sessionManager.GetSessionPermissionsAsync(sessionId));
-                            ((UserContext)userContext).CurrentUser = user;
+                            ((IdentityContext)identityContext).CurrentUser = user;
                         }
                         await next(context);
 
@@ -54,7 +54,7 @@ public class ServerSideSessionMiddleware(
         }
         else
         {
-            ((UserContext)userContext).CurrentUser = ServiceUser.Instance;
+            ((IdentityContext)identityContext).CurrentUser = ServiceUser.Instance;
             await next(context);
         }
     }

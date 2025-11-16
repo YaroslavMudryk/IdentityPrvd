@@ -84,7 +84,7 @@ app.Run();
 - Endpoints: discovered via `IEndpoint` and mapped by `app.MapEndpoints()` inside `app.UseIdentityPrvd()`
 - Authentication: JWT Bearer + External cookie, configured from `TokenOptions`
 - Core features: signup/signin, refresh token, signout, sessions, MFA, roles/claims, contacts, devices, QR signin
-- Contexts: `IUserContext`, `ICurrentContext`
+- Contexts: `IIdentityContext`
 - Middlewares: correlation, global exception handler, server-side sessions
 - Storage: EF-based stores/queries by default (can be swapped)
 - Sessions: server-side session manager + in-memory/Redis store
