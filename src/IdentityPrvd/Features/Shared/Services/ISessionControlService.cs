@@ -35,22 +35,11 @@ public class SessionControlService(
         }
     }
 
-    public async Task CloseActiveUserSessionsExpectAsync(Ulid userId, Ulid sessionIdToKeep)
-    {
-        var userSessions = await sessionStore.GetActiveSessionsByUserIdAsync(userId);
-        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
-
-        foreach (var userSession in userSessions)
-        {
-            await CloseSessionAsync(userSession.Id, utcNow);
-        }
-    }
-
     public async Task CloseOtherSessionsIfRequiredAsync(Ulid userId, Ulid currentSessionId)
     {
         if (identityOptions.SingleSessionPerUser)
         {
-            await CloseActiveUserSessionsExpectAsync(userId, currentSessionId);
+            await CloseActiveUserSessionsAsync(userId, [currentSessionId]);
         }
     }
 
