@@ -14,9 +14,8 @@ public class SignoutOrchestrator(
     public async Task SignoutAsync(bool everywhere)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All,
-            [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
+        currentUser.EnsureUserHasPermissions(
+            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 

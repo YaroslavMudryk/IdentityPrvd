@@ -17,15 +17,13 @@ public class GetSessionOrchestrator(
     public async Task<SessionDetailDto> GetUserSessionAsync(Ulid sessionId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All,
-            [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
+        currentUser.EnsureUserHasPermissions(
+            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var dbSession = await sessionsQuery.GetSessionAsync(sessionId);
 
-        if (!currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin])
-            && dbSession.UserId.GetIdAsString() != currentUser.UserId)
-            throw new UnauthorizedException("Not your session");
+        if (dbSession.UserId.GetIdAsString() != currentUser.UserId)
+            throw new UnauthorizedException();
 
         var session = dbSession.MapToDto();
 

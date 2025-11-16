@@ -28,9 +28,8 @@ public class EnableMfaOrchestrator(
     public async Task<MfaResponse> EnableMfaAsync(MfaDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All,
-            [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
+        currentUser.EnsureUserHasPermissions(
+            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var userId = currentUser.UserId.GetIdAsUlid();
         await using var transaction = await transactionManager.BeginTransactionAsync();
