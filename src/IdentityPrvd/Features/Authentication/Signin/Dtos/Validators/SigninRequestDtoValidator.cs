@@ -21,7 +21,8 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         IUserSecureService userSecureService,
         TimeProvider timeProvider,
         IdentityPrvdOptions options,
-        UserHelper userHelper)
+        UserHelper userHelper,
+        IFailedLoginAttemptsQuery failedLoginAttemptsQuery)
     {
         RuleFor(x => x.Login)
             .NotEmpty()
@@ -88,11 +89,38 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         RuleFor(x => x).MustAsync(async (dto, _) =>
         {
             var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+            
+            // Check rate limiting before user lookup to prevent user enumeration
+            if (options.Protection.RateLimit.Enabled)
+            {
+                var timeWindowStart = utcNow.AddMinutes(-options.Protection.RateLimit.TimeWindowInMinutes);
+                var recentAttempts = await failedLoginAttemptsQuery.CountFailedAttemptsByLoginAsync(dto.Login, timeWindowStart);
+                
+                if (recentAttempts >= options.Protection.RateLimit.MaxAttempts)
+                {
+                    var timeRemaining = options.Protection.RateLimit.TimeWindowInMinutes;
+                    throw new BadRequestException($"Too many login attempts. Please try again in {timeRemaining} minute(s).");
+                }
+            }
+            
             var user = await usersQuery.GetUserByLoginNullableAsync(dto.Login)
                     ?? throw new BadRequestException("Login or password is incorrect");
 
             if (!user.IsConfirmed)
                 throw new BadRequestException("User is not confirmed");
+
+            // Additional rate limiting check by user ID (in case user exists)
+            if (options.Protection.RateLimit.Enabled)
+            {
+                var timeWindowStart = utcNow.AddMinutes(-options.Protection.RateLimit.TimeWindowInMinutes);
+                var recentAttemptsByUser = await failedLoginAttemptsQuery.CountFailedAttemptsByUserIdAsync(user.Id, timeWindowStart);
+                
+                if (recentAttemptsByUser >= options.Protection.RateLimit.MaxAttempts)
+                {
+                    var timeRemaining = options.Protection.RateLimit.TimeWindowInMinutes;
+                    throw new BadRequestException($"Too many login attempts. Please try again in {timeRemaining} minute(s).");
+                }
+            }
 
             if (user.CanBeBlocked)
             {
