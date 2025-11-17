@@ -215,10 +215,6 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder
-            .Properties<Ulid>()
-            .HaveConversion<UlidToStringConverter>();
-
-        configurationBuilder
             .Properties<Enum>()
             .HaveConversion<EnumToStringConverter>();
     }
@@ -296,9 +292,9 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
 
     private static void HandleAddedEntry(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry, DateTime utcNow, string by)
     {
-        if (entry.Entity is BaseModel baseModel && baseModel.Id == Ulid.Empty)
+        if (entry.Entity is BaseModel baseModel && baseModel.Id == Guid.Empty)
         {
-            baseModel.Id = Ulid.NewUlid();
+            baseModel.Id = Guid.CreateVersion7();
         }
 
         if (entry.Entity is IAuditable auditEntity)

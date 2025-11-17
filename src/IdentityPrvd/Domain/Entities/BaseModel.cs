@@ -5,7 +5,7 @@ namespace IdentityPrvd.Domain.Entities;
 
 public class BaseModel : IAuditable, IVersionable, ISoftDeletable
 {
-    public Ulid Id { get; set; } = Ulid.Empty;
+    public Guid Id { get; set; } = Guid.Empty;
 
     public string CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }

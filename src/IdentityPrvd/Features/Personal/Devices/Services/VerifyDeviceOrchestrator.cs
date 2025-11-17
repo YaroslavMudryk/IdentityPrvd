@@ -22,7 +22,7 @@ public class VerifyDeviceOrchestrator(
 
         var userId = currentUser.UserId;
 
-        var existDevice = await devicesQuery.GetDeviceByIdentifierAsync(dto.Identifier, userId.GetIdAsUlid());
+        var existDevice = await devicesQuery.GetDeviceByIdentifierAsync(dto.Identifier, userId.GetIdAsGuid());
         if (existDevice != null && existDevice.Verified)
             throw new BadRequestException("This device already verified");
 
@@ -30,7 +30,7 @@ public class VerifyDeviceOrchestrator(
         newDevice.Verified = true;
         newDevice.VerifiedAt = timeProvider.GetUtcNow().UtcDateTime;
         newDevice.VerifiedBySessionId = currentUser.SessionId;
-        newDevice.UserId = userId.GetIdAsUlid();
+        newDevice.UserId = userId.GetIdAsGuid();
 
         var addedDevice = await deviceStore.AddAsync(newDevice);
 

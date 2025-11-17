@@ -9,27 +9,27 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IMfaStore
 {
-    Task<IdentityUser> GetUserAsync(Ulid userId);
-    Task<IdentityMfa> GetByUserIdAsync(Ulid userId);
-    Task<IdentityMfa> GetUserMfaTotpNullableAsync(Ulid userId);
-    Task<IdentityMfa> GetUserActiveMfaNullableAsync(Ulid userId);
+    Task<IdentityUser> GetUserAsync(Guid userId);
+    Task<IdentityMfa> GetByUserIdAsync(Guid userId);
+    Task<IdentityMfa> GetUserMfaTotpNullableAsync(Guid userId);
+    Task<IdentityMfa> GetUserActiveMfaNullableAsync(Guid userId);
     Task<IdentityMfa> AddAsync(IdentityMfa mfa);
     Task<IdentityMfa> UpdateAsync(IdentityMfa mfa);
     Task DeleteAsync(IdentityMfa mfa);
-    Task<IdentityMfa> GetUserActivatedMfaNullableAsync(Ulid userId);
-    Task<List<IdentityMfaRecoveryCode>> GetMfaRecoveryCodesAsync(Ulid mfaId);
+    Task<IdentityMfa> GetUserActivatedMfaNullableAsync(Guid userId);
+    Task<List<IdentityMfaRecoveryCode>> GetMfaRecoveryCodesAsync(Guid mfaId);
     Task DeleteRecoveryCodesAsync(List<IdentityMfaRecoveryCode> recoveryCodes);
 }
 
 public class EfMfaStore(IdentityPrvdContext dbContext) : IMfaStore
 {
-    public async Task<IdentityUser> GetUserAsync(Ulid userId) =>
+    public async Task<IdentityUser> GetUserAsync(Guid userId) =>
         await dbContext.Users.FindAsync(userId) ?? throw new NotFoundException($"User {userId} not found");
 
-    public async Task<IdentityMfa> GetUserMfaTotpNullableAsync(Ulid userId) =>
+    public async Task<IdentityMfa> GetUserMfaTotpNullableAsync(Guid userId) =>
         await dbContext.Mfas.Where(m => m.Type == MfaType.Totp && m.UserId == userId && m.Activated == null).FirstOrDefaultAsync();
 
-    public async Task<IdentityMfa> GetUserActiveMfaNullableAsync(Ulid userId) =>
+    public async Task<IdentityMfa> GetUserActiveMfaNullableAsync(Guid userId) =>
         await dbContext.Mfas.Where(m => m.Type == MfaType.Totp && m.UserId == userId && m.Activated != null).FirstOrDefaultAsync();
 
     public async Task<IdentityMfa> AddAsync(IdentityMfa mfa)
@@ -56,10 +56,10 @@ public class EfMfaStore(IdentityPrvdContext dbContext) : IMfaStore
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<IdentityMfa> GetUserActivatedMfaNullableAsync(Ulid userId) =>
+    public async Task<IdentityMfa> GetUserActivatedMfaNullableAsync(Guid userId) =>
         await dbContext.Mfas.AsNoTracking().Where(s => s.Type == MfaType.Totp && s.UserId == userId && s.Activated != null).FirstOrDefaultAsync();
 
-    public async Task<List<IdentityMfaRecoveryCode>> GetMfaRecoveryCodesAsync(Ulid mfaId) =>
+    public async Task<List<IdentityMfaRecoveryCode>> GetMfaRecoveryCodesAsync(Guid mfaId) =>
         await dbContext.MfaRecoveryCodes.Where(s => s.MfaId == mfaId).ToListAsync();
 
     public async Task DeleteRecoveryCodesAsync(List<IdentityMfaRecoveryCode> recoveryCodes)
@@ -68,6 +68,6 @@ public class EfMfaStore(IdentityPrvdContext dbContext) : IMfaStore
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<IdentityMfa> GetByUserIdAsync(Ulid userId) =>
+    public async Task<IdentityMfa> GetByUserIdAsync(Guid userId) =>
         await dbContext.Mfas.FirstOrDefaultAsync(s => s.UserId == userId);
 }

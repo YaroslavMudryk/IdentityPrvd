@@ -10,7 +10,7 @@ public class DeleteDeviceOrchestrator(
     IIdentityContext identityContext,
     IDeviceStore deviceStore)
 {
-    public async Task DeleteDeviceAsync(Ulid deviceId)
+    public async Task DeleteDeviceAsync(Guid deviceId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
@@ -19,7 +19,7 @@ public class DeleteDeviceOrchestrator(
 
         var deviceToDelete = await deviceStore.GetAsync(deviceId) ?? throw new NotFoundException($"Device id:{deviceId} not found");
 
-        if (deviceToDelete.UserId != userId.GetIdAsUlid())
+        if (deviceToDelete.UserId != userId.GetIdAsGuid())
             throw new UnauthorizedException("Not your device");
 
         await deviceStore.DeleteAsync(deviceToDelete);

@@ -42,7 +42,7 @@ public class SignupOrchestrator(
 
         var user = new IdentityUser
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             Login = dto.Login,
             PasswordHash = hasher.GetHash(dto.Password),
             UserName = dto.UserName ?? Guid.NewGuid().ToString("N")[..10],

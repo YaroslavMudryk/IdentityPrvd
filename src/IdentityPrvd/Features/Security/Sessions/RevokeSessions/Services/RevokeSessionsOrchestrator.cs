@@ -18,7 +18,7 @@ public class RevokeSessionsOrchestrator(
     ITransactionManager transactionManager,
     TimeProvider timeProvider)
 {
-    public async Task<int> RevokeSessionsAsync(Ulid[] sessionIds)
+    public async Task<int> RevokeSessionsAsync(Guid[] sessionIds)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(
@@ -37,7 +37,7 @@ public class RevokeSessionsOrchestrator(
         {
             session.Status = SessionStatus.Close;
             session.DeactivatedAt = utcNow;
-            session.DeactivatedBySessionId = currentUser.SessionId.GetIdAsUlid();
+            session.DeactivatedBySessionId = currentUser.SessionId.GetIdAsGuid();
         }
         await sessionStore.UpdateRangeAsync(sessionsToRevoke);
 

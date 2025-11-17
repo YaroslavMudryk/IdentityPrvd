@@ -49,7 +49,7 @@ public class CreateClientOrchestrator(
         [
             new()
             {
-                Id = Ulid.NewUlid(),
+                Id = Guid.CreateVersion7(),
                 IsActive = true,
                 Value = hasher.GetHash(secret),
             }

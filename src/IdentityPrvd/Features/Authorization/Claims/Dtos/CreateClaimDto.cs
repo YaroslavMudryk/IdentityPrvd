@@ -1,4 +1,4 @@
-namespace IdentityPrvd.Features.Authorization.Claims.Dtos;
+﻿namespace IdentityPrvd.Features.Authorization.Claims.Dtos;
 
 public class CreateClaimDto
 {

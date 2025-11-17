@@ -1,4 +1,4 @@
-using IdentityPrvd.Common.Api;
+﻿using IdentityPrvd.Common.Api;
 using IdentityPrvd.Endpoints;
 using IdentityPrvd.Features.Authentication.SigninOptions.Services;
 using Microsoft.AspNetCore.Authorization;

@@ -19,7 +19,7 @@ public class UpdateRoleOrchestrator(
     DefaultRoleService defaultRoleService,
     IRoleClaimStore roleClaimStore)
 {
-    public async Task<RoleDto> UpdateRoleAsync(Ulid roleId, UpdateRoleDto dto)
+    public async Task<RoleDto> UpdateRoleAsync(Guid roleId, UpdateRoleDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
@@ -40,14 +40,14 @@ public class UpdateRoleOrchestrator(
         if (dto.IsDefault)
             await defaultRoleService.MakeRoleAsDefaultAsync(roleId);
 
-        await UpdateRoleClaimsAsync(roleId, [.. dto.ClaimIds.Select(s => s.GetIdAsUlid())]);
+        await UpdateRoleClaimsAsync(roleId, [.. dto.ClaimIds.Select(s => s.GetIdAsGuid())]);
 
         await transaction.CommitAsync();
 
         return await query.GetRoleAsync(roleId);
     }
 
-    private async Task UpdateRoleClaimsAsync(Ulid roleId, Ulid[] newClaimIds)
+    private async Task UpdateRoleClaimsAsync(Guid roleId, Guid[] newClaimIds)
     {
         var roleClaimsToDelete = await roleClaimStore.GetRoleClaimsByRoleIdAsync(roleId);
         await roleClaimStore.DeleteRangeAsync(roleClaimsToDelete);

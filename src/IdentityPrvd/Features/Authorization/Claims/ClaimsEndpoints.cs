@@ -39,7 +39,7 @@ public class UpdateClaimEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPut("/api/identity/claims/{claimId}",
-            async (Ulid claimId, UpdateClaimDto dto, UpdateClaimOrchestrator orc) =>
+            async (Guid claimId, UpdateClaimDto dto, UpdateClaimOrchestrator orc) =>
             {
                 dto.Id = claimId;
                 var updatedClaim = await orc.UpdateClaimAsync(claimId, dto);
@@ -53,7 +53,7 @@ public class DeleteClaimEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("/api/identity/claims/{claimId}",
-            async (Ulid claimId, DeleteClaimOrchestrator orc) =>
+            async (Guid claimId, DeleteClaimOrchestrator orc) =>
             {
                 await orc.DeleteClaimAsync(claimId);
                 return Results.NoContent();

@@ -39,7 +39,7 @@ public class UnverifyDeviceEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/identity/devices/unverify/{deviceId}",
-            async (Ulid deviceId, UnverifyDeviceOrchestrator orc) =>
+            async (Guid deviceId, UnverifyDeviceOrchestrator orc) =>
             {
                 await orc.UnverifyDeviceAsync(deviceId);
                 return Results.NoContent();
@@ -52,7 +52,7 @@ public class DeleteDeviceEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("/api/identity/devices/{deviceId}",
-            async (Ulid deviceId, DeleteDeviceOrchestrator orc) =>
+            async (Guid deviceId, DeleteDeviceOrchestrator orc) =>
             {
                 await orc.DeleteDeviceAsync(deviceId);
                 return Results.NoContent();

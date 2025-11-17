@@ -1,7 +1,6 @@
-using IdentityPrvd.DependencyInjection;
+﻿using IdentityPrvd.DependencyInjection;
 using IdentityPrvd.DependencyInjection.Auth;
 using IdentityPrvd.Infrastructure.Database.Context;
-using IdentityPrvd.Infrastructure.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.WebApi;
@@ -14,12 +13,6 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         
-        // Register Ulid route constraint
-        builder.Services.Configure<RouteOptions>(options =>
-        {
-            options.ConstraintMap.Add("Ulid", typeof(UlidRouteConstraint));
-        });
-
         builder.Services.AddIdentityPrvd(builder.Configuration, builder =>
         {
             builder

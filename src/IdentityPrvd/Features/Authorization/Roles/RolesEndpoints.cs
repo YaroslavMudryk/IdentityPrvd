@@ -39,7 +39,7 @@ public class UpdateRoleEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPut("/api/identity/roles/{roleId}",
-            async (Ulid roleId, UpdateRoleDto dto, UpdateRoleOrchestrator orc) =>
+            async (Guid roleId, UpdateRoleDto dto, UpdateRoleOrchestrator orc) =>
             {
                 dto.Id = roleId;
                 var updatedRole = await orc.UpdateRoleAsync(roleId, dto);
@@ -53,7 +53,7 @@ public class DeleteRoleEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("/api/identity/roles/{roleId}",
-            async (Ulid roleId, DeleteRoleOrchestrator orc) =>
+            async (Guid roleId, DeleteRoleOrchestrator orc) =>
             {
                 await orc.DeleteRoleAsync(roleId);
                 return Results.NoContent();

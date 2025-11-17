@@ -14,7 +14,7 @@ public class GetSessionOrchestrator(
     ISessionManager sessionManager,
     ISessionsQuery sessionsQuery)
 {
-    public async Task<SessionDetailDto> GetUserSessionAsync(Ulid sessionId)
+    public async Task<SessionDetailDto> GetUserSessionAsync(Guid sessionId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(

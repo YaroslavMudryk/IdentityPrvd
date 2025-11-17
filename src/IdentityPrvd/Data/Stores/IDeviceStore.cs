@@ -7,7 +7,7 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IDeviceStore
 {
-    Task<IdentityDevice> GetAsync(Ulid deviceId);
+    Task<IdentityDevice> GetAsync(Guid deviceId);
     Task<IdentityDevice> AddAsync(IdentityDevice device);
     Task<IdentityDevice> UpdateAsync(IdentityDevice device);
     Task DeleteAsync(IdentityDevice device);
@@ -28,7 +28,7 @@ public class EfDeviceStore(IdentityPrvdContext dbContext) : IDeviceStore
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<IdentityDevice> GetAsync(Ulid deviceId)
+    public async Task<IdentityDevice> GetAsync(Guid deviceId)
     {
         return await dbContext.Devices.FindAsync(deviceId);
     }

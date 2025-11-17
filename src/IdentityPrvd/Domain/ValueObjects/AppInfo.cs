@@ -2,7 +2,7 @@
 
 public class AppInfo
 {
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public string ShortName { get; set; }
     public string Description { get; set; }

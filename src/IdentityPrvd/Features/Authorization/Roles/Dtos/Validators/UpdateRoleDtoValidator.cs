@@ -24,7 +24,7 @@ public class UpdateRoleDtoValidator : AbstractValidator<UpdateRoleDto>
 
                 if (dto.ClaimIds != null && dto.ClaimIds.Length != 0)
                 {
-                    var allClaimsExists = await claimsQuery.GetClaimsByIdsAsync([.. dto.ClaimIds.Select(s=>s.GetIdAsUlid())]);
+                    var allClaimsExists = await claimsQuery.GetClaimsByIdsAsync([.. dto.ClaimIds.Select(s=>s.GetIdAsGuid())]);
                     if (allClaimsExists.Count != dto.ClaimIds.Length)
                         throw new BadRequestException("Some claims do not exist or are invalid");
                 }

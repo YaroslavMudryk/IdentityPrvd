@@ -14,7 +14,7 @@ public class GetClientOrchestrator(
     IClientClaimsQuery clientClaimsQuery,
     IIdentityContext identityContext)
 {
-    public async Task<ClientDto> GetClientAsync(Ulid clientId)
+    public async Task<ClientDto> GetClientAsync(Guid clientId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(

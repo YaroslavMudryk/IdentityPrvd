@@ -1,4 +1,4 @@
-using IdentityPrvd.Common.Exceptions;
+﻿using IdentityPrvd.Common.Exceptions;
 
 namespace IdentityPrvd.Contexts;
 

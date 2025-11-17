@@ -9,14 +9,14 @@ namespace IdentityPrvd.Data.Queries;
 
 public interface ISessionsQuery
 {
-    Task<IReadOnlyList<SessionDto>> GetActiveUserSessionsAsync(Ulid userId);
+    Task<IReadOnlyList<SessionDto>> GetActiveUserSessionsAsync(Guid userId);
     Task<IReadOnlyCollection<IdentitySession>> GetAllActiveSessionsAsync();
-    Task<IdentitySession> GetSessionAsync(Ulid sessionId);
+    Task<IdentitySession> GetSessionAsync(Guid sessionId);
 }
 
 public class EfSessionsQuery(IdentityPrvdContext dbContext) : ISessionsQuery
 {
-    public async Task<IReadOnlyList<SessionDto>> GetActiveUserSessionsAsync(Ulid userId)
+    public async Task<IReadOnlyList<SessionDto>> GetActiveUserSessionsAsync(Guid userId)
     {
         return await dbContext.Sessions
             .Where(s => s.UserId == userId && (s.Status == SessionStatus.Active || s.Status == SessionStatus.New))
@@ -28,6 +28,6 @@ public class EfSessionsQuery(IdentityPrvdContext dbContext) : ISessionsQuery
     public async Task<IReadOnlyCollection<IdentitySession>> GetAllActiveSessionsAsync() =>
         await dbContext.Sessions.AsNoTracking().Where(s => s.Status == SessionStatus.Active).ToListAsync();
 
-    public async Task<IdentitySession> GetSessionAsync(Ulid sessionId) =>
+    public async Task<IdentitySession> GetSessionAsync(Guid sessionId) =>
         await dbContext.Sessions.AsNoTracking().Where(s => s.Id == sessionId).FirstOrDefaultAsync();
 }

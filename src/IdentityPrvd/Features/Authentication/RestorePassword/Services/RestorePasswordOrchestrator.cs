@@ -60,7 +60,7 @@ public class RestorePasswordOrchestrator(
         return restoreToConfirm;
     }
 
-    private async Task DeactivatedPasswordsAsync(Ulid userId, DateTime utcNow)
+    private async Task DeactivatedPasswordsAsync(Guid userId, DateTime utcNow)
     {
         var userPasswords = await passwordStore.GetUserPasswordsAsync(userId);
         if (userPasswords.Count != 0)
@@ -76,14 +76,14 @@ public class RestorePasswordOrchestrator(
         }
     }
 
-    private async Task SetupUserPasswordAsync(Ulid userId, string passwordHash)
+    private async Task SetupUserPasswordAsync(Guid userId, string passwordHash)
     {
         var userForUpdate = await userStore.GetUserAsync(userId);
         userForUpdate.PasswordHash = passwordHash;
         await userStore.UpdateAsync(userForUpdate);
     }
 
-    private async Task CreateNewPasswordAsync(Ulid userId, string passwordHash, string hint, DateTime utcNow)
+    private async Task CreateNewPasswordAsync(Guid userId, string passwordHash, string hint, DateTime utcNow)
     {
         var newPassword = new IdentityPassword
         {

@@ -1,4 +1,4 @@
-using IdentityPrvd.Common.Constants;
+﻿using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;

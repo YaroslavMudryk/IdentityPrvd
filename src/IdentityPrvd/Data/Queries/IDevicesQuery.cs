@@ -8,18 +8,18 @@ namespace IdentityPrvd.Data.Queries;
 
 public interface IDevicesQuery
 {
-    Task<List<DeviceDto>> GetUserDevicesAsync(Ulid userId);
-    Task<IdentityDevice> GetDeviceByIdentifierAsync(string identifier, Ulid userId);
+    Task<List<DeviceDto>> GetUserDevicesAsync(Guid userId);
+    Task<IdentityDevice> GetDeviceByIdentifierAsync(string identifier, Guid userId);
 }
 
 public class EfDevicesQuery(IdentityPrvdContext dbContext) : IDevicesQuery
 {
-    public async Task<IdentityDevice> GetDeviceByIdentifierAsync(string identifier, Ulid userId) =>
+    public async Task<IdentityDevice> GetDeviceByIdentifierAsync(string identifier, Guid userId) =>
         await dbContext.Devices
         .AsNoTracking()
         .FirstOrDefaultAsync(s => s.Identifier == identifier && s.UserId == userId);
 
-    public async Task<List<DeviceDto>> GetUserDevicesAsync(Ulid userId) =>
+    public async Task<List<DeviceDto>> GetUserDevicesAsync(Guid userId) =>
         await dbContext.Devices
         .AsNoTracking()
         .Where(s => s.UserId == userId)

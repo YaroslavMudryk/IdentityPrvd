@@ -7,8 +7,8 @@ public class IdentityQr : BaseModel
     public DateTime ActivatedAt { get; set; }
     public string QrCodeVerify { get; set; }
     public string Ip { get; set; }
-    public Ulid SessionId { get; set; }
+    public Guid SessionId { get; set; }
     public IdentitySession Session { get; set; }
-    public Ulid UserId { get; set; }
+    public Guid UserId { get; set; }
     public IdentityUser User { get; set; }
 }

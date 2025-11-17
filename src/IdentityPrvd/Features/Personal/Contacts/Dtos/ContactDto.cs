@@ -4,7 +4,7 @@ namespace IdentityPrvd.Features.Personal.Contacts.Dtos;
 
 public class ContactDto
 {
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public string Title { get; set; }
     public string Value { get; set; }

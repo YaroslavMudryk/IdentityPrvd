@@ -13,7 +13,7 @@ public class UnlinkExternalSigninOrchestrator(
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
 
-        var userLogin = await userLoginStore.GetAsync(currentUser.UserId.GetIdAsUlid(), provider)
+        var userLogin = await userLoginStore.GetAsync(currentUser.UserId.GetIdAsGuid(), provider)
             ?? throw new BadRequestException($"No linked account found for provider: {provider}");
 
         await userLoginStore.HardDeleteAsync(userLogin);

@@ -39,7 +39,7 @@ public class DeleteContactsEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("/api/identity/contacts/{id}",
-            async (Ulid id, DeleteContactOrchestrator orc) =>
+            async (Guid id, DeleteContactOrchestrator orc) =>
             {
                 await orc.DeleteContactAsync(id);
                 return Results.NoContent();

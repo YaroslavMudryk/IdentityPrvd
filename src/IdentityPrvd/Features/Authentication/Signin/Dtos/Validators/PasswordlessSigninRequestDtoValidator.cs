@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Data.Queries;

@@ -5,12 +5,12 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IClientSecretStore
 {
-    Task DeleteByClientIdAsync(Ulid clientId);
+    Task DeleteByClientIdAsync(Guid clientId);
 }
 
 public class EfClientSecretStore(IdentityPrvdContext dbContext) : IClientSecretStore
 {
-    public async Task DeleteByClientIdAsync(Ulid clientId)
+    public async Task DeleteByClientIdAsync(Guid clientId)
     {
         var secrets = await dbContext.ClientSecrets.Where(s => s.ClientId == clientId).ToListAsync();
         dbContext.ClientSecrets.RemoveRange(secrets);

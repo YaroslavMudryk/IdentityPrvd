@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;

@@ -11,7 +11,7 @@ public interface IRoleStore
     Task<IdentityRole> AddAsync(IdentityRole role);
     Task<IdentityRole> UpdateAsync(IdentityRole role);
     Task<List<IdentityRole>> UpdateRangeAsync(List<IdentityRole> roles);
-    Task<IdentityRole> GetAsync(Ulid roleId);
+    Task<IdentityRole> GetAsync(Guid roleId);
     Task<List<IdentityRole>> GetAllRolesAsync();
     Task DeleteAsync(IdentityRole role);
 }
@@ -36,7 +36,7 @@ public class EfRoleStore(IdentityPrvdContext dbContext) : IRoleStore
         throw new ArgumentException("Entity must be in modified state or unchanged state to be updated.");
     }
 
-    public async Task<IdentityRole> GetAsync(Ulid roleId) =>
+    public async Task<IdentityRole> GetAsync(Guid roleId) =>
         await dbContext.Roles.Where(s => s.Id == roleId).FirstOrDefaultAsync() ?? throw new NotFoundException($"Role with id:{roleId} not found");
 
     public async Task DeleteAsync(IdentityRole role)

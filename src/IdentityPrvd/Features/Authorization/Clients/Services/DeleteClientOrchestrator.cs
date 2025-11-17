@@ -13,7 +13,7 @@ public class DeleteClientOrchestrator(
     IClientSecretStore clientSecretStore,
     IIdentityContext identityContext)
 {
-    public async Task DeleteAsync(Ulid clientId)
+    public async Task DeleteAsync(Guid clientId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(

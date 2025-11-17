@@ -1,4 +1,4 @@
-using Extensions.DeviceDetector;
+﻿using Extensions.DeviceDetector;
 using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
@@ -59,7 +59,7 @@ public class PasswordlessSigninOrchestrator(
             throw new BadRequestException("OTP code is invalid");
 
         // Create session and sign in
-        var sessionId = Ulid.NewUlid();
+        var sessionId = Guid.CreateVersion7();
 
         var refreshToken = new IdentityRefreshToken
         {

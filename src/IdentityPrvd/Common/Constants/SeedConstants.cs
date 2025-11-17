@@ -9,7 +9,7 @@ public class SeedConstants
     {
         yield return new IdentityClaim
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             Type = IdentityClaims.Types.Identity,
             Value = IdentityClaims.Values.All
         };
@@ -19,21 +19,21 @@ public class SeedConstants
     {
         yield return new IdentityRole
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             Name = DefaultsRoles.SuperAdmin,
             NameNormalized = DefaultsRoles.SuperAdmin.ToUpper(),
             IsDefault = false
         };
         yield return new IdentityRole
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             Name = DefaultsRoles.Admin,
             NameNormalized = DefaultsRoles.Admin.ToUpper(),
             IsDefault = false
         };
         yield return new IdentityRole
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             Name = DefaultsRoles.User,
             NameNormalized = DefaultsRoles.User.ToUpper(),
             IsDefault = true
@@ -42,7 +42,7 @@ public class SeedConstants
 
     public static IEnumerable<IdentityClient> GetClients(IHasher hasher, string audience = "IdentityPrvd")
     {
-        var clientId = Ulid.NewUlid();
+        var clientId = Guid.CreateVersion7();
         yield return new IdentityClient
         {
             Id = clientId,

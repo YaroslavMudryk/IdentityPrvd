@@ -30,8 +30,8 @@ public class LinkExternalSigninOrchestrator(
         {
             externalLogin = new IdentityUserLogin
             {
-                Id = Ulid.NewUlid(),
-                UserId = currentUser.UserId.GetIdAsUlid(),
+                Id = Guid.CreateVersion7(),
+                UserId = currentUser.UserId.GetIdAsGuid(),
                 Provider = provider,
                 ProviderUserId = userId
             };

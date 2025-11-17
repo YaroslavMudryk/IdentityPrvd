@@ -31,7 +31,7 @@ public class EnableMfaOrchestrator(
         currentUser.EnsureUserHasPermissions(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
-        var userId = currentUser.UserId.GetIdAsUlid();
+        var userId = currentUser.UserId.GetIdAsGuid();
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
         MfaResponse response = null;
@@ -49,7 +49,7 @@ public class EnableMfaOrchestrator(
         return response;
     }
 
-    private async Task<MfaResponse> HandleInitMfaAsync(Ulid userId)
+    private async Task<MfaResponse> HandleInitMfaAsync(Guid userId)
     {
         var user = await mfaStore.GetUserAsync(userId);
         var activatedMfa = await mfaStore.GetUserActivatedMfaNullableAsync(userId);
@@ -60,7 +60,7 @@ public class EnableMfaOrchestrator(
         if (userMfa == null)
         {
             var secret = Base32Encoding.ToString(KeyGeneration.GenerateRandomKey(10));
-            var mfaId = Ulid.NewUlid();
+            var mfaId = Guid.CreateVersion7();
             var recoveryCodes = Generator.GetRecoveryCodes();
             var mfaRecoveryCodes = GetMfaRecoveryCodes(mfaId, recoveryCodes);
             var newMfa = new IdentityMfa
@@ -92,7 +92,7 @@ public class EnableMfaOrchestrator(
         }
     }
 
-    private async Task<MfaResponse> HandleConfirmMfaAsync(string code, Ulid userId, string sessionId)
+    private async Task<MfaResponse> HandleConfirmMfaAsync(string code, Guid userId, string sessionId)
     {
         var userMfa = await mfaStore.GetUserMfaTotpNullableAsync(userId)
             ?? throw new BadRequestException("Unable activate mfa");
@@ -101,12 +101,12 @@ public class EnableMfaOrchestrator(
             throw new BadRequestException("Your otp code is invalid");
 
         userMfa.Activated = timeProvider.GetUtcNow().UtcDateTime;
-        userMfa.ActivatedBySessionId = sessionId.GetIdAsUlid();
+        userMfa.ActivatedBySessionId = sessionId.GetIdAsGuid();
         await mfaStore.UpdateAsync(userMfa);
         return null;
     }
 
-    private IEnumerable<IdentityMfaRecoveryCode> GetMfaRecoveryCodes(Ulid mfaId, IEnumerable<string> codes)
+    private IEnumerable<IdentityMfaRecoveryCode> GetMfaRecoveryCodes(Guid mfaId, IEnumerable<string> codes)
     {
         string HashCode(string code)
         {
@@ -119,7 +119,7 @@ public class EnableMfaOrchestrator(
         {
             return new IdentityMfaRecoveryCode
             {
-                Id = Ulid.NewUlid(),
+                Id = Guid.CreateVersion7(),
                 MfaId = mfaId,
                 CodeHash = HashCode(code),
                 ExpiryAt = timeProvider.GetUtcNow().UtcDateTime.AddMonths(6), //ToDo: Make it configurable

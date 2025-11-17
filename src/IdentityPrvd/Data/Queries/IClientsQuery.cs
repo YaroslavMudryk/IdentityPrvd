@@ -15,14 +15,14 @@ public interface IClientsQuery
     Task<IdentityClientSecret> GetClientSecretNullableAsync(string clientId);
     Task<bool> IsExistsClientAsync();
     Task<IReadOnlyList<ClientDto>> GetAllClientsAsync();
-    Task<IReadOnlyList<ClientDto>> GetClientsByCreatorIdAsync(Ulid userId);
+    Task<IReadOnlyList<ClientDto>> GetClientsByCreatorIdAsync(Guid userId);
 }
 
 public class EfClientsQuery(IdentityPrvdContext dbContext) : IClientsQuery
 {
     public async Task<IdentityClientSecret> GetClientSecretAsync(string id)
     {
-        return await dbContext.ClientSecrets.AsNoTracking().FirstOrDefaultAsync(s => s.IsActive && s.ClientId == id.GetIdAsUlid());
+        return await dbContext.ClientSecrets.AsNoTracking().FirstOrDefaultAsync(s => s.IsActive && s.ClientId == id.GetIdAsGuid());
     }
 
     public async Task<IdentityClient> GetClientByIdNullableAsync(string clientId)
@@ -32,7 +32,7 @@ public class EfClientsQuery(IdentityPrvdContext dbContext) : IClientsQuery
 
     public async Task<IdentityClientSecret> GetClientSecretNullableAsync(string clientId)
     {
-        return (await dbContext.ClientSecrets.AsNoTracking().Where(c => c.ClientId == clientId.GetIdAsUlid()).FirstOrDefaultAsync())!;
+        return (await dbContext.ClientSecrets.AsNoTracking().Where(c => c.ClientId == clientId.GetIdAsGuid()).FirstOrDefaultAsync())!;
     }
 
     public async Task<IdentityClient> GetClientByIdAsync(string clientId) =>
@@ -49,7 +49,7 @@ public class EfClientsQuery(IdentityPrvdContext dbContext) : IClientsQuery
         .ProjectToDto()
         .ToListAsync();
 
-    public async Task<IReadOnlyList<ClientDto>> GetClientsByCreatorIdAsync(Ulid userId) =>
+    public async Task<IReadOnlyList<ClientDto>> GetClientsByCreatorIdAsync(Guid userId) =>
         await dbContext.Clients
         .Where(s => s.CreatedBy == userId.GetIdAsString())
         .OrderByDescending(s => s.CreatedBy).ThenBy(s => s.Id)

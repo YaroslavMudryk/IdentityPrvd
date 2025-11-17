@@ -1,4 +1,4 @@
-using AspNet.Security.OAuth.GitHub;
+﻿using AspNet.Security.OAuth.GitHub;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;

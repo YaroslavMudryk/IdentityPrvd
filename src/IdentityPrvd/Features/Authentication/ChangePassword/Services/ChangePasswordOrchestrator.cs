@@ -31,7 +31,7 @@ public class ChangePasswordOrchestrator(
         currentUser.EnsureUserHasPermissions(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
-        var userId = currentUser.UserId.GetIdAsUlid();
+        var userId = currentUser.UserId.GetIdAsGuid();
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
@@ -81,7 +81,7 @@ public class ChangePasswordOrchestrator(
         if (options.User.ForceSignoutEverywhere || dto.SignoutEverywhere)
         {
             var userSessions = await sessionStore.GetActiveSessionsByUserIdAsync(userId);
-            var sessionId = currentUser.SessionId.GetIdAsUlid();
+            var sessionId = currentUser.SessionId.GetIdAsGuid();
             foreach (var session in userSessions)
             {
                 session.Status = SessionStatus.Close;

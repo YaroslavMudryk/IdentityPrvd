@@ -14,7 +14,7 @@ public class LinkedExternalSigninOrchestrator(
     public async Task<List<ExternalProviderDto>> GetLinkedExternalSigninsAsync()
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        var userLogins = await userLoginsQuery.GetUserLoginsAsync(currentUser.UserId.GetIdAsUlid());
+        var userLogins = await userLoginsQuery.GetUserLoginsAsync(currentUser.UserId.GetIdAsGuid());
 
         var externalProviders = await authSchemes.GetAllSchemesAsync();
 

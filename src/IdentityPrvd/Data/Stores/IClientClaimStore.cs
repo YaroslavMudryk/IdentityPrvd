@@ -6,7 +6,7 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IClientClaimStore
 {
-    Task DeleteByClientIdAsync(Ulid clientId);
+    Task DeleteByClientIdAsync(Guid clientId);
     Task CreateAsync(List<IdentityClientClaim> clientClaims);
 }
 
@@ -18,7 +18,7 @@ public class EfClientClaimStore(IdentityPrvdContext dbContext) : IClientClaimSto
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteByClientIdAsync(Ulid clientId)
+    public async Task DeleteByClientIdAsync(Guid clientId)
     {
         var claims = await dbContext.ClientClaims.Where(s => s.ClientId == clientId).ToListAsync();
         dbContext.ClientClaims.RemoveRange(claims);

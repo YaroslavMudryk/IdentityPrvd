@@ -15,7 +15,7 @@ public class DeleteRoleOrchestrator(
     ITransactionManager transactionManager,
     IIdentityContext identityContext)
 {
-    public async Task DeleteRoleAsync(Ulid roleId)
+    public async Task DeleteRoleAsync(Guid roleId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(

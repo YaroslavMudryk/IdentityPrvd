@@ -1,4 +1,4 @@
-namespace IdentityPrvd.Contexts;
+﻿namespace IdentityPrvd.Contexts;
 
 public interface IIdentityContext
 {

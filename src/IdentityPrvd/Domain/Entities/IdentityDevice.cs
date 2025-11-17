@@ -25,7 +25,7 @@ public class IdentityDevice : BaseModel
     public DateTime? UnverifiedAt { get; set; }
     public string UnverifiedBySessionId { get; set; }
 
-    public Ulid UserId { get; set; }
+    public Guid UserId { get; set; }
     public IdentityUser User { get; set; }
 
     public List<IdentitySession> Sessions { get; set; } = [];

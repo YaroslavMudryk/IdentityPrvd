@@ -20,7 +20,7 @@ public class CreateContactOrchestrator(
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
-        var userId = currentUser.UserId.GetIdAsUlid();
+        var userId = currentUser.UserId.GetIdAsGuid();
 
         var existContact = await contactQuery.GetByTypeAndValueAsync(dto.Type, dto.Value);
         if (existContact != null && existContact.UserId == userId)

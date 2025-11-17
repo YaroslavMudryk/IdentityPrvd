@@ -64,9 +64,9 @@ public class Generator
         return id;
     }
 
-    public static Ulid GetSessionId()
+    public static Guid GetSessionId()
     {
-        return Ulid.NewUlid();
+        return Guid.CreateVersion7();
     }
 
     public static string GetRefreshToken()
@@ -76,7 +76,7 @@ public class Generator
 
     public static string GetSessionVerification()
     {
-        return Ulid.NewUlid().ToString();
+        return Guid.CreateVersion7().ToString();
     }
 
     public static string GetUniqCode(int sections)

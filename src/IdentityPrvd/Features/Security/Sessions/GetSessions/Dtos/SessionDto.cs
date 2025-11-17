@@ -4,7 +4,7 @@ namespace IdentityPrvd.Features.Security.Sessions.GetSessions.Dtos;
 
 public class SessionDto
 {
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public string App { get; set; }
     public string Location { set; get; }

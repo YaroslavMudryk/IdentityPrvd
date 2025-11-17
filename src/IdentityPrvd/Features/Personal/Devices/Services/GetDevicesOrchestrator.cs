@@ -15,6 +15,6 @@ public class GetDevicesOrchestrator(
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
-        return await devicesQuery.GetUserDevicesAsync(currentUser.UserId.GetIdAsUlid());
+        return await devicesQuery.GetUserDevicesAsync(currentUser.UserId.GetIdAsGuid());
     }
 }

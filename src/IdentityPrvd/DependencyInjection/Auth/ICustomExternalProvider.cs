@@ -1,4 +1,4 @@
-using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
+﻿using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Options;
 using Microsoft.AspNetCore.Authentication;
 

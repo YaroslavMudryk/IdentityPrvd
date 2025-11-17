@@ -8,7 +8,7 @@ namespace IdentityPrvd.Data.Queries;
 public interface IClientClaimsQuery
 {
     Task<IReadOnlyList<IdentityClaim>> GetClaimsByClientIdAsync(string clientId);
-    Task<IReadOnlyList<string>> GetClaimsIdsByClientIdAsync(Ulid clientId);
+    Task<IReadOnlyList<string>> GetClaimsIdsByClientIdAsync(Guid clientId);
 }
 
 public class EfClientClaimsQuery(IdentityPrvdContext dbContext) : IClientClaimsQuery
@@ -19,6 +19,6 @@ public class EfClientClaimsQuery(IdentityPrvdContext dbContext) : IClientClaimsQ
         return await dbContext.ClientClaims.AsNoTracking().Where(s => s.ClientId == userClientId).Select(s => s.Claim).ToListAsync();
     }
 
-    public async Task<IReadOnlyList<string>> GetClaimsIdsByClientIdAsync(Ulid clientId) =>
+    public async Task<IReadOnlyList<string>> GetClaimsIdsByClientIdAsync(Guid clientId) =>
         await dbContext.ClientClaims.Where(s => s.ClientId == clientId).Select(s => s.ClaimId.GetIdAsString()).ToListAsync();
 }

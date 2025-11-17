@@ -11,8 +11,8 @@ public class GetSessionEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/identity/sessions/{sessionId:Ulid}",
-            async (Ulid sessionId, GetSessionOrchestrator orc) =>
+        app.MapGet("/api/identity/sessions/{sessionId:guid}",
+            async (Guid sessionId, GetSessionOrchestrator orc) =>
             {
                 var result = await orc.GetUserSessionAsync(sessionId);
                 return Results.Ok(result.MapToResponse());

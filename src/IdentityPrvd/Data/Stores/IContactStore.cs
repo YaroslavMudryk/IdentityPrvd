@@ -9,9 +9,9 @@ public interface IContactStore
 {
     Task<IdentityContact> AddAsync(IdentityContact contact);
     Task<IdentityContact> UpdateAsync(IdentityContact contact);
-    Task<IdentityContact> GetAsync(Ulid contactId);
+    Task<IdentityContact> GetAsync(Guid contactId);
     Task DeleteAsync(IdentityContact contact);
-    Task DeleteAsync(Ulid contactId);
+    Task DeleteAsync(Guid contactId);
 }
 
 public class EfContactStore(IdentityPrvdContext dbContext) : IContactStore
@@ -29,14 +29,14 @@ public class EfContactStore(IdentityPrvdContext dbContext) : IContactStore
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Ulid contactId)
+    public async Task DeleteAsync(Guid contactId)
     {
         var contactToDelete = await GetAsync(contactId);
         dbContext.Contacts.Remove(contactToDelete);
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<IdentityContact> GetAsync(Ulid contactId) =>
+    public async Task<IdentityContact> GetAsync(Guid contactId) =>
         await dbContext.Contacts.Where(s => s.Id == contactId).FirstOrDefaultAsync() ?? throw new NotFoundException($"Contact with id:{contactId} not found");
 
     public async Task<IdentityContact> UpdateAsync(IdentityContact contact)

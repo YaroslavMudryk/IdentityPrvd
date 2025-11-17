@@ -2,5 +2,5 @@
 
 public class UpdateRoleDto : CreateRoleDto
 {
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
 }

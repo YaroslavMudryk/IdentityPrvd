@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
@@ -13,7 +13,7 @@ public class UpdateClaimOrchestrator(
     IClaimsQuery query,
     IClaimStore store)
 {
-    public async Task<ClaimDto> UpdateClaimAsync(Ulid claimId, UpdateClaimDto dto)
+    public async Task<ClaimDto> UpdateClaimAsync(Guid claimId, UpdateClaimDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(

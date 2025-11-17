@@ -10,13 +10,13 @@ public class DeleteContactOrchestrator(
     IIdentityContext identityContext,
     IContactStore contactStore)
 {
-    public async Task DeleteContactAsync(Ulid id)
+    public async Task DeleteContactAsync(Guid id)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
         var contactToDelete = await contactStore.GetAsync(id);
-        if (contactToDelete.UserId != currentUser.UserId.GetIdAsUlid())
+        if (contactToDelete.UserId != currentUser.UserId.GetIdAsGuid())
             throw new BadRequestException("Contact not anssigne to you");
 
         if(!contactToDelete.CanBeDeleted)

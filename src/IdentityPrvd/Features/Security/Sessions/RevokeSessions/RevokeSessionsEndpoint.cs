@@ -15,7 +15,7 @@ public class RevokeSessionsEndpoint : IEndpoint
         app.MapDelete("/api/identity/revoke-sessions",
             async (string[] sessionIds, RevokeSessionsOrchestrator orc) =>
             {
-                var revokeSessionsCount = await orc.RevokeSessionsAsync([.. sessionIds.Select(s=>s.GetIdAsUlid())]);
+                var revokeSessionsCount = await orc.RevokeSessionsAsync([.. sessionIds.Select(s=>s.GetIdAsGuid())]);
                 return Results.Ok(revokeSessionsCount.MapToResponse());
             }).WithTags("Sessions");
     }

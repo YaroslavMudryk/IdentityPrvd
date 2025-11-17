@@ -9,20 +9,20 @@ namespace IdentityPrvd.Data.Queries;
 
 public interface IRolesQuery
 {
-    Task<Ulid> GetDefaultRoleIdAsync();
+    Task<Guid> GetDefaultRoleIdAsync();
     Task<IdentityRole> GetDefaultRoleAsync();
     Task<IReadOnlyList<RoleDto>> GetRolesAsync(bool withStats = true);
-    Task<RoleDto> GetRoleAsync(Ulid roleId);
+    Task<RoleDto> GetRoleAsync(Guid roleId);
     Task<IdentityRole> GetRoleByNameAsync(string name);
-    Task<IdentityRole> GetRoleByIdAsync(Ulid roleId);
-    Task<int> GetUsersCountByRoleIdAsync(Ulid roleId);
-    Task<int> GetClaimsCountByRoleIdAsync(Ulid roleId);
+    Task<IdentityRole> GetRoleByIdAsync(Guid roleId);
+    Task<int> GetUsersCountByRoleIdAsync(Guid roleId);
+    Task<int> GetClaimsCountByRoleIdAsync(Guid roleId);
     Task<bool> IsExistsRoleAsync();
 }
 
 public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
 {
-    public async Task<Ulid> GetDefaultRoleIdAsync()
+    public async Task<Guid> GetDefaultRoleIdAsync()
     {
         var defaultRole = await dbContext.Roles.AsNoTracking().FirstOrDefaultAsync(s => s.IsDefault);
         return defaultRole!.Id;
@@ -51,7 +51,7 @@ public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
         return roles;
     }
 
-    public async Task<RoleDto> GetRoleAsync(Ulid roleId)
+    public async Task<RoleDto> GetRoleAsync(Guid roleId)
     {
         var role = await dbContext.Roles
             .Where(s => s.Id == roleId)
@@ -64,13 +64,13 @@ public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
         return role;
     }
 
-    public async Task<int> GetUsersCountByRoleIdAsync(Ulid roleId) =>
+    public async Task<int> GetUsersCountByRoleIdAsync(Guid roleId) =>
         await dbContext.UserRoles.Where(s => s.RoleId == roleId).CountAsync();
 
-    public async Task<int> GetClaimsCountByRoleIdAsync(Ulid roleId) =>
+    public async Task<int> GetClaimsCountByRoleIdAsync(Guid roleId) =>
         await dbContext.RoleClaims.Where(s => s.RoleId == roleId).CountAsync();
 
-    public async Task<IdentityRole> GetRoleByIdAsync(Ulid roleId) =>
+    public async Task<IdentityRole> GetRoleByIdAsync(Guid roleId) =>
         await dbContext.Roles.Where(s => s.Id == roleId).FirstOrDefaultAsync();
 
     public async Task<IdentityRole> GetRoleByNameAsync(string name) =>

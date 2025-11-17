@@ -11,7 +11,7 @@ public class UnverifyDeviceOrchestrator(
     IDeviceStore deviceStore,
     TimeProvider timeProvider)
 {
-    public async Task UnverifyDeviceAsync(Ulid deviceId, bool deleteDevice = false)
+    public async Task UnverifyDeviceAsync(Guid deviceId, bool deleteDevice = false)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
@@ -19,7 +19,7 @@ public class UnverifyDeviceOrchestrator(
         var userId = currentUser.UserId;
 
         var deviceToUnverify = await deviceStore.GetAsync(deviceId) ?? throw new NotFoundException($"Device id:{deviceId} not found");
-        if (deviceToUnverify.UserId != userId.GetIdAsUlid())
+        if (deviceToUnverify.UserId != userId.GetIdAsGuid())
             throw new BadRequestException("Not your device");
 
         deviceToUnverify.Verified = false;

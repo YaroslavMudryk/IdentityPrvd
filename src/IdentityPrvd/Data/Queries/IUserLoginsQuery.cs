@@ -6,14 +6,14 @@ namespace IdentityPrvd.Data.Queries;
 
 public interface IUserLoginsQuery
 {
-    Task<List<IdentityUserLogin>> GetUserLoginsAsync(Ulid userId);
+    Task<List<IdentityUserLogin>> GetUserLoginsAsync(Guid userId);
     Task<IdentityUserLogin> GetUserLoginByProviderAsync(string userId, string provider);
     Task<IdentityUserLogin> GetUserLoginByProviderWithUserAsync(string userId, string provider);
 }
 
 public class EfUserLoginsQuery(IdentityPrvdContext dbContext) : IUserLoginsQuery
 {
-    public async Task<List<IdentityUserLogin>> GetUserLoginsAsync(Ulid userId) =>
+    public async Task<List<IdentityUserLogin>> GetUserLoginsAsync(Guid userId) =>
         await dbContext.UserLogins
         .AsNoTracking()
         .Where(s => s.UserId == userId)

@@ -13,16 +13,16 @@ public class IdentitySession : BaseModel
     public SessionStatus Status { set; get; }
     public string VerificationId { get; set; }
     public DateTime? VerificationExpire { get; set; }
-    public Ulid? AuthorizedBy { get; set; }
+    public Guid? AuthorizedBy { get; set; }
     public string Language { set; get; }
-    public Ulid? DeactivatedBySessionId { set; get; }
+    public Guid? DeactivatedBySessionId { set; get; }
     public DateTime? DeactivatedAt { set; get; }
     public DateTime ExpireAt { get; set; }
-    public Ulid UserId { get; set; }
+    public Guid UserId { get; set; }
     public IdentityUser User { get; set; }
-    public Ulid? DeviceId { get; set; }
+    public Guid? DeviceId { get; set; }
     public IdentityDevice Device { get; set; }
-    public Ulid? QrId { get; set; }
+    public Guid? QrId { get; set; }
     public IdentityQr Qr { get; set; }
     public Dictionary<string, string> Data { get; set; }
     public List<IdentityRefreshToken> Tokens { get; set; } = [];

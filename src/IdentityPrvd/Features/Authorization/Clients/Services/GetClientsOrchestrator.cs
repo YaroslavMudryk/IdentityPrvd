@@ -20,6 +20,6 @@ public class GetClientsOrchestrator(
         if (currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]))
             return await clientsQuery.GetAllClientsAsync();
         else
-            return await clientsQuery.GetClientsByCreatorIdAsync(currentUser.UserId.GetIdAsUlid());
+            return await clientsQuery.GetClientsByCreatorIdAsync(currentUser.UserId.GetIdAsGuid());
     }
 }

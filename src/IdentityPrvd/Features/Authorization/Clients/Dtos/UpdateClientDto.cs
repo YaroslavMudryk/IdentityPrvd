@@ -2,5 +2,5 @@
 
 public class UpdateClientDto : CreateClientDto
 {
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
 }

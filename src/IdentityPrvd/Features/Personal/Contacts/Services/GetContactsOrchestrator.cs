@@ -15,6 +15,6 @@ public class GetContactsOrchestrator(
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
-        return await query.GetUserContactsAsync(currentUser.UserId.GetIdAsUlid());
+        return await query.GetUserContactsAsync(currentUser.UserId.GetIdAsGuid());
     }
 }

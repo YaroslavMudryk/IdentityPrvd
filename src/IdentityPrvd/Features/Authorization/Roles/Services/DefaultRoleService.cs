@@ -5,7 +5,7 @@ namespace IdentityPrvd.Features.Authorization.Roles.Services;
 public class DefaultRoleService(
     IRoleStore roleStore)
 {
-    public async Task MakeRoleAsDefaultAsync(Ulid defaultRoleId)
+    public async Task MakeRoleAsDefaultAsync(Guid defaultRoleId)
     {
         var allRoles = await roleStore.GetAllRolesAsync();
 

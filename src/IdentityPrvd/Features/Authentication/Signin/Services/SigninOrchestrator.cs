@@ -68,7 +68,7 @@ public class SigninOrchestrator(
     private async Task<SigninResponseDto> SigninMfaAsync(IdentityUser user, SigninRequestDto dto, IdentityClient client, LocationInfo location)
     {
         var sessionVerification = Generator.GetSessionVerification();
-        var sessionId = Ulid.NewUlid();
+        var sessionId = Guid.CreateVersion7();
 
         var newSession = new IdentitySession
         {
@@ -97,7 +97,7 @@ public class SigninOrchestrator(
 
     private async Task<SigninResponseDto> SigninAsync(IdentityUser user, SigninRequestDto dto, IdentityClient client, LocationInfo location)
     {
-        var sessionId = Ulid.NewUlid();
+        var sessionId = Guid.CreateVersion7();
 
         var refreshToken = new IdentityRefreshToken
         {

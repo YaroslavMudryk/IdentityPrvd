@@ -8,7 +8,7 @@ namespace IdentityPrvd.Data.Stores;
 public interface IRoleClaimStore
 {
     Task<IEnumerable<IdentityRoleClaim>> AddRangeAsync(IEnumerable<IdentityRoleClaim> roleClaims);
-    Task<List<IdentityRoleClaim>> GetRoleClaimsByRoleIdAsync(Ulid roleId);
+    Task<List<IdentityRoleClaim>> GetRoleClaimsByRoleIdAsync(Guid roleId);
     Task DeleteRangeAsync(IEnumerable<IdentityRoleClaim> roleClaims);
 }
 
@@ -21,7 +21,7 @@ public class EfRoleClaimStore(IdentityPrvdContext dbContext) : IRoleClaimStore
         return roleClaims;
     }
 
-    public async Task<List<IdentityRoleClaim>> GetRoleClaimsByRoleIdAsync(Ulid roleId)
+    public async Task<List<IdentityRoleClaim>> GetRoleClaimsByRoleIdAsync(Guid roleId)
     {
         return await dbContext.RoleClaims
             .Where(rc => rc.RoleId == roleId)

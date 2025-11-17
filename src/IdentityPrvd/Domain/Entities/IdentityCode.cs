@@ -11,7 +11,7 @@ public class IdentityCode : BaseModel
     public bool IsActivated { get; set; }
     public DateTime? ActivatedAt { get; set; }
     public CodeType Type { get; set; }
-    public Ulid? ContactId { get; set; }
-    public Ulid UserId { get; set; }
+    public Guid? ContactId { get; set; }
+    public Guid UserId { get; set; }
     public IdentityUser User { get; set; }
 }

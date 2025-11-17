@@ -14,7 +14,7 @@ public class SessionRevocationValidator(
     public async Task EnsureRevocationAllowedAsync(List<IdentitySession> sessions)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        var currentSession = await sessionsQuery.GetSessionAsync(currentUser.SessionId.GetIdAsUlid());
+        var currentSession = await sessionsQuery.GetSessionAsync(currentUser.SessionId.GetIdAsGuid());
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
         var isCurrentSessionYoungerThanDay = utcNow - currentSession.CreatedAt < TimeSpan.FromDays(1);

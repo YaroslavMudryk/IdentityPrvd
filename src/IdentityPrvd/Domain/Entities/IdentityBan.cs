@@ -9,6 +9,6 @@ public class IdentityBan : BaseModel
     public string Cause { get; set; }
     [NotMapped]
     public bool IsPermanent => End == DateTime.MaxValue;
-    public Ulid UserId { get; set; }
+    public Guid UserId { get; set; }
     public IdentityUser User { get; set; }
 }

@@ -8,10 +8,10 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface ISessionStore
 {
-    Task<IdentitySession> GetAsync(Ulid sessionId);
+    Task<IdentitySession> GetAsync(Guid sessionId);
     Task<IdentitySession> GetSessionByVerificationIdAsync(string verificationId);
-    Task<List<IdentitySession>> GetActiveSessionsByUserIdAsync(Ulid userId);
-    Task<List<IdentitySession>> GetActiveSessionsByIdsAsync(Ulid[] sessionIds);
+    Task<List<IdentitySession>> GetActiveSessionsByUserIdAsync(Guid userId);
+    Task<List<IdentitySession>> GetActiveSessionsByIdsAsync(Guid[] sessionIds);
     Task<IdentitySession> AddAsync(IdentitySession session);
     Task<IdentitySession> UpdateAsync(IdentitySession session);
     Task UpdateRangeAsync(List<IdentitySession> sessions);
@@ -19,13 +19,13 @@ public interface ISessionStore
 
 public class EfSessionStore(IdentityPrvdContext dbContext) : ISessionStore
 {
-    public async Task<IdentitySession> GetAsync(Ulid sessionId)
+    public async Task<IdentitySession> GetAsync(Guid sessionId)
     {
         return await dbContext.Sessions.Where(s => s.Id == sessionId && s.Status != SessionStatus.Close).FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Session with id:{sessionId} not found");
     }
 
-    public async Task<List<IdentitySession>> GetActiveSessionsByUserIdAsync(Ulid userId) =>
+    public async Task<List<IdentitySession>> GetActiveSessionsByUserIdAsync(Guid userId) =>
         await dbContext.Sessions.Where(s => s.UserId == userId && s.Status != SessionStatus.Close).ToListAsync();
 
     public async Task<IdentitySession> GetSessionByVerificationIdAsync(string verificationId) =>
@@ -49,7 +49,7 @@ public class EfSessionStore(IdentityPrvdContext dbContext) : ISessionStore
         throw new ArgumentException("Entity must be in modified state or unchanged state to be updated.");
     }
 
-    public async Task<List<IdentitySession>> GetActiveSessionsByIdsAsync(Ulid[] sessionIds)
+    public async Task<List<IdentitySession>> GetActiveSessionsByIdsAsync(Guid[] sessionIds)
     {
         return await dbContext.Sessions.Where(s => sessionIds.Contains(s.Id) && s.Status != SessionStatus.Close).ToListAsync();
     }

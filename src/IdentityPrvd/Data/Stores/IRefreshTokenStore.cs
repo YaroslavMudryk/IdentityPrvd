@@ -6,9 +6,9 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IRefreshTokenStore
 {
-    Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdAsync(Ulid sessionId);
+    Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdAsync(Guid sessionId);
     Task<IdentityRefreshToken> GetRefreshTokenWithSessionByValueAsync(string token);
-    Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdsAsync(Ulid[] sessionIds);
+    Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdsAsync(Guid[] sessionIds);
     Task<IdentityRefreshToken> AddAsync(IdentityRefreshToken refreshToken);
     Task<IdentityRefreshToken> UpdateAsync(IdentityRefreshToken refreshToken);
     Task UpdateRangeAsync(List<IdentityRefreshToken> refreshTokens);
@@ -16,7 +16,7 @@ public interface IRefreshTokenStore
 
 public class EfRefreshTokenStore(IdentityPrvdContext dbContext) : IRefreshTokenStore
 {
-    public async Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdAsync(Ulid sessionId)
+    public async Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdAsync(Guid sessionId)
     {
         return await dbContext.RefreshTokens
             .Where(s => s.SessionId == sessionId && s.UsedAt == null)
@@ -53,7 +53,7 @@ public class EfRefreshTokenStore(IdentityPrvdContext dbContext) : IRefreshTokenS
     }
 
 
-    public async Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdsAsync(Ulid[] sessionIds)
+    public async Task<List<IdentityRefreshToken>> GetRefreshTokensBySessionIdsAsync(Guid[] sessionIds)
     {
         return await dbContext.RefreshTokens
             .Where(s => sessionIds.Contains(s.SessionId) && s.UsedAt == null)

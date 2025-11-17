@@ -1,4 +1,4 @@
-namespace IdentityPrvd.Features.Authentication.SigninOptions.Dtos;
+﻿namespace IdentityPrvd.Features.Authentication.SigninOptions.Dtos;
 
 public class SigninOptionsDto
 {

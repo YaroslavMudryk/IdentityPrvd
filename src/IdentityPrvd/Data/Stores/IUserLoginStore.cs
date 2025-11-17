@@ -8,7 +8,7 @@ namespace IdentityPrvd.Data.Stores;
 public interface IUserLoginStore
 {
     Task<IdentityUserLogin> AddAsync(IdentityUserLogin userLogin);
-    Task<IdentityUserLogin> GetAsync(Ulid userId, string provider);
+    Task<IdentityUserLogin> GetAsync(Guid userId, string provider);
     Task HardDeleteAsync(IdentityUserLogin identityUserLogin);
 }
 
@@ -21,7 +21,7 @@ public class EfUserLoginStore(IdentityPrvdContext dbContext) : IUserLoginStore
         return userLogin;
     }
 
-    public async Task<IdentityUserLogin> GetAsync(Ulid userId, string provider) =>
+    public async Task<IdentityUserLogin> GetAsync(Guid userId, string provider) =>
         await dbContext.UserLogins
         .FirstOrDefaultAsync(s => s.UserId == userId && s.Provider == provider);
 

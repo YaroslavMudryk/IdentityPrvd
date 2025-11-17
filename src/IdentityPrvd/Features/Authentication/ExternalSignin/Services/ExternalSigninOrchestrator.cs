@@ -94,7 +94,7 @@ public class ExternalSigninOrchestrator(
 
     private async Task<IdentitySession> CreateSessionAsync(ExternalSigninDto dto, IdentityUser userToLogin, string provider)
     {
-        var sessionId = Ulid.NewUlid();
+        var sessionId = Guid.CreateVersion7();
         var refreshTokenValue = Generator.GetRefreshToken();
         var refreshTokenExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.RefreshLifeTimeInDays);
         var sessionExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.SessionLifeTimeInDays);

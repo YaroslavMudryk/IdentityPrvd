@@ -1,4 +1,4 @@
-using IdentityPrvd.Common.Extensions;
+﻿using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Domain.Enums;
@@ -14,7 +14,7 @@ public static class ExternalSigninEntityFactory
     {
         return new IdentityUser
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             FirstName = user.FirstName,
             LastName = user.LastName,
             Login = user.Email,
@@ -28,28 +28,28 @@ public static class ExternalSigninEntityFactory
         };
     }
 
-    public static IdentityUserRole CreateIdentityUserRole(Ulid userId, Ulid roleId)
+    public static IdentityUserRole CreateIdentityUserRole(Guid userId, Guid roleId)
     {
         return new IdentityUserRole
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             UserId = userId,
             RoleId = roleId
         };
     }
 
-    public static IdentityUserLogin CreateIdentityUserLogin(Ulid userId, string provider, string providerUserId)
+    public static IdentityUserLogin CreateIdentityUserLogin(Guid userId, string provider, string providerUserId)
     {
         return new IdentityUserLogin
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             UserId = userId,
             Provider = provider,
             ProviderUserId = providerUserId
         };
     }
 
-    public static IdentityRefreshToken CreateRefreshToken(Ulid sessionId, string value, DateTime expiredAt)
+    public static IdentityRefreshToken CreateRefreshToken(Guid sessionId, string value, DateTime expiredAt)
     {
         return new IdentityRefreshToken
         {
@@ -60,8 +60,8 @@ public static class ExternalSigninEntityFactory
     }
 
     public static IdentitySession CreateIdentitySession(
-        Ulid sessionId, 
-        Ulid userId, 
+        Guid sessionId, 
+        Guid userId, 
         ExternalSigninDto dto, 
         IdentityClient client, 
         LocationInfo location, 

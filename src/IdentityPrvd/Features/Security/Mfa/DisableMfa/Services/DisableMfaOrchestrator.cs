@@ -21,7 +21,7 @@ public class DisableMfaOrchestrator(
         currentUser.EnsureUserHasPermissions(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
-        var userId = currentUser.UserId.GetIdAsUlid();
+        var userId = currentUser.UserId.GetIdAsGuid();
 
         var userMfa = await mfaStore.GetUserActiveMfaNullableAsync(userId)
             ?? throw new BadRequestException("Mfa already diactivated");

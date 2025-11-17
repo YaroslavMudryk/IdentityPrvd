@@ -18,7 +18,7 @@ public class UpdateClientClaimsOrchestrator(
     IClientStore clientStore,
     IIdentityContext identityContext)
 {
-    public async Task<ClientDto> UpdateClaimsAsync(Ulid clientId, UpdateClientClaimsDto dto)
+    public async Task<ClientDto> UpdateClaimsAsync(Guid clientId, UpdateClientClaimsDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
@@ -36,7 +36,7 @@ public class UpdateClientClaimsOrchestrator(
         var newClaims = dto.ClaimsIds.Select(claimId => new IdentityClientClaim
         {
             ClientId = clientId,
-            ClaimId = claimId.GetIdAsUlid()
+            ClaimId = claimId.GetIdAsGuid()
         }).ToList();
         if (newClaims.Count != 0)
         {

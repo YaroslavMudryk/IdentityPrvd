@@ -5,7 +5,7 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IClientStore
 {
-    Task<IdentityClient> GetAsync(Ulid clientId);
+    Task<IdentityClient> GetAsync(Guid clientId);
     Task<IdentityClient> AddAsync(IdentityClient client);
     Task<IdentityClient> UpdateAsync(IdentityClient client);
     Task DeleteAsync(IdentityClient client);
@@ -26,7 +26,7 @@ public class EfClientStore(IdentityPrvdContext dbContext) : IClientStore
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<IdentityClient> GetAsync(Ulid clientId) =>
+    public async Task<IdentityClient> GetAsync(Guid clientId) =>
         await dbContext.Clients.FindAsync(clientId);
 
     public async Task<IdentityClient> UpdateAsync(IdentityClient client)

@@ -64,7 +64,7 @@ public static class IdentityPrvdSeedLoader
 
         await dbContext.RoleClaims.AddAsync(new IdentityRoleClaim
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             RoleId = defaultRole!.Id,
             ClaimId = identityClaim!.Id,
             ActiveFrom = DateTime.MinValue,

@@ -6,11 +6,11 @@ namespace IdentityPrvd.Data.Queries;
 
 public interface IMfasQuery
 {
-    Task<IdentityMfa> GetMfaByUserIdAsync(Ulid userId);
+    Task<IdentityMfa> GetMfaByUserIdAsync(Guid userId);
 }
 
 public class EfMfasQuery(IdentityPrvdContext dbContext) : IMfasQuery
 {
-    public async Task<IdentityMfa> GetMfaByUserIdAsync(Ulid userId) =>
+    public async Task<IdentityMfa> GetMfaByUserIdAsync(Guid userId) =>
         await dbContext.Mfas.AsNoTracking().FirstOrDefaultAsync(s => s.UserId == userId);
 }

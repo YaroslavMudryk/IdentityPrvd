@@ -14,7 +14,7 @@ public static class CollectionExtensions
     public static Dictionary<string, List<string>> GroupUnionCollectionBy<T>(
         this IReadOnlyCollection<T> firstCollection,
         IReadOnlyCollection<T> secondCollection,
-        Func<T, Ulid> distinctBy,
+        Func<T, Guid> distinctBy,
         Func<T, string> groupBy,
         Func<T, string> select)
         => firstCollection

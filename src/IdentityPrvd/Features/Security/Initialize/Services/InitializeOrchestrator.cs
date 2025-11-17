@@ -68,7 +68,7 @@ public class InitializeOrchestrator(
 
     private async Task<(IdentityRefreshToken refreshToken, Shared.Dtos.JwtToken jwtToken)> InitSessionAsync(InitializeRequestDto dto, IdentityUser user)
     {
-        var sessionId = Ulid.NewUlid();
+        var sessionId = Guid.CreateVersion7();
 
         var refreshToken = new IdentityRefreshToken
         {
@@ -167,7 +167,7 @@ public class InitializeOrchestrator(
     {
         return new IdentityUser
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             Login = GetLogin(identityOptions.User.LoginType),
             CanBeBlocked = false,
             ConfirmedAt = timeProvider.GetUtcNow().DateTime,
@@ -201,7 +201,7 @@ public class InitializeOrchestrator(
 
         await dbContext.RoleClaims.AddAsync(new IdentityRoleClaim
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             RoleId = defaultRole!.Id,
             ClaimId = identityClaim!.Id,
             ActiveFrom = DateTime.MinValue,

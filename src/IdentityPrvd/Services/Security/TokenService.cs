@@ -19,7 +19,7 @@ public class TokenService(
     IClientClaimsQuery clientClaimsQuery,
     IEnumerable<ITokenClaimsContributor> claimsContributors) : ITokenService
 {
-    public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId, string audience = null)
+    public async Task<JwtToken> GetUserTokenAsync(Guid userId, string sessionId, string audience = null)
     {
         var claims = new List<Claim>
         {
@@ -43,7 +43,7 @@ public class TokenService(
         return GenerateJwtToken(claims, audience);
     }
 
-    public async Task<JwtToken> GetUserTokenAsync(Ulid userId, string sessionId, string provider, string audience = null)
+    public async Task<JwtToken> GetUserTokenAsync(Guid userId, string sessionId, string provider, string audience = null)
     {
         var claims = new List<Claim>
         {
@@ -68,7 +68,7 @@ public class TokenService(
         return GenerateJwtToken(claims, audience);
     }
 
-    public async Task<Dictionary<string, List<string>>> GetUserPermissionsAsync(Ulid userId, string clientId)
+    public async Task<Dictionary<string, List<string>>> GetUserPermissionsAsync(Guid userId, string clientId)
     {
         var roleClaims = await roleClaimsQuery.GetClaimsByUserIdAsync(userId);
         var clientClaims = await clientClaimsQuery.GetClaimsByClientIdAsync(clientId);

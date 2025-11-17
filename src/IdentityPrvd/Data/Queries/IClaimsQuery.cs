@@ -10,10 +10,10 @@ namespace IdentityPrvd.Data.Queries;
 public interface IClaimsQuery
 {
     Task<IReadOnlyList<ClaimDto>> GetClaimsAsync();
-    Task<ClaimDto> GetClaimAsync(Ulid claimId);
-    Task<int> GetRolesCountByClaimIdAsync(Ulid claimId);
-    Task<int> GetClientsCountByClaimIdAsync(Ulid claimId);
-    Task<List<IdentityClaim>> GetClaimsByIdsAsync(Ulid[] claimIds);
+    Task<ClaimDto> GetClaimAsync(Guid claimId);
+    Task<int> GetRolesCountByClaimIdAsync(Guid claimId);
+    Task<int> GetClientsCountByClaimIdAsync(Guid claimId);
+    Task<List<IdentityClaim>> GetClaimsByIdsAsync(Guid[] claimIds);
     Task<IdentityClaim> GetClaimByTypeAndValueAsync(string type, string value);
     Task<bool> IsExistsClaimAsync();
 }
@@ -29,7 +29,7 @@ public class EfClaimsQuery(IdentityPrvdContext dbContext) : IClaimsQuery
             .ToListAsync();
     }
 
-    public async Task<ClaimDto> GetClaimAsync(Ulid claimId)
+    public async Task<ClaimDto> GetClaimAsync(Guid claimId)
     {
         var claim = await dbContext.Claims
             .Where(s => s.Id == claimId)
@@ -42,16 +42,16 @@ public class EfClaimsQuery(IdentityPrvdContext dbContext) : IClaimsQuery
         return claim;
     }
 
-    public async Task<int> GetRolesCountByClaimIdAsync(Ulid claimId) =>
+    public async Task<int> GetRolesCountByClaimIdAsync(Guid claimId) =>
         await dbContext.RoleClaims.Where(s => s.ClaimId == claimId).CountAsync();
 
-    public async Task<int> GetClientsCountByClaimIdAsync(Ulid claimId) =>
+    public async Task<int> GetClientsCountByClaimIdAsync(Guid claimId) =>
         await dbContext.ClientClaims.Where(s => s.ClaimId == claimId).CountAsync();
 
     public async Task<IdentityClaim> GetClaimByTypeAndValueAsync(string type, string value) =>
         await dbContext.Claims.AsNoTracking().Where(s => s.Type == type && s.Value == value).FirstOrDefaultAsync();
 
-    public async Task<List<IdentityClaim>> GetClaimsByIdsAsync(Ulid[] claimIds) =>
+    public async Task<List<IdentityClaim>> GetClaimsByIdsAsync(Guid[] claimIds) =>
         await dbContext.Claims.AsNoTracking().Where(s => claimIds.Contains(s.Id)).ToListAsync();
 
     public async Task<bool> IsExistsClaimAsync() =>

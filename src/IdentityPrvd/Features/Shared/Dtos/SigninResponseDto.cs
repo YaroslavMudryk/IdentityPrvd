@@ -1,4 +1,4 @@
-namespace IdentityPrvd.Features.Shared.Dtos;
+﻿namespace IdentityPrvd.Features.Shared.Dtos;
 
 public class SigninResponseDto
 {

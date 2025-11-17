@@ -22,7 +22,7 @@ public class ChangeLoginOrchestrator(
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissions(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All);
-        var userId = currentUser.UserId.GetIdAsUlid();
+        var userId = currentUser.UserId.GetIdAsGuid();
 
         var userFromDb = await userStore.GetUserAsync(userId);
 

@@ -18,7 +18,7 @@ public class GetSessionsOrchestrator(
         currentUser.EnsureUserHasPermissions(
             IdentityClaims.Types.Identity, IdentityClaims.Values.All);
 
-        var dbSessions = await sessionsQuery.GetActiveUserSessionsAsync(Ulid.Parse(currentUser.UserId));
+        var dbSessions = await sessionsQuery.GetActiveUserSessionsAsync(Guid.Parse(currentUser.UserId));
         var cacheSessions = await sessionManager.GetUserSessionsAsync(currentUser.UserId);
 
         return SortAndSyncSessionsData([.. dbSessions], cacheSessions, currentUser.SessionId);
@@ -36,7 +36,7 @@ public class GetSessionsOrchestrator(
         }
 
         return dbSessions
-            .OrderByDescending(s => s.Id == currentSessionId.GetIdAsUlid())
+            .OrderByDescending(s => s.Id == currentSessionId.GetIdAsGuid())
             .ThenByDescending(s => s.LastActivityAt)
             .ToList().AsReadOnly();
     }

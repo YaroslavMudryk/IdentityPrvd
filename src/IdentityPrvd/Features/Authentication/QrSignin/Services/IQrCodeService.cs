@@ -109,7 +109,7 @@ public class QrCodeService(
         await using var transaction = await transactionManager.BeginTransactionAsync();
         var client = await clientsQuery.GetClientByIdNullableAsync(qrSocket.QrRequest.ClientId);
 
-        var sessionId = Ulid.NewUlid();
+        var sessionId = Guid.CreateVersion7();
 
         var refreshToken = new IdentityRefreshToken
         {
@@ -118,7 +118,7 @@ public class QrCodeService(
             ExpiredAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.RefreshLifeTimeInDays)
         };
 
-        var userId = currentUser.UserId.GetIdAsUlid();
+        var userId = currentUser.UserId.GetIdAsGuid();
         var location = await locationService.GetIpInfoAsync(identityContext.IpAddress);
 
         var newSession = new IdentitySession
@@ -130,7 +130,7 @@ public class QrCodeService(
             App = client.MapToAppInfo(qrSocket.QrRequest.AppVersion),
             Location = location,
             Language = qrSocket.QrRequest.Language,
-            AuthorizedBy = currentUser.SessionId.GetIdAsUlid(),
+            AuthorizedBy = currentUser.SessionId.GetIdAsGuid(),
             Status = SessionStatus.Active,
             Type = SessionType.Qr,
             ExpireAt = timeProvider.GetUtcNow().UtcDateTime.AddDays(identityOptions.Token.SessionLifeTimeInDays),

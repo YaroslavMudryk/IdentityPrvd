@@ -13,7 +13,7 @@ public class UpdateClientOrchestrator(
     IClientStore clientStore,
     IIdentityContext identityContext)
 {
-    public async Task<ClientDto> UpdateAsync(Ulid clientId, UpdateClientDto dto)
+    public async Task<ClientDto> UpdateAsync(Guid clientId, UpdateClientDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(

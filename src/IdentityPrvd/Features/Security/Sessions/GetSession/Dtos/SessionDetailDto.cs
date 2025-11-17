@@ -5,7 +5,7 @@ namespace IdentityPrvd.Features.Security.Sessions.GetSession.Dtos;
 
 public class SessionDetailDto
 {
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public AppInfo App { get; set; }
     public LocationInfo Location { set; get; }
@@ -14,9 +14,9 @@ public class SessionDetailDto
     public bool ViaMfa { get; set; }
     public SessionStatus Status { set; get; }
     public string Language { set; get; }
-    public Ulid? DeactivatedBySessionId { set; get; }
+    public Guid? DeactivatedBySessionId { set; get; }
     public DateTime? DeactivatedAt { set; get; }
     public DateTime? LastActivityAt { set; get; }
     public DateTime UpdatedAt { get; set; }
-    public Ulid? DeviceId { get; set; }
+    public Guid? DeviceId { get; set; }
 }

@@ -6,10 +6,10 @@ namespace IdentityPrvd.Data.Stores;
 
 public interface IPasswordStore
 {
-    Task<List<IdentityPassword>> GetUserPasswordsAsync(Ulid userId);
-    Task<List<IdentityPassword>> GetAllUserPasswordsAsync(Ulid userId);
-    Task<IdentityPassword> GetUserActivePasswordAsync(Ulid userId);
-    Task<List<IdentityPassword>> GetUserActivePasswordsAsync(Ulid userId);
+    Task<List<IdentityPassword>> GetUserPasswordsAsync(Guid userId);
+    Task<List<IdentityPassword>> GetAllUserPasswordsAsync(Guid userId);
+    Task<IdentityPassword> GetUserActivePasswordAsync(Guid userId);
+    Task<List<IdentityPassword>> GetUserActivePasswordsAsync(Guid userId);
     Task<IdentityPassword> AddAsync(IdentityPassword password);
     Task UpdateRangeAsync(IEnumerable<IdentityPassword> passwords);
     Task<IdentityPassword> UpdateAsync(IdentityPassword password);
@@ -17,7 +17,7 @@ public interface IPasswordStore
 
 public class EfPasswordStore(IdentityPrvdContext dbContext) : IPasswordStore
 {
-    public async Task<List<IdentityPassword>> GetUserPasswordsAsync(Ulid userId)
+    public async Task<List<IdentityPassword>> GetUserPasswordsAsync(Guid userId)
         => await dbContext.Passwords.Where(s => s.UserId == userId).ToListAsync();
 
     public async Task<IdentityPassword> AddAsync(IdentityPassword password)
@@ -38,13 +38,13 @@ public class EfPasswordStore(IdentityPrvdContext dbContext) : IPasswordStore
         throw new ArgumentException("Entities must be in modified state or unchanged state to be updated.");
     }
 
-    public async Task<List<IdentityPassword>> GetAllUserPasswordsAsync(Ulid userId) =>
+    public async Task<List<IdentityPassword>> GetAllUserPasswordsAsync(Guid userId) =>
         await dbContext.Passwords.Where(s => s.UserId == userId).ToListAsync();
 
-    public async Task<IdentityPassword> GetUserActivePasswordAsync(Ulid userId) =>
+    public async Task<IdentityPassword> GetUserActivePasswordAsync(Guid userId) =>
         await dbContext.Passwords.FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive);
 
-    public async Task<List<IdentityPassword>> GetUserActivePasswordsAsync(Ulid userId) =>
+    public async Task<List<IdentityPassword>> GetUserActivePasswordsAsync(Guid userId) =>
         await dbContext.Passwords
         .Where(s => s.UserId == userId && s.IsActive)
         .ToListAsync();

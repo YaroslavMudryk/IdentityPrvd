@@ -33,12 +33,12 @@ public class SignoutOrchestrator(
 
     public async Task HandleSignoutEverywhereAsync(BasicAuthenticatedUser currentUser)
     {
-        await sessionControlService.CloseActiveUserSessionsAsync(currentUser.UserId.GetIdAsUlid());
+        await sessionControlService.CloseActiveUserSessionsAsync(currentUser.UserId.GetIdAsGuid());
     }
 
     public async Task HandleSignoutAsync(BasicAuthenticatedUser currentUser)
     {
-        var sessionId = currentUser.SessionId.GetIdAsUlid();
+        var sessionId = currentUser.SessionId.GetIdAsGuid();
         await sessionControlService.CloseSessionByIdAsync(sessionId);
     }
 }

@@ -1,4 +1,4 @@
-using IdentityPrvd.Common.Constants;
+﻿using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
@@ -10,7 +10,7 @@ public class DeleteClaimOrchestrator(
     ITransactionManager transactionManager,
     IClaimStore repo)
 {
-    public async Task DeleteClaimAsync(Ulid claimId)
+    public async Task DeleteClaimAsync(Guid claimId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
         currentUser.EnsureUserHasPermissionsOrRoles(
@@ -26,7 +26,7 @@ public class DeleteClaimOrchestrator(
         await transaction.CommitAsync();
     }
 
-    private async Task DeleteClaimReferencesAsync(Ulid claimId)
+    private async Task DeleteClaimReferencesAsync(Guid claimId)
     {
         var clientClaimsToDelete = await repo.GetClientClaimsByIdAsync(claimId);
         await repo.DeleteClientClaimsAsync(clientClaimsToDelete);
