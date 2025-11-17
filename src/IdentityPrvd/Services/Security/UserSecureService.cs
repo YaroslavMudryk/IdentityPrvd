@@ -53,4 +53,32 @@ public class UserSecureService(
 
         await transaction.CommitAsync();
     }
+
+    public async Task BanUserDueToRateLimitAsync(IdentityUser user, DateTime utcNow, int banDurationInMinutes, int attemptCount)
+    {
+        await using var transaction = await transactionManager.BeginTransactionAsync();
+
+        var banEnd = utcNow.AddMinutes(banDurationInMinutes);
+        user.BlockedUntil = banEnd;
+        await userStore.UpdateAsync(user);
+        
+        await banStore.AddAsync(new IdentityBan
+        {
+            Cause = $"Rate limit exceeded: {attemptCount} failed login attempts within time window",
+            UserId = user.Id,
+            Start = utcNow,
+            End = banEnd,
+        });
+        
+        await failedLoginAttemptStore.AddAsync(new IdentityFailedLoginAttempt
+        {
+            UserId = user.Id,
+            Client = default!,
+            Location = default!,
+            Login = user.Login,
+            Password = string.Empty, // Password is not stored for security reasons
+        });
+
+        await transaction.CommitAsync();
+    }
 }

@@ -22,7 +22,8 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         TimeProvider timeProvider,
         IdentityPrvdOptions options,
         UserHelper userHelper,
-        IFailedLoginAttemptsQuery failedLoginAttemptsQuery)
+        IFailedLoginAttemptsQuery failedLoginAttemptsQuery,
+        IBansQuery bansQuery)
     {
         RuleFor(x => x.Login)
             .NotEmpty()
@@ -91,6 +92,7 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
             var utcNow = timeProvider.GetUtcNow().UtcDateTime;
             
             // Check rate limiting before user lookup to prevent user enumeration
+            // Note: We can't ban here because we don't know the user yet, but we can block the attempt
             if (options.Protection.RateLimit.Enabled)
             {
                 var timeWindowStart = utcNow.AddMinutes(-options.Protection.RateLimit.TimeWindowInMinutes);
@@ -109,6 +111,13 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
             if (!user.IsConfirmed)
                 throw new BadRequestException("User is not confirmed");
 
+            // Check for active ban before allowing signin
+            var activeBan = await bansQuery.GetActiveBanByUserIdAsync(user.Id, utcNow);
+            if (activeBan != null)
+            {
+                throw new BadRequestException($"Account is banned until {activeBan.End:yyyy-MM-dd HH:mm:ss}. Reason: {activeBan.Cause}");
+            }
+
             // Additional rate limiting check by user ID (in case user exists)
             if (options.Protection.RateLimit.Enabled)
             {
@@ -117,8 +126,18 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
                 
                 if (recentAttemptsByUser >= options.Protection.RateLimit.MaxAttempts)
                 {
-                    var timeRemaining = options.Protection.RateLimit.TimeWindowInMinutes;
-                    throw new BadRequestException($"Too many login attempts. Please try again in {timeRemaining} minute(s).");
+                    // Ban user due to rate limiting
+                    if (user.CanBeBlocked)
+                    {
+                        await userSecureService.BanUserDueToRateLimitAsync(
+                            user, 
+                            utcNow, 
+                            options.Protection.RateLimit.BanDurationInMinutes,
+                            recentAttemptsByUser);
+                    }
+                    
+                    var timeRemaining = options.Protection.RateLimit.BanDurationInMinutes;
+                    throw new BadRequestException($"Too many login attempts. Account is banned for {timeRemaining} minute(s).");
                 }
             }
 
