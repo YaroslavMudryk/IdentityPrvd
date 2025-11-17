@@ -11,4 +11,9 @@ public class BadRequestException : HttpResponseException
     {
 
     }
+
+    public BadRequestException(string localizationKey, params object[] args) : base(localizationKey, 400, args)
+    {
+
+    }
 }

@@ -7,6 +7,7 @@ public class IdentityContext : IIdentityContext
     public CurrentUser CurrentUser { get; set; } = UninitializedUser.Instance;
     public string IpAddress { get; set; } = string.Empty;
     public string CorrelationId { get; set; } = string.Empty;
+    public string CurrentLanguage { get; set; } = "en";
 
     public TUser AssumeAuthenticated<TUser>() where TUser : CurrentUser
     {

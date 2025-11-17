@@ -1,13 +1,18 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Api;
 using IdentityPrvd.Common.Exceptions;
+using IdentityPrvd.Contexts;
 using IdentityPrvd.Helpers;
+using IdentityPrvd.Services.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace IdentityPrvd.Infrastructure.Middleware;
 
-public class GlobalExceptionHandlerMiddleware(ILogger<GlobalExceptionHandlerMiddleware> logger) : IMiddleware
+public class GlobalExceptionHandlerMiddleware(
+    ILogger<GlobalExceptionHandlerMiddleware> logger,
+    ILocalizationService localizationService,
+    IIdentityContext identityContext) : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
@@ -34,28 +39,44 @@ public class GlobalExceptionHandlerMiddleware(ILogger<GlobalExceptionHandlerMidd
             logger.LogWarning(ex, ex.Message);
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = ex.StatusCode;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(ex.Message), Settings.Json);
+            
+            string message = ex.Message;
+            if (!string.IsNullOrEmpty(ex.LocalizationKey))
+            {
+                var language = identityContext.CurrentLanguage ?? "en";
+                message = ex.LocalizationArgs != null && ex.LocalizationArgs.Length > 0
+                    ? localizationService.GetString(ex.LocalizationKey, language, ex.LocalizationArgs)
+                    : localizationService.GetString(ex.LocalizationKey, language);
+            }
+            
+            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(message), Settings.Json);
         }
         catch (BadHttpRequestException ex)
         {
             logger.LogWarning(ex, ex.Message);
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail("Bad request"), Settings.Json);
+            var language = identityContext.CurrentLanguage ?? "en";
+            var message = localizationService.GetString("errors.bad_request", language);
+            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(message), Settings.Json);
         }
         catch (NotImplementedException nie)
         {
             logger.LogError(nie, nie.Message);
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail("This functionality is planned but not yet implemented, it will be available in the near future"), Settings.Json);
+            var language = identityContext.CurrentLanguage ?? "en";
+            var message = localizationService.GetString("errors.not_implemented", language);
+            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(message), Settings.Json);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, ex.Message);
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail("Server error"), Settings.Json);
+            var language = identityContext.CurrentLanguage ?? "en";
+            var message = localizationService.GetString("errors.server.error", language);
+            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(message), Settings.Json);
         }
     }
 }

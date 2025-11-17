@@ -25,6 +25,8 @@ public class IdentityPrvdBuilder : IIdentityPrvdBuilder
     {
         Services = services ?? throw new ArgumentNullException(nameof(services));
         Options = options ?? throw new ArgumentNullException(nameof(options));
+        Options.Language ??= new LanguageOptions();
+        Options.Language.EnsureEnglishLanguage();
         services.AddScoped(_ => options);
         AuthenticationBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
         

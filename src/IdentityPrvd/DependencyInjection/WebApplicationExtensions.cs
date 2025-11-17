@@ -10,6 +10,7 @@ public static class WebApplicationExtensions
     public static WebApplication UseIdentityPrvd(this WebApplication app)
     {
         app.UseMiddleware<CorrelationContextMiddleware>();
+        app.UseMiddleware<LanguageDetectionMiddleware>();
         app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
         app.UseAuthentication();

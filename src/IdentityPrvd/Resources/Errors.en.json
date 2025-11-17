@@ -1,0 +1,17 @@
+{
+  "errors.login.incorrect": "Login or password is incorrect",
+  "errors.user.not_confirmed": "User is not confirmed",
+  "errors.user.blocked": "User is blocked until {0}",
+  "errors.rate_limit.exceeded": "Too many login attempts. Please try again in {0} minute(s).",
+  "errors.rate_limit.banned": "Too many login attempts. Account is banned for {0} minute(s).",
+  "errors.account.banned": "Account is banned until {0}. Reason: {1}",
+  "errors.client.not_found": "Client {0} not found",
+  "errors.client.not_active": "Client is not active",
+  "errors.client.not_active_time": "Client is not active at this time",
+  "errors.client.secret_not_found": "Not found secret for clientId:{0}",
+  "errors.client.secret_invalid": "Secret is invalid",
+  "errors.validation.failed": "Validation errors",
+  "errors.server.error": "Server error",
+  "errors.not_implemented": "This functionality is planned but not yet implemented, it will be available in the near future",
+  "errors.bad_request": "Bad request"
+}

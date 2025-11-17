@@ -11,4 +11,9 @@ public class NotFoundException : HttpResponseException
     {
 
     }
+
+    public NotFoundException(string localizationKey, params object[] args) : base(localizationKey, 404, args)
+    {
+
+    }
 }

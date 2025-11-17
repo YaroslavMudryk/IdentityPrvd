@@ -2,10 +2,12 @@
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Common.Helpers;
+using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Options;
+using IdentityPrvd.Services.Localization;
 using IdentityPrvd.Services.Security;
 using System.Text.RegularExpressions;
 
@@ -23,64 +25,73 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         IdentityPrvdOptions options,
         UserHelper userHelper,
         IFailedLoginAttemptsQuery failedLoginAttemptsQuery,
-        IBansQuery bansQuery)
+        IBansQuery bansQuery,
+        ILocalizationService localizationService,
+        IIdentityContext identityContext)
     {
         RuleFor(x => x.Login)
             .NotEmpty()
-            .WithMessage("Login is required.")
+            .WithMessage((dto) => localizationService.GetString("validation.login.required", identityContext.CurrentLanguage))
             .Must((login) =>
             {
+                var language = identityContext.CurrentLanguage ?? "en";
                 if (options.User.LoginType == LoginType.Email)
                 {
                     var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
                     if (!emailRegex.IsMatch(login))
-                        throw new BadRequestException("Login must be a valid email address");
+                        throw new BadRequestException("validation.login.email_invalid");
                 }
                 else if (options.User.LoginType == LoginType.Phone)
                 {
                     var phoneRegex = new Regex(@"^\+?[1-9]\d{1,14}$");
                     if (!phoneRegex.IsMatch(login))
-                        throw new BadRequestException("Login must be a valid phone number");
+                        throw new BadRequestException("validation.login.phone_invalid");
                 }
                 else if (options.User.LoginType == LoginType.Any)
                 {
                     if (string.IsNullOrWhiteSpace(login))
-                        throw new BadRequestException("Login is required");
+                        throw new BadRequestException("validation.login.required");
 
                     if (login.Length < 4)
-                        throw new BadRequestException("Login must be at least 4 characters long");
+                        throw new BadRequestException("validation.login.min_length");
                 }
 
                 return true;
-            })
-            .WithMessage("Email must be a valid email address.");
+            });
 
         RuleFor(x => x.Password)
             .Custom((password, context) =>
             {
+                var language = identityContext.CurrentLanguage ?? "en";
                 if (string.IsNullOrWhiteSpace(password))
-                    context.AddFailure("password", "Password is required");
+                    context.AddFailure("password", localizationService.GetString("validation.password.required", language));
 
                 if (password.Length < 6)
-                    context.AddFailure("password", "Password must be at least 6 characters long");
+                    context.AddFailure("password", localizationService.GetString("validation.password.min_length", language));
 
                 if (!string.IsNullOrEmpty(options.Password.Regex))
                 {
                     var passwordRegex = new Regex(options.Password.Regex);
                     if (!passwordRegex.IsMatch(password))
-                        throw new BadRequestException($"{options.Password.RegexErrorMessage}");
+                    {
+                        var errorMessage = !string.IsNullOrEmpty(options.Password.RegexErrorMessage)
+                            ? options.Password.RegexErrorMessage
+                            : localizationService.GetString("validation.password.regex", language, options.Password.RegexErrorMessage ?? "");
+                        throw new BadRequestException("validation.password.regex", errorMessage);
+                    }
                 }
             });
 
         RuleFor(x => x.Language)
             .Must((language) =>
             {
+                var currentLanguage = identityContext.CurrentLanguage ?? "en";
                 if (options.Language.LanguageRequired)
                 {
                     if (!options.Language.UseCustomLanguages)
                     {
                         if (!options.Language.Languages.Any(s => s.Contains(language)))
-                            throw new BadRequestException($"Language `{language}` is not at available list ({string.Join(',', options.Language.Languages)})");
+                            throw new BadRequestException("validation.language.invalid", language, string.Join(',', options.Language.Languages));
                     }
                 }
 
@@ -101,21 +112,21 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
                 if (recentAttempts >= options.Protection.RateLimit.MaxAttempts)
                 {
                     var timeRemaining = options.Protection.RateLimit.TimeWindowInMinutes;
-                    throw new BadRequestException($"Too many login attempts. Please try again in {timeRemaining} minute(s).");
+                    throw new BadRequestException("errors.rate_limit.exceeded", timeRemaining);
                 }
             }
             
             var user = await usersQuery.GetUserByLoginNullableAsync(dto.Login)
-                    ?? throw new BadRequestException("Login or password is incorrect");
+                    ?? throw new BadRequestException("errors.login.incorrect");
 
             if (!user.IsConfirmed)
-                throw new BadRequestException("User is not confirmed");
+                throw new BadRequestException("errors.user.not_confirmed");
 
             // Check for active ban before allowing signin
             var activeBan = await bansQuery.GetActiveBanByUserIdAsync(user.Id, utcNow);
             if (activeBan != null)
             {
-                throw new BadRequestException($"Account is banned until {activeBan.End:yyyy-MM-dd HH:mm:ss}. Reason: {activeBan.Cause}");
+                throw new BadRequestException("errors.account.banned", activeBan.End.ToString("yyyy-MM-dd HH:mm:ss"), activeBan.Cause);
             }
 
             // Additional rate limiting check by user ID (in case user exists)
@@ -137,7 +148,7 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
                     }
                     
                     var timeRemaining = options.Protection.RateLimit.BanDurationInMinutes;
-                    throw new BadRequestException($"Too many login attempts. Account is banned for {timeRemaining} minute(s).");
+                    throw new BadRequestException("errors.rate_limit.banned", timeRemaining);
                 }
             }
 
@@ -148,32 +159,32 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
                 if (user.FailedLoginAttemptsCount >= 5)
                 {
                     await userSecureService.IncrementFailedLoginByBlockAsync(user, utcNow);
-                    throw new BadRequestException("User is blocked until " + user.BlockedUntil!.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                    throw new BadRequestException("errors.user.blocked", user.BlockedUntil!.Value.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
             }
 
             if (!hasher.Verify(user.PasswordHash, dto.Password))
             {
                 await userSecureService.IncrementFailedLoginByPasswordAsync(user, utcNow);
-                throw new BadRequestException("Login or password is incorrect");
+                throw new BadRequestException("errors.login.incorrect");
             }
 
             var client = await clientsQuery.GetClientByIdNullableAsync(dto.ClientId)
-                    ?? throw new NotFoundException($"Client {dto.ClientId} not found");
+                    ?? throw new NotFoundException("errors.client.not_found", dto.ClientId);
 
             if (!client.IsActive)
-                throw new BadRequestException("Client is not active");
+                throw new BadRequestException("errors.client.not_active");
 
             if (client.ActiveFrom > utcNow || client.ActiveTo.HasValue && client.ActiveTo.Value < utcNow)
-                throw new BadRequestException("Client is not active at this time");
+                throw new BadRequestException("errors.client.not_active_time");
 
             if (client.ClientSecretRequired)
             {
                 var clientSecret = await clientsQuery.GetClientSecretNullableAsync(client.Id.GetIdAsString())
-                    ?? throw new NotFoundException($"Not found secret for clientId:{dto.ClientId}");
+                    ?? throw new NotFoundException("errors.client.secret_not_found", dto.ClientId);
 
                 if (!hasher.Verify(clientSecret.Value, dto.ClientSecret))
-                    throw new BadRequestException("Secret is invalid");
+                    throw new BadRequestException("errors.client.secret_invalid");
             }
 
             return true;
@@ -181,7 +192,7 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
     }
 
 
-    private static async Task CheckBlockUserStatusAsync(IUserStore userStore, TimeProvider timeProvider, IdentityUser identityUser)
+    private async Task CheckBlockUserStatusAsync(IUserStore userStore, TimeProvider timeProvider, IdentityUser identityUser)
     {
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -191,7 +202,7 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         if (identityUser.BlockedUntil.HasValue)
         {
             if (identityUser.BlockedUntil.Value > utcNow)
-                throw new BadRequestException("User is blocked until " + identityUser.BlockedUntil!.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                throw new BadRequestException("errors.user.blocked", identityUser.BlockedUntil!.Value.ToString("yyyy-MM-dd HH:mm:ss"));
             else
             {
                 identityUser.BlockedUntil = null;

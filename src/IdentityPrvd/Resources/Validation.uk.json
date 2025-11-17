@@ -1,0 +1,10 @@
+{
+  "validation.login.required": "Логін обов'язковий.",
+  "validation.login.email_invalid": "Логін повинен бути дійсною електронною адресою",
+  "validation.login.phone_invalid": "Логін повинен бути дійсним номером телефону",
+  "validation.login.min_length": "Логін повинен містити принаймні 4 символи",
+  "validation.password.required": "Пароль обов'язковий",
+  "validation.password.min_length": "Пароль повинен містити принаймні 6 символів",
+  "validation.password.regex": "{0}",
+  "validation.language.invalid": "Мова `{0}` не в доступному списку ({1})"
+}

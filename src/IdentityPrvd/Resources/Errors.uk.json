@@ -1,0 +1,17 @@
+{
+  "errors.login.incorrect": "Невірний логін або пароль",
+  "errors.user.not_confirmed": "Користувач не підтверджений",
+  "errors.user.blocked": "Користувач заблокований до {0}",
+  "errors.rate_limit.exceeded": "Занадто багато спроб входу. Спробуйте ще раз через {0} хвилин(и).",
+  "errors.rate_limit.banned": "Занадто багато спроб входу. Обліковий запис заблоковано на {0} хвилин(и).",
+  "errors.account.banned": "Обліковий запис заблоковано до {0}. Причина: {1}",
+  "errors.client.not_found": "Клієнт {0} не знайдено",
+  "errors.client.not_active": "Клієнт не активний",
+  "errors.client.not_active_time": "Клієнт не активний в цей час",
+  "errors.client.secret_not_found": "Секрет для clientId:{0} не знайдено",
+  "errors.client.secret_invalid": "Секрет недійсний",
+  "errors.validation.failed": "Помилки валідації",
+  "errors.server.error": "Помилка сервера",
+  "errors.not_implemented": "Ця функціональність запланована, але ще не реалізована, вона буде доступна найближчим часом",
+  "errors.bad_request": "Невірний запит"
+}

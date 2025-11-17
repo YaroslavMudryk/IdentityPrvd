@@ -4,6 +4,7 @@ using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Endpoints;
+using IdentityPrvd.Services.Localization;
 using IdentityPrvd.Features.Authentication.ChangeLogin;
 using IdentityPrvd.Features.Authentication.ChangePassword;
 using IdentityPrvd.Features.Authentication.ExternalSignin;
@@ -120,6 +121,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<ISystemStatus, DefaultSystemStatus>();
         builder.Services.AddScoped<ISessionControlService, SessionControlService>();
+        builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
         return builder;
     }
 
@@ -147,6 +149,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
     internal static IIdentityPrvdBuilder AddMiddlewares(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddTransient<CorrelationContextMiddleware>();
+        builder.Services.AddTransient<LanguageDetectionMiddleware>();
         builder.Services.AddTransient<ServerSideSessionMiddleware>();
         builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
         return builder;
