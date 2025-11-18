@@ -1,6 +1,4 @@
-﻿using IdentityPrvd.Common.Constants;
-
-namespace IdentityPrvd.Options;
+﻿namespace IdentityPrvd.Options;
 
 /// <summary>
 /// Configuration options for IdentityPrvd
@@ -18,6 +16,8 @@ public class IdentityPrvdOptions
         App = new AppOptions();
         Password = new PasswordOptions();
         Protection = new ProtectionOptions();
+        Signin = new SigninOptions();
+        Sessions = new SessionOptions();
     }
 
     public IdentityConnectionOptions Connections { get; set; }
@@ -28,8 +28,8 @@ public class IdentityPrvdOptions
     public AppOptions App { get; set; }
     public PasswordOptions Password { get; set; }
     public ProtectionOptions Protection { get; set; }
-    public bool TrackSessionActivity { get; set; } = true;
-    public bool SingleSessionPerUser { get; set; } = false;
+    public SigninOptions Signin { get; set; }
+    public SessionOptions Sessions { get; set; }
 
     public void ValidateAndThrowIfNeeded()
     {

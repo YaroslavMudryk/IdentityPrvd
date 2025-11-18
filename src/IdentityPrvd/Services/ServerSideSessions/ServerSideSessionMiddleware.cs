@@ -40,7 +40,7 @@ public class ServerSideSessionMiddleware(
                         await next(context);
 
                         var options = context.RequestServices.GetRequiredService<IdentityPrvdOptions>();
-                        if (options.TrackSessionActivity)
+                        if (options.Sessions.TrackActivity)
                             await sessionManager.MarkSessionLastActivityAsync(userId, sessionId);
                     }
                     else

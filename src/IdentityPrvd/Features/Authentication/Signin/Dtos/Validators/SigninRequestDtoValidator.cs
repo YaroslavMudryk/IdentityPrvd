@@ -29,6 +29,13 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         ILocalizationService localizationService,
         IIdentityContext identityContext)
     {
+        RuleFor(dto => dto)
+            .Custom((_, _) =>
+            {
+                if (!options.Signin.Password)
+                    throw new BadRequestException("errors.signin.password_disabled");
+            });
+
         RuleFor(x => x.Login)
             .NotEmpty()
             .WithMessage((dto) => localizationService.GetString("validation.login.required", identityContext.CurrentLanguage))

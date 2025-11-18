@@ -2,13 +2,15 @@
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Features.Authentication.Signin.Dtos;
+using IdentityPrvd.Options;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Services;
 
 public class SigninOptionsOrchestrator(
     IUsersQuery usersQuery,
     IMfaStore mfaStore,
-    IUserLoginsQuery userLoginsQuery)
+    IUserLoginsQuery userLoginsQuery,
+    IdentityPrvdOptions identityOptions)
 {
     public async Task<SigninUserOptionsDto> GetSigninUserOptionsAsync(string login)
     {
@@ -29,11 +31,11 @@ public class SigninOptionsOrchestrator(
         }
 
         // Check if user has password
-        var hasPassword = !string.IsNullOrWhiteSpace(user.PasswordHash);
+        var hasPassword = identityOptions.Signin.Password && !string.IsNullOrWhiteSpace(user.PasswordHash);
 
         // Check if user has activated MFA
         var activatedMfa = await mfaStore.GetUserActiveMfaNullableAsync(user.Id);
-        var hasPasswordless = activatedMfa != null;
+        var hasPasswordless = identityOptions.Signin.Passwordless && activatedMfa != null;
 
         // Get linked external providers
         var userLogins = await userLoginsQuery.GetUserLoginsAsync(user.Id);

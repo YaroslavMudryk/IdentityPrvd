@@ -10,6 +10,8 @@
   "errors.client.not_active_time": "Client is not active at this time",
   "errors.client.secret_not_found": "Not found secret for clientId:{0}",
   "errors.client.secret_invalid": "Secret is invalid",
+  "errors.signin.password_disabled": "Password signin is disabled",
+  "errors.signin.passwordless_disabled": "Passwordless signin is disabled",
   "errors.validation.failed": "Validation errors",
   "errors.server.error": "Server error",
   "errors.not_implemented": "This functionality is planned but not yet implemented, it will be available in the near future",

@@ -37,7 +37,7 @@ public class SessionControlService(
 
     public async Task CloseOtherSessionsIfRequiredAsync(Guid userId, Guid currentSessionId)
     {
-        if (identityOptions.SingleSessionPerUser)
+        if (identityOptions.Sessions.SingleSessionPerUser)
         {
             await CloseActiveUserSessionsAsync(userId, [currentSessionId]);
         }

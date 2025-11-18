@@ -17,6 +17,13 @@ public class PasswordlessSigninRequestDtoValidator : AbstractValidator<Passwordl
         TimeProvider timeProvider,
         IdentityPrvdOptions options)
     {
+        RuleFor(dto => dto)
+            .Custom((_, _) =>
+            {
+                if (!options.Signin.Passwordless)
+                    throw new BadRequestException("errors.signin.passwordless_disabled");
+            });
+
         RuleFor(x => x.Login)
             .NotEmpty()
             .WithMessage("Login is required.")

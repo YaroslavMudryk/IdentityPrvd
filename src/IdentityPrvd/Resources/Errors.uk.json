@@ -10,6 +10,8 @@
   "errors.client.not_active_time": "Клієнт не активний в цей час",
   "errors.client.secret_not_found": "Секрет для clientId:{0} не знайдено",
   "errors.client.secret_invalid": "Секрет недійсний",
+  "errors.signin.password_disabled": "Вхід за паролем вимкнено",
+  "errors.signin.passwordless_disabled": "Безпарольний вхід вимкнено",
   "errors.validation.failed": "Помилки валідації",
   "errors.server.error": "Помилка сервера",
   "errors.not_implemented": "Ця функціональність запланована, але ще не реалізована, вона буде доступна найближчим часом",

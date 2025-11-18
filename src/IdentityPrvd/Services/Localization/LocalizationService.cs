@@ -1,6 +1,7 @@
+using IdentityPrvd.Options;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Text.Json;
-using IdentityPrvd.Options;
 
 namespace IdentityPrvd.Services.Localization;
 
@@ -8,23 +9,26 @@ public class LocalizationService : ILocalizationService
 {
     private const string DefaultLanguage = "en";
     private readonly Dictionary<string, Dictionary<string, string>> _resources = new();
-    private readonly IdentityPrvdOptions _options;
+    private readonly IServiceProvider _serviceProvider;
     private readonly Assembly _assembly;
 
-    public LocalizationService(IdentityPrvdOptions options)
+    public LocalizationService(IServiceProvider serviceProvider)
     {
-        _options = options;
+        _serviceProvider = serviceProvider;
         _assembly = Assembly.GetExecutingAssembly();
         LoadResources();
     }
 
     private void LoadResources()
     {
-        var supportedLanguages = _options.Language.Languages ?? ["en", "uk"];
+        using var serviceScope = _serviceProvider.CreateScope();
+        var options = serviceScope.ServiceProvider.GetRequiredService<IdentityPrvdOptions>();
+
+        var supportedLanguages = options.Language.Languages ?? ["en", "uk"];
         
         foreach (var lang in supportedLanguages)
         {
-            _resources[lang] = new Dictionary<string, string>();
+            _resources[lang] = [];
             LoadResourceFile($"IdentityPrvd.Resources.Errors.{lang}.json", lang);
             LoadResourceFile($"IdentityPrvd.Resources.Validation.{lang}.json", lang);
         }
