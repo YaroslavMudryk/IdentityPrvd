@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using IdentityPrvd.Common.Api;
+﻿using IdentityPrvd.Common.Api;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Helpers;
@@ -23,16 +22,12 @@ public class GlobalExceptionHandlerMiddleware(
         {
             await next(context);
         }
-        catch (ValidationException ex)
+        catch (ValidationFailedException ex)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-            var validationErrors = ex.Errors
-                    .ToLookup(x => x.PropertyName, x => x.ErrorMessage)
-                    .ToDictionary(x => x.Key, x => x.ToArray());
-
-            await context.Response.WriteAsJsonAsync(ApiResponse.ValidationFail(validationErrors), Settings.Json);
+            await context.Response.WriteAsJsonAsync(ApiResponse.ValidationFail(ex.Errors), Settings.Json);
         }
         catch (HttpResponseException ex)
         {

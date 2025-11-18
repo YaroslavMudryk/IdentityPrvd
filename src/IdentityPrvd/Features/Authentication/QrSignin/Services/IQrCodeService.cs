@@ -74,7 +74,7 @@ public class QrCodeService(
 
     public async Task<QrCodeDto> GenerateQrCodeAsync(QrRequestDto requestDto)
     {
-        await validator.ValidateAndThrowAsync(requestDto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, requestDto);
         var verificationId = $"IdPrvd:{Guid.NewGuid():N}";
         var qrSocket = new QrSocket
         {

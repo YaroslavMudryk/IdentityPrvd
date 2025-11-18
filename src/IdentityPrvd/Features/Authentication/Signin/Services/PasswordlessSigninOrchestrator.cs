@@ -39,7 +39,7 @@ public class PasswordlessSigninOrchestrator(
 {
     public async Task<SigninResponseDto> SigninAsync(PasswordlessSigninRequestDto dto)
     {
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
         var user = await usersQuery.GetUserByLoginNullableAsync(dto.Login)

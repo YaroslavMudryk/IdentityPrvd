@@ -22,7 +22,7 @@ public class RefreshTokenOrchestrator(
 {
     public async Task<SigninResponseDto> SigninByRefreshTokenAsync(RefreshTokenDto dto)
     {
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 

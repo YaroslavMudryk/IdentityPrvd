@@ -2,6 +2,7 @@
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Common.Extensions;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
@@ -25,7 +26,7 @@ public class UpdateClientClaimsOrchestrator(
             IdentityClaims.Types.Clients, IdentityClaims.Values.Update,
             [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
 
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 

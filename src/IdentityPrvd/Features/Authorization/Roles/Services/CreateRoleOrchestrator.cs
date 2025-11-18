@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Extensions;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
@@ -26,7 +27,7 @@ public class CreateRoleOrchestrator(
              IdentityClaims.Types.Role, IdentityClaims.Values.Create,
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
         await using var transaction = await transactionManager.BeginTransactionAsync();
         var newRole = new IdentityRole
         {

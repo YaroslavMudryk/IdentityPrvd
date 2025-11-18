@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Exceptions;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Domain.Entities;
@@ -19,7 +20,7 @@ public class RestorePasswordOrchestrator(
 {
     public async Task RestorePasswordAsync(RestorePasswordDto dto)
     {
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
@@ -21,7 +22,7 @@ public class CreateClaimOrchestrator(
             IdentityClaims.Types.Claims, IdentityClaims.Values.Create,
             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         var newClaim = new IdentityClaim
         {

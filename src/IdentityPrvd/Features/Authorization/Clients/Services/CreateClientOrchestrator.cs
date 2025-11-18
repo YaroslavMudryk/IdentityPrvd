@@ -25,7 +25,7 @@ public class CreateClientOrchestrator(
             IdentityClaims.Types.Clients, IdentityClaims.Values.Create,
             [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
 
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 

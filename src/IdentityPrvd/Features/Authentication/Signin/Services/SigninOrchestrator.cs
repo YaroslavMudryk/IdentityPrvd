@@ -38,7 +38,7 @@ public class SigninOrchestrator(
 {
     public async Task<SigninResponseDto> SigninAsync(SigninRequestDto dto)
     {
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
         var user = await usersQuery.GetUserByLoginNullableAsync(dto.Login);

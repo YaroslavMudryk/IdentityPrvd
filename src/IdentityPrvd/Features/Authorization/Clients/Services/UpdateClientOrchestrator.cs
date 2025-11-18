@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Exceptions;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Features.Authorization.Clients.Dtos;
@@ -20,7 +21,7 @@ public class UpdateClientOrchestrator(
             IdentityClaims.Types.Clients, IdentityClaims.Values.Update,
             [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
 
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         var clientToUpdate = await clientStore.GetAsync(clientId) ?? throw new NotFoundException($"Client with id:{clientId} not found");
 

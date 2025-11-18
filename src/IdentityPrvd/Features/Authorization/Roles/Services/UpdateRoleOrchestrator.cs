@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
 using IdentityPrvd.Common.Extensions;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
@@ -27,7 +28,7 @@ public class UpdateRoleOrchestrator(
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
         dto.Id = roleId;
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 

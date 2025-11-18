@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Constants;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
@@ -21,7 +22,7 @@ public class UpdateClaimOrchestrator(
              [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
 
         dto.Id = claimId;
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         var claim = await store.GetAsync(claimId);
         claim.Type = dto.Type;

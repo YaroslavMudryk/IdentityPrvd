@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using IdentityPrvd.Common.Extensions;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Data.Transactions;
 using IdentityPrvd.Features.Authentication.Signup.Dtos;
@@ -15,7 +16,7 @@ public class SignupConfirmOrchestrator(
 {
     public async Task ConfirmAsync(SignupConfirmRequestDto dto)
     {
-        await validator.ValidateAndThrowAsync(dto);
+        await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;

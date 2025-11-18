@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using IdentityPrvd.Common.Helpers;
 using IdentityPrvd.Endpoints;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Dtos;
 using IdentityPrvd.Features.Authentication.ExternalSignin.Services;
@@ -23,7 +24,7 @@ public class ExternalSigninEndpoint : IEndpoint
                 LinkGenerator linkGenerator,
                 HttpContext context) =>
             {
-                await validator.ValidateAndThrowAsync(dto);
+                await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
                 if (string.IsNullOrEmpty(dto.ReturnUrl))
                     dto.ReturnUrl = linkGenerator.GetUriByName(context, "DefaultReturnUri");
