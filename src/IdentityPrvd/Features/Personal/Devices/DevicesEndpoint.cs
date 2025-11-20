@@ -34,14 +34,20 @@ public class VerifyDeviceEndpoint : IEndpoint
     }
 }
 
-public class UnverifyDeviceEndpoint : IEndpoint
+public class UpdateDeviceVerificationEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/identity/devices/unverify/{deviceId}",
-            async (Guid deviceId, UnverifyDeviceOrchestrator orc) =>
+        app.MapPatch("/api/identity/devices/{deviceId}",
+            async (Guid deviceId, UpdateDeviceVerificationDto dto, UnverifyDeviceOrchestrator unverifyOrc) =>
             {
-                await orc.UnverifyDeviceAsync(deviceId);
+                if (dto is null)
+                    return Results.BadRequest(ApiResponse.Fail("Payload is required"));
+
+                if (dto.Verified)
+                    return Results.BadRequest(ApiResponse.Fail("Use POST /api/identity/devices/verify to mark device as verified"));
+
+                await unverifyOrc.UnverifyDeviceAsync(deviceId);
                 return Results.NoContent();
             }).WithTags("Devices");
     }

@@ -251,9 +251,10 @@
 - **Повертає:** `DeviceDto`.
 - **Реалізація:** `VerifyDeviceOrchestrator` або створює, або оновлює пристрій, позначає як верифікований.
 
-#### POST `/api/identity/devices/unverify/{deviceId}`
+#### PATCH `/api/identity/devices/{deviceId}`
+- **Приймає:** `UpdateDeviceVerificationDto` (`verified`).
 - **Повертає:** `204`.
-- **Реалізація:** `UnverifyDeviceOrchestrator` скидає прапор перевірки.
+- **Реалізація:** якщо вказано `verified = false`, `UnverifyDeviceOrchestrator` скидає прапор перевірки, логуючи хто і коли це зробив. (Для повторної верифікації все ще використовується `POST /devices/verify`.)
 
 #### DELETE `/api/identity/devices/{deviceId}`
 - **Повертає:** `204`.
