@@ -14,7 +14,7 @@ using IdentityPrvd.Services.ServerSideSessions;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Services;
 
-public class SigninMfaOrchestrator(
+public class MfaSigninService(
     ISessionStore sessionStore,
     IRefreshTokenStore refreshTokenStore,
     IMfaStore mfaStore,
@@ -26,7 +26,7 @@ public class SigninMfaOrchestrator(
     ITransactionManager transactionManager,
     ISessionControlService sessionControlService)
 {
-    public async Task<SigninResponseDto> SinginMfaAsync(SigninMfaRequestDto dto)
+    public async Task<SigninResponseDto> SinginMfaAsync(MfaSigninDto dto)
     {
         await using var transaction = await transactionManager.BeginTransactionAsync();
 

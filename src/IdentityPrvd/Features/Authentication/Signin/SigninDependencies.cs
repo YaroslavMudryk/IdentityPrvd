@@ -12,11 +12,12 @@ public static class SigninDependencies
 {
     public static IServiceCollection AddSigninDependencies(this IServiceCollection services)
     {
-        services.AddScoped<IValidator<SigninRequestDto>, SigninRequestDtoValidator>();
-        services.AddScoped<IValidator<PasswordlessSigninRequestDto>, PasswordlessSigninRequestDtoValidator>();
+        services.AddScoped<IValidator<PasswordSigninDto>, PasswordSigninDtoValidator>();
+        services.AddScoped<IValidator<PasswordlessSigninDto>, PasswordlessSigninDtoValidator>();
+        services.AddScoped<PasswordSigninService>();
+        services.AddScoped<MfaSigninService>();
+        services.AddScoped<PasswordlessSigninService>();
         services.AddScoped<SigninOrchestrator>();
-        services.AddScoped<SigninMfaOrchestrator>();
-        services.AddScoped<PasswordlessSigninOrchestrator>();
         services.AddScoped<SigninOptionsOrchestrator>();
         services.AddScoped<IUserSecureService, UserSecureService>();
         services.AddDeviceDetector();

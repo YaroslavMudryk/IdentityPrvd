@@ -2,7 +2,7 @@
 
 namespace IdentityPrvd.Features.Authentication.Signin.Dtos;
 
-public class PasswordlessSigninRequestDto
+public class PasswordlessSigninDto
 {
     public string Login { get; set; }
     public string Code { get; set; }
@@ -13,4 +13,3 @@ public class PasswordlessSigninRequestDto
     public Dictionary<string, string> Data { get; set; }
     public ClientInfo Client { get; set; }
 }
-

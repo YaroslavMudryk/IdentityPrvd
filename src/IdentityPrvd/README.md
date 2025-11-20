@@ -11,32 +11,26 @@
 
 ### Базові сценарії входу
 #### POST `/api/identity/signin`
-- **Призначення:** класичний логін за логіном/паролем.
-- **Приймає:** `SigninRequestDto` (`login`, `password`, `language`, `clientId`, `clientSecret`, `appVersion`, довільні `data`, `client` про пристрій).
-- **Повертає:** `SigninResponseDto` (JWT, refresh, час життя, ознака `requiredMfa`, `verifyId` коли MFA обов’язкове).
-- **Пов'язаний з:** `signin-mfa`, `signin-user-options`, `refresh-token`, менеджментом сесій.
-- **Реалізація:** `SigninOrchestrator` (`Features/Authentication/Signin/Services/SigninOrchestrator.cs`) перевіряє клієнта, резолвить геодані через `ILocationService`, створює `IdentitySession` і refresh‑токен, пушить сесію у кеш (`ISessionManager`) та закриває інші при необхідності через `ISessionControlService`. Якщо для юзера активовано MFA — створює `SessionType.Mfa` зі `VerificationId`.
+- **Призначення:** універсальний ендпоінт для всіх способів входу.
+- **Приймає:** `SigninUnifiedRequestDto`:
+  - поле `mode` визначає сценарій (`password`, `passwordless`, `mfa`);
+  - спільні параметри (`language`, `clientId`, `clientSecret`, `appVersion`, `data`, `client`);
+  - для `password` потрібні `login` + `password`;
+  - для `passwordless` потрібні `login` + одноразовий `code` (з активної MFA);
+  - для `mfa` потрібні `verificationId` + `code`.
+- **Повертає:** `SigninResponseDto` (JWT, refresh, `expireIn`, показники `requiredMfa`/`verifyId`).
+- **Пов'язаний з:** `signin/challenge`, `refresh-token`, `enable/disable mfa`, менеджментом сесій.
+- **Реалізація:** ендпоінт маршрутизує запит у відповідний оркестратор:
+  - `SigninService` — класичний парольний сценарій, створює `IdentitySession`/refresh, може повернути `verifyId` коли потрібна MFA.
+  - `PasswordlessSigninService` — OTP-вхід, перевіряє, що MFA активована, створює `SessionType.Mfa`.
+  - `SigninMfaService` — завершує початий сеанс за `verificationId`, верифікує код, переводить сесію в `Active`.
 
-#### POST `/api/identity/signin-mfa`
-- **Призначення:** підтвердження MFA після попереднього логіну.
-- **Приймає:** `SigninMfaRequestDto` (`verificationId`, `code`).
-- **Повертає:** `SigninResponseDto` з бойовими токенами.
-- **Пов'язаний з:** попереднім `signin`, `enable/disable mfa`, `refresh-token`.
-- **Реалізація:** `SigninMfaOrchestrator` знаходить сесію за `verificationId`, перевіряє TOTP через `IMfaService`, переводить її в `SessionStatus.Active`, випускає новий refresh, генерує JWT та оновлює кеш сесій.
-
-#### POST `/api/identity/signin-passwordless`
-- **Призначення:** OTP‑вхід без пароля на основі активованої MFA.
-- **Приймає:** `PasswordlessSigninRequestDto` (логін, OTP‑код, `clientId/secret`, `appVersion`, `client`, `data`).
-- **Повертає:** `SigninResponseDto`.
-- **Пов'язаний з:** `enable mfa`, `signin-mfa`, `refresh-token`.
-- **Реалізація:** `PasswordlessSigninOrchestrator` підтверджує, що MFA активна, верифікує код, створює `SessionType.Mfa`, refresh‑токен, обчислює дозволи для клієнта і закриває зайві сесії.
-
-#### GET `/api/identity/signin-user-options`
-- **Призначення:** дізнатися, які механізми входу доступні конкретному логіну.
+#### GET `/api/identity/signin/challenge`
+- **Призначення:** дізнатися, які фактори доступні конкретному логіну, щоб показати користувачу релевантні опції.
 - **Приймає:** query `login`.
 - **Повертає:** `SigninUserOptionsDto` (`password`, `passwordless`, `linkedExternalProviders`).
 - **Пов'язаний з:** UI вибору методу входу, `linked-external-signin`.
-- **Реалізація:** `SigninOptionsOrchestrator` шукає користувача, перевіряє наявність пароля (`PasswordHash`), активну MFA (`IMfaStore`), витягує зовнішні прив’язки (`IUserLoginsQuery`). Для неіснуючих логінів повертає порожні опції щоб не «палити» користувачів.
+- **Реалізація:** `SigninOptionsOrchestrator` шукає користувача, перевіряє наявність пароля (`PasswordHash`), активну MFA (`IMfaStore`), витягує зовнішні прив’язки (`IUserLoginsQuery`). Для неіснуючих логінів повертає порожні опції, щоб не «палити» користувачів.
 
 #### GET `/api/identity/signin-options`
 - **Призначення:** глобальна конфігурація доступних способів входу.
@@ -275,7 +269,7 @@
 #### POST `/api/identity/mfa`
 - **Приймає:** `MfaDto` з `totp` (може бути порожнім).
 - **Повертає:** або `204`, або `MfaResponse` (URL для сканування, секрет, recovery‑коди).
-- **Пов'язаний з:** `signin-mfa`, `passwordless`.
+- **Пов'язаний з:** `signin` (режими `passwordless` та `mfa`).
 - **Реалізація:** `EnableMfaOrchestrator` без `totp` генерує секрет, QR (`OtpUri`) і recovery‑коди (`IdentityMfaRecoveryCode`), з `totp` — перевіряє код і активує MFA.
 
 #### DELETE `/api/identity/mfa`
@@ -304,8 +298,8 @@
 - **Реалізація:** `RevokeSessionsOrchestrator` перетворює на GUID, через `SessionRevocationValidator` перевіряє доступність, виставляє `SessionStatus.Close`, оновлює refresh‑токени та чистить кеш (`ISessionManager.DeleteSessionsByIdsAsync`).
 
 ## Взаємозв’язки
-- `Signin` → `SigninMfa` → `RefreshToken` → `Sessions` → `Revoke/Signout`.
-- `Enable/DisableMfa` впливають на `signin-passwordless` та на те, що повертає `signin-user-options`.
+- `Signin (mode password)` → `Signin (mode mfa)` → `RefreshToken` → `Sessions` → `Revoke/Signout`.
+- `Enable/DisableMfa` впливають на `signin (mode passwordless)` та на відповіді `signin/challenge`.
 - `Signup` + `SignupConfirm` + `Start/Restore password` спільно використовують `IdentityCode`.
 - `External signin` і `Link external signin` дзеркалять один одного: перший створює або знаходить користувача, другий лише додає провайдера для існуючого.
 - `QR` сценарій використовує ті ж сервіси, що і класичний логін: створення сесії, токени, закриття старих сесій.

@@ -15,45 +15,19 @@ public class SigninEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/identity/signin",
-            [AllowAnonymous] async (SigninRequestDto dto, SigninOrchestrator orc) =>
+            [AllowAnonymous] async (SigninRequestDto dto, SigninOrchestrator orchestrator) =>
             {
-                var result = await orc.SigninAsync(dto);
-                return Results.Ok(result.MapToResponse());
+                var response = await orchestrator.SigninAsync(dto);
+                return Results.Ok(response.MapToResponse());
             }).WithTags("Signin");
     }
 }
 
-public class SigninMfa : IEndpoint
+public class SigninChallengeEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/identity/signin-mfa",
-            [AllowAnonymous] async (SigninMfaRequestDto dto, SigninMfaOrchestrator orc) =>
-            {
-                var result = await orc.SinginMfaAsync(dto);
-                return Results.Ok(result.MapToResponse());
-            }).WithTags("Signin");
-    }
-}
-
-public class PasswordlessSigninEndpoint : IEndpoint
-{
-    public void MapEndpoint(IEndpointRouteBuilder app)
-    {
-        app.MapPost("/api/identity/signin-passwordless",
-            [AllowAnonymous] async (PasswordlessSigninRequestDto dto, PasswordlessSigninOrchestrator orc) =>
-            {
-                var result = await orc.SigninAsync(dto);
-                return Results.Ok(result.MapToResponse());
-            }).WithTags("Signin");
-    }
-}
-
-public class SigninOptionsEndpoint : IEndpoint
-{
-    public void MapEndpoint(IEndpointRouteBuilder app)
-    {
-        app.MapGet("/api/identity/signin-user-options",
+        app.MapGet("/api/identity/signin/challenge",
             [AllowAnonymous] async ([FromQuery] string login, SigninOptionsOrchestrator orc) =>
             {
                 var result = await orc.GetSigninUserOptionsAsync(login);

@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Dtos.Validators;
 
-public class PasswordlessSigninRequestDtoValidator : AbstractValidator<PasswordlessSigninRequestDto>
+public class PasswordlessSigninDtoValidator : AbstractValidator<PasswordlessSigninDto>
 {
-    public PasswordlessSigninRequestDtoValidator(
+    public PasswordlessSigninDtoValidator(
         IUsersQuery usersQuery,
         IClientsQuery clientsQuery,
         IHasher hasher,

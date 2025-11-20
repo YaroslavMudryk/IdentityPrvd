@@ -20,7 +20,7 @@ using IdentityPrvd.Services.ServerSideSessions;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Services;
 
-public class PasswordlessSigninOrchestrator(
+public class PasswordlessSigninService(
     ITokenService tokenService,
     ISessionManager sessionManager,
     IIdentityContext identityContext,
@@ -34,10 +34,10 @@ public class PasswordlessSigninOrchestrator(
     ISessionStore sessionRepo,
     IMfaStore mfaStore,
     IMfaService mfaService,
-    IValidator<PasswordlessSigninRequestDto> validator,
+    IValidator<PasswordlessSigninDto> validator,
     ISessionControlService sessionControlService)
 {
-    public async Task<SigninResponseDto> SigninAsync(PasswordlessSigninRequestDto dto)
+    public async Task<SigninResponseDto> SigninAsync(PasswordlessSigninDto dto)
     {
         await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
@@ -114,10 +114,9 @@ public class PasswordlessSigninOrchestrator(
         };
     }
 
-    private void InitClient(PasswordlessSigninRequestDto dto)
+    private void InitClient(PasswordlessSigninDto dto)
     {
         if (dto.Client == default)
             dto.Client = detector.GetClientInfo().MapToClientInfo();
     }
 }
-

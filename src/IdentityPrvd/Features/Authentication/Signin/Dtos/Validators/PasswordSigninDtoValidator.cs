@@ -13,9 +13,9 @@ using System.Text.RegularExpressions;
 
 namespace IdentityPrvd.Features.Authentication.Signin.Dtos.Validators;
 
-public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
+public class PasswordSigninDtoValidator : AbstractValidator<PasswordSigninDto>
 {
-    public SigninRequestDtoValidator(
+    public PasswordSigninDtoValidator(
         IUsersQuery usersQuery,
         IUserStore userStore,
         IClientsQuery clientsQuery,
@@ -23,7 +23,6 @@ public class SigninRequestDtoValidator : AbstractValidator<SigninRequestDto>
         IUserSecureService userSecureService,
         TimeProvider timeProvider,
         IdentityPrvdOptions options,
-        UserHelper userHelper,
         IFailedLoginAttemptsQuery failedLoginAttemptsQuery,
         IBansQuery bansQuery,
         ILocalizationService localizationService,
