@@ -6,6 +6,8 @@ public class ExternalSigninDto
 {
     [FromQuery(Name = "provider")]
     public string Provider { get; set; }
+    [FromQuery(Name = "purpose")]
+    public string Purpose { get; set; } = "login"; // "login" or "link"
     [FromQuery(Name = "returnUrl")]
     public string ReturnUrl { get; set; }
 

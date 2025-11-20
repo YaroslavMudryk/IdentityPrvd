@@ -5,6 +5,7 @@ namespace IdentityPrvd.Features.Authentication.ExternalSignin.Services;
 public static class ExternalSigninDtoHelper
 {
     private const string ProviderKey = "provider";
+    private const string PurposeKey = "purpose";
     private const string ReturnUrlKey = "returnUrl";
     private const string LanguageKey = "language";
     private const string ClientIdKey = "clientId";
@@ -28,6 +29,9 @@ public static class ExternalSigninDtoHelper
     {
         if (dto.Provider != null)
             items.Add(ProviderKey, dto.Provider);
+
+        if (dto.Purpose != null)
+            items.Add(PurposeKey, dto.Purpose);
 
         if (dto.ReturnUrl != null)
             items.Add(ReturnUrlKey, dto.ReturnUrl);
@@ -92,6 +96,7 @@ public static class ExternalSigninDtoHelper
         var dto = new ExternalSigninDto
         {
             Provider = items.TryGetValue(ProviderKey, out var provider) ? provider : unknown,
+            Purpose = items.TryGetValue(PurposeKey, out var purpose) ? purpose : "login",
             ReturnUrl = items.TryGetValue(ReturnUrlKey, out var returnUrl) ? returnUrl : unknown,
             Language = items.TryGetValue(LanguageKey, out var language) ? language : unknown,
             ClientId = items.TryGetValue(ClientIdKey, out var clientId) ? clientId : unknown,

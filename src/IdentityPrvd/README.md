@@ -90,34 +90,23 @@
 
 ### Зовнішні провайдери та SSO
 #### GET `/api/identity/signin-external`
-- **Приймає:** query з `ExternalSigninDto` (провайдер, `returnUrl`, client/device/os/browser метадані).
+- **Приймає:** query з `ExternalSigninDto` (провайдер, `purpose` = `"login"|"link"`, `returnUrl`, client/device/os/browser метадані).
 - **Повертає:** HTTP 401 Challenge на потрібну схему.
-- **Пов'язаний з:** `signin-external-callback`, `link-external-signin`.
-- **Реалізація:** `ExternalSigninEndpoint` з FluentValidation, формує `AuthenticationProperties` з RedirectUri (`SigninExternalCallback`) та кладe DTO у `authProperties.Items`.
+- **Пов'язаний з:** `signin-external-callback`.
+- **Реалізація:** `ExternalSigninEndpoint` з FluentValidation, формує `AuthenticationProperties` з RedirectUri (`SigninExternalCallback`) та кладe DTO у `authProperties.Items`. Параметр `purpose` визначає поведінку: `"login"` — вхід/реєстрація (дозволено анонімним), `"link"` — прив’язка до існуючого акаунта (потрібна автентифікація).
 
 #### GET `/api/identity/signin-external-callback`
-- **Приймає:** `returnUrl`, `provider`.
-- **Повертає:** redirect на `returnUrl` з query (`accessToken`, `refreshToken`, `expireIn`).
-- **Пов'язаний з:** попередній крок, `ExternalSigninOrchestrator`.
-- **Реалізація:** автентифікує користувача через `ExternalProviderManager`, викликає `ExternalSigninOrchestrator`, який:
-  - екстрактить профіль (`ExternalUserExtractorService`),
-  - створює юзера+роль+логін за потреби,
-  - створює сесію (`IdentitySession`) + refresh,
-  - видає токени та синхронізує `ISessionManager`.
+- **Приймає:** `returnUrl`, `provider`, `purpose`.
+- **Повертає:** redirect на `returnUrl` з query (`accessToken`, `refreshToken`, `expireIn`) для `purpose=login` або `status=link_success` для `purpose=link`.
+- **Пов'язаний з:** попередній крок, `ExternalSigninOrchestrator` або `LinkExternalSigninOrchestrator`.
+- **Реалізація:** автентифікує користувача через `ExternalProviderManager`, читає `purpose` з query:
+  - `purpose=login`: викликає `ExternalSigninOrchestrator`, який екстрактить профіль, створює юзера+роль+логін за потреби, сесію + refresh, видає токени.
+  - `purpose=link`: викликає `LinkExternalSigninOrchestrator`, який створює запис в `IdentityUserLogin` для поточного користувача.
 
 #### GET `/api/identity/linked-external-signin`
 - **Повертає:** список `ExternalProviderDto` (провайдер, картинка, чи лінковано, коли).
-- **Пов'язаний з:** UI керування провайдерами, `link`/`unlink`.
+- **Пов'язаний з:** UI керування провайдерами, `unlink`.
 - **Реалізація:** `LinkedExternalSigninOrchestrator` бере поточного користувача, перетинає його логіни з усіма схемами `IAuthSchemes`.
-
-#### GET `/api/identity/link-external-signin`
-- **Приймає:** query `provider`, `returnUrl`.
-- **Повертає:** 401 Challenge з Redirect на `LinkSigninExternalCallback`.
-- **Реалізація:** Дозволений лише для автентифікованих. В `AuthenticationProperties.Items` пише `CurrentUserId` для подальшої обробки.
-
-#### GET `/api/identity/link-external-signin-callback`
-- **Повертає:** redirect на `returnUrl?status=link_success`.
-- **Реалізація:** `LinkExternalSigninOrchestrator` перевіряє `AuthenticateResult`, створює запис в `IdentityUserLogin`, не дозволяє повторної прив’язки.
 
 #### DELETE `/api/identity/unlink-external-signin`
 - **Приймає:** query `provider`.
@@ -308,7 +297,7 @@
 - `Signin (mode password)` → `Signin (mode mfa)` → `RefreshToken` → `Sessions` → `DELETE /sessions*` або `POST /sessions/revoke`.
 - `Enable/DisableMfa` впливають на `signin (mode passwordless)` та на відповіді `signin/challenge`.
 - `Signup` + `SignupConfirm` + `Restore password (POST/PATCH)` спільно використовують `IdentityCode`.
-- `External signin` і `Link external signin` дзеркалять один одного: перший створює або знаходить користувача, другий лише додає провайдера для існуючого.
+- `External signin` з `purpose=login` створює або знаходить користувача та видає токени; з `purpose=link` лише додає провайдера до поточного користувача.
 - `QR` сценарій використовує ті ж сервіси, що і класичний логін: створення сесії, токени, закриття старих сесій.
 - Адміністративні частини (`claims`, `roles`, `clients`) безпосередньо впливають на те, які клейми видає `ITokenService`, а отже й на авторизацію у всіх інших ендпоінтах.
 
