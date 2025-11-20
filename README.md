@@ -72,7 +72,12 @@ app.Run();
 	},
 	"Protection": {
 	  "Key": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
-	}
+	},
+    "RateLimit": {
+      "MaxAttempts": 5,
+      "TimeWindowInMinutes": 60,
+      "Enabled": true
+    }
   }
 }
 ```
