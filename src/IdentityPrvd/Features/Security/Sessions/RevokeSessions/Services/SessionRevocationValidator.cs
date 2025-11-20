@@ -6,10 +6,15 @@ using IdentityPrvd.Domain.Entities;
 
 namespace IdentityPrvd.Features.Security.Sessions.RevokeSessions.Services;
 
+public interface ISessionRevocationValidator
+{
+    Task EnsureRevocationAllowedAsync(List<IdentitySession> sessions);
+}
+
 public class SessionRevocationValidator(
     IIdentityContext identityContext,
     ISessionsQuery sessionsQuery,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider) : ISessionRevocationValidator
 {
     public async Task EnsureRevocationAllowedAsync(List<IdentitySession> sessions)
     {

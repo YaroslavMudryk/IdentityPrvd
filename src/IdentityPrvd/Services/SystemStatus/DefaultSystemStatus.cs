@@ -22,7 +22,7 @@ public class DefaultSystemStatus(
                 _ => SystemStatus.NotConfigured
             };
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return SystemStatus.NotConfigured;
         }

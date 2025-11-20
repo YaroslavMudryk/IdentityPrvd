@@ -37,12 +37,16 @@
 - **Повертає:** `SigninOptionsDto` (`password`, `passwordless`, список зовнішніх провайдерів).
 - **Реалізація:** `Features/Authentication/SigninOptions/Services/SigninOptionsOrchestrator` комбінує `IdentityPrvdOptions.Signin` та зареєстровані `IAuthSchemes`.
 
-#### POST `/api/identity/signout`
-- **Призначення:** вихід з поточної сесії або з усіх.
-- **Приймає:** query `everywhere` (bool, за замовчуванням `false`).
-- **Повертає:** `204 No Content`.
-- **Пов'язаний з:** `sessions` та `revoke-sessions`.
-- **Реалізація:** `SignoutOrchestrator` (через `ISessionControlService`) або закриває одну сесію, або всі активні користувача, валідує права через `IdentityClaims`.
+#### DELETE `/api/identity/sessions/current`
+- **Призначення:** закрити лише поточну сесію користувача.
+- **Повертає:** `204`.
+- **Пов'язаний з:** `GET /api/identity/sessions`, `POST /api/identity/sessions/revoke`.
+- **Реалізація:** `SignoutOrchestrator.SignoutAsync(false)` через `ISessionControlService` закриває поточний `SessionId`.
+
+#### DELETE `/api/identity/sessions`
+- **Призначення:** закрити всі активні сесії користувача (signout everywhere).
+- **Повертає:** `204`.
+- **Реалізація:** `SignoutOrchestrator.SignoutAsync(true)` закриває всі сесії користувача і очищує refresh-токени.
 
 ### Реєстрація та підтвердження
 #### POST `/api/identity/signup`
@@ -67,7 +71,7 @@
 #### POST `/api/identity/change-password`
 - **Приймає:** `ChangePasswordDto` (старий/новий пароль, hint, `signoutEverywhere`).
 - **Повертає:** `204`.
-- **Пов'язаний з:** `signout`, `refresh-token` (всі токени інвалідовано).
+- **Пов'язаний з:** `DELETE /api/identity/sessions*`, `refresh-token` (всі токени інвалідовано).
 - **Реалізація:** `ChangePasswordOrchestrator` перевіряє старий пароль, політику reuse (`options.User.UseOldPasswords`), деактивує попередні записи в `IdentityPassword`, додає новий, за потреби закриває всі сесії й refresh‑токени.
 
 #### POST `/api/identity/restore-password`
@@ -295,13 +299,13 @@
 - **Повертає:** `SessionDetailDto` з повним описом (локація, тип, `viaMfa`, пов’язані пристрої).
 - **Реалізація:** `GetSessionOrchestrator` валідує, що сесія належить користувачу, додає `LastActivityAt` з кешу.
 
-#### DELETE `/api/identity/revoke-sessions`
+#### POST `/api/identity/sessions/revoke`
 - **Приймає:** масив рядків `sessionIds` в тілі.
 - **Повертає:** кількість закритих сесій (Ok + цифра).
 - **Реалізація:** `RevokeSessionsOrchestrator` перетворює на GUID, через `SessionRevocationValidator` перевіряє доступність, виставляє `SessionStatus.Close`, оновлює refresh‑токени та чистить кеш (`ISessionManager.DeleteSessionsByIdsAsync`).
 
 ## Взаємозв’язки
-- `Signin (mode password)` → `Signin (mode mfa)` → `RefreshToken` → `Sessions` → `Revoke/Signout`.
+- `Signin (mode password)` → `Signin (mode mfa)` → `RefreshToken` → `Sessions` → `DELETE /sessions*` або `POST /sessions/revoke`.
 - `Enable/DisableMfa` впливають на `signin (mode passwordless)` та на відповіді `signin/challenge`.
 - `Signup` + `SignupConfirm` + `Restore password (POST/PATCH)` спільно використовують `IdentityCode`.
 - `External signin` і `Link external signin` дзеркалять один одного: перший створює або знаходить користувача, другий лише додає провайдера для існуючого.

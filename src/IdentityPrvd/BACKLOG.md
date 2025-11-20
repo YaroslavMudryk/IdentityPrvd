@@ -24,5 +24,5 @@
   - [x] Відновлення пароля стає ресурсом `POST /restore-password` (створює запит, повертає `verifyId`) та `PATCH /restore-password/{verifyId}` (встановлює новий пароль). Журнали бачать весь життєвий цикл.
   - [x] Пристрої: `PATCH /devices/{id}` з полем `verified` замінює `POST /devices/unverify/{id}`. Також варто додати `PUT /devices/{id}` для оновлення метаданих без повторної верифікації.
   - [ ] Зовнішня авторизація і прив’язка об’єднуються в `/signin-external?purpose=login|link`, callback читає `purpose` і виконує відповідну гілку; немає дубльованих DTO.
-  - [ ] `DELETE /sessions/current` та `DELETE /sessions` (з `everywhere=true`) замінюють `signout`, `POST /sessions/revoke` приймає масив id у тілі замість безіменного DELETE з body.
+  - [x] `DELETE /sessions/current` та `DELETE /sessions` (з `everywhere=true`) замінюють `signout`, `POST /sessions/revoke` приймає масив id у тілі замість безіменного DELETE з body.
   - [ ] Адмінські сутності отримують парність операцій: `GET /roles/{id}` та `GET /clients/{id}` повертають повний стан для форм редагування, `PUT /roles/{id}/claims`/`PATCH /roles/{id}/claims` дозволяють або замінювати, або точково додавати/прибирати зв’язки.

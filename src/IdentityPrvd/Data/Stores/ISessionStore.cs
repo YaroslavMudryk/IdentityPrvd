@@ -9,6 +9,7 @@ namespace IdentityPrvd.Data.Stores;
 public interface ISessionStore
 {
     Task<IdentitySession> GetAsync(Guid sessionId);
+    Task<IdentitySession> GetActiveSessionAsync(Guid sessionId);
     Task<IdentitySession> GetSessionByVerificationIdAsync(string verificationId);
     Task<List<IdentitySession>> GetActiveSessionsByUserIdAsync(Guid userId);
     Task<List<IdentitySession>> GetActiveSessionsByIdsAsync(Guid[] sessionIds);
@@ -21,7 +22,7 @@ public class EfSessionStore(IdentityPrvdContext dbContext) : ISessionStore
 {
     public async Task<IdentitySession> GetAsync(Guid sessionId)
     {
-        return await dbContext.Sessions.Where(s => s.Id == sessionId && s.Status != SessionStatus.Close).FirstOrDefaultAsync()
+        return await dbContext.Sessions.Where(s => s.Id == sessionId).FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Session with id:{sessionId} not found");
     }
 
@@ -63,5 +64,11 @@ public class EfSessionStore(IdentityPrvdContext dbContext) : ISessionStore
         }
 
         throw new ArgumentException("Entities must be in modified state or unchanged state to be updated.");
+    }
+
+    public async Task<IdentitySession> GetActiveSessionAsync(Guid sessionId)
+    {
+        return await dbContext.Sessions.Where(s => s.Id == sessionId && s.Status != SessionStatus.Close).FirstOrDefaultAsync()
+            ?? throw new NotFoundException($"Session with id:{sessionId} not found");
     }
 }

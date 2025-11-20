@@ -8,7 +8,7 @@ public static class RevokeSessionsDependencies
     public static IServiceCollection AddRevokeSessionsDependencies(this IServiceCollection services)
     {
         services.AddScoped<RevokeSessionsOrchestrator>();
-        services.AddScoped<SessionRevocationValidator>();
+        services.AddScoped<ISessionRevocationValidator, SessionRevocationValidator>();
         return services;
     }
 }

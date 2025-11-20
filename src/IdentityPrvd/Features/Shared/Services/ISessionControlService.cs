@@ -1,6 +1,7 @@
 ﻿using IdentityPrvd.Common.Extensions;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Domain.Enums;
+using IdentityPrvd.Features.Security.Sessions.RevokeSessions.Services;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.ServerSideSessions;
 
@@ -12,6 +13,7 @@ namespace IdentityPrvd.Features.Shared.Services;
 public interface ISessionControlService
 {
     Task CloseSessionByIdAsync(Guid sessionId);
+    Task CloseSessionByIdsAsync(Guid[] sessionIdIds);
     Task CloseActiveUserSessionsAsync(Guid userId, Guid[] sessionIdsToKeep = null);
     Task CloseOtherSessionsIfRequiredAsync(Guid userId, Guid currentSessionId);
 }
@@ -20,6 +22,7 @@ public class SessionControlService(
     IdentityPrvdOptions identityOptions,
     ISessionStore sessionStore,
     IRefreshTokenStore refreshTokenStore,
+    ISessionRevocationValidator revocationValidator,
     ISessionManager sessionManager,
     TimeProvider timeProvider) : ISessionControlService
 {
@@ -27,6 +30,8 @@ public class SessionControlService(
     {
         var userSessions = await sessionStore.GetActiveSessionsByUserIdAsync(userId);
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+
+        await revocationValidator.EnsureRevocationAllowedAsync(userSessions);
 
         foreach (var userSession in userSessions)
         {
@@ -48,9 +53,23 @@ public class SessionControlService(
         await CloseSessionAsync(sessionId, timeProvider.GetUtcNow().UtcDateTime);
     }
 
+    public async Task CloseSessionByIdsAsync(Guid[] sessionIdIds)
+    {
+        var sessionsToClose = await sessionStore.GetActiveSessionsByIdsAsync(sessionIdIds);
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+
+        await revocationValidator.EnsureRevocationAllowedAsync(sessionsToClose);
+
+        foreach (var userSession in sessionsToClose)
+        {
+            await CloseSessionAsync(userSession.Id, utcNow);
+        }
+    }
+
     private async Task CloseSessionAsync(Guid sessionId, DateTime utcNow)
     {
-        var session = await sessionStore.GetAsync(sessionId);
+        var session = await sessionStore.GetActiveSessionAsync(sessionId);
+
         session.Status = SessionStatus.Close;
         session.DeactivatedAt = utcNow;
         session.DeactivatedBySessionId = sessionId;
