@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Routing;
 
 namespace IdentityPrvd.Features.Authentication.RestorePassword;
 
-public class StartRestorePasswordEndpoint : IEndpoint
+public class CreateRestorePasswordRequestEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/identity/start-restore-password",
+        app.MapPost("/api/identity/restore-password",
             [AllowAnonymous] async (StartRestorePasswordDto dto, StartRestorePasswordOrchestrator orc) =>
             {
                 var startedRestoreDto = await orc.StartRestorePasswordAsync(dto);
@@ -22,13 +22,14 @@ public class StartRestorePasswordEndpoint : IEndpoint
     }
 }
 
-public class RestorePasswordEndpoint : IEndpoint
+public class CompleteRestorePasswordEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/identity/restore-password",
-            [AllowAnonymous] async (RestorePasswordDto dto, RestorePasswordOrchestrator orc) =>
+        app.MapPatch("/api/identity/restore-password/{verifyId}",
+            [AllowAnonymous] async (string verifyId, RestorePasswordDto dto, RestorePasswordOrchestrator orc) =>
             {
+                dto.VerifyId = verifyId;
                 await orc.RestorePasswordAsync(dto);
                 return Results.NoContent();
             }).WithTags("Restore password");

@@ -20,9 +20,8 @@
 - [ ] Self-service exports: ендпоінт для вивантаження користувачем власних даних (GDPR).
 - [ ] Виділити окрему адмін-фічу: ізольовані маршрути `/api/admin/*`, окремі scopes, RBAC та аудит для керування ролями/клеймами/клієнтами, щоб спростити делегування адміністраторам.
 - [ ] Перепланувати існуючі ендпоінти, щоб вони відповідали REST та не дублювали логіку:
-  - [ ] `POST /api/identity/signin` приймає `"mode": "password|passwordless|mfa"` замість окремих маршрутів; повертає єдину відповідь. `GET /signin/challenge` підказує доступні фактори і замінює `signin-user-options`.
   - [x] `POST /api/identity/signin` приймає `"mode": "password|passwordless|mfa"` замість окремих маршрутів; повертає єдину відповідь. `GET /signin/challenge` підказує доступні фактори і замінює `signin-user-options`.
-  - [ ] Відновлення пароля стає ресурсом `POST /restore-password` (створює запит, повертає `verifyId`) та `PATCH /restore-password/{verifyId}` (встановлює новий пароль). Журнали бачать весь життєвий цикл.
+  - [x] Відновлення пароля стає ресурсом `POST /restore-password` (створює запит, повертає `verifyId`) та `PATCH /restore-password/{verifyId}` (встановлює новий пароль). Журнали бачать весь життєвий цикл.
   - [ ] Пристрої: `PATCH /devices/{id}` з полем `verified` замінює `POST /devices/unverify/{id}`. Також варто додати `PUT /devices/{id}` для оновлення метаданих без повторної верифікації.
   - [ ] Зовнішня авторизація і прив’язка об’єднуються в `/signin-external?purpose=login|link`, callback читає `purpose` і виконує відповідну гілку; немає дубльованих DTO.
   - [ ] `DELETE /sessions/current` та `DELETE /sessions` (з `everywhere=true`) замінюють `signout`, `POST /sessions/revoke` приймає масив id у тілі замість безіменного DELETE з body.

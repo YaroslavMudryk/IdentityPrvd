@@ -48,7 +48,7 @@
 #### POST `/api/identity/signup`
 - **Приймає:** `SignupRequestDto` (ім’я, логін, пароль, профільні поля).
 - **Повертає:** `SignupResponseDto` (ID, логін, юзернейм).
-- **Пов'язаний з:** `signup/confirm`, `start-restore-password` (код повторно використовує ті ж механізми).
+- **Пов'язаний з:** `signup/confirm`, `restore-password` (первинний запит на відновлення використовує ті ж механізми кодів).
 - **Реалізація:** `SignupOrchestrator` створює `IdentityUser`, прив’язує дефолтну роль (`IRolesQuery.GetDefaultRoleIdAsync`), пароль, за потреби додає контакт, надсилає код підтвердження через email/SMS якщо `options.User.ConfirmRequired`.
 
 #### POST `/api/identity/signup/confirm`
@@ -70,17 +70,19 @@
 - **Пов'язаний з:** `signout`, `refresh-token` (всі токени інвалідовано).
 - **Реалізація:** `ChangePasswordOrchestrator` перевіряє старий пароль, політику reuse (`options.User.UseOldPasswords`), деактивує попередні записи в `IdentityPassword`, додає новий, за потреби закриває всі сесії й refresh‑токени.
 
-#### POST `/api/identity/start-restore-password`
+#### POST `/api/identity/restore-password`
+- **Призначення:** створити запит на відновлення пароля.
 - **Приймає:** `StartRestorePasswordDto` (`login`).
 - **Повертає:** `StartedRestorePasswordDto` (`login`, `verifyId` – код не повертається, надсилається каналом логіна).
-- **Пов'язаний з:** наступний `/restore-password`.
+- **Пов'язаний з:** `PATCH /api/identity/restore-password/{verifyId}`.
 - **Реалізація:** `StartRestorePasswordOrchestrator` перевіряє, що користувач існує, генерує `IdentityCode` (hash коду), зберігає `verifyId`, надсилає код через email/SMS.
 
-#### POST `/api/identity/restore-password`
-- **Приймає:** `RestorePasswordDto` (`hint`, `password`, отримані `code`, `verifyId`).
+#### PATCH `/api/identity/restore-password/{verifyId}`
+- **Призначення:** завершити процес зміни пароля за отриманим `verifyId`.
+- **Приймає:** `RestorePasswordDto` (новий пароль + hint + `code`), тоді як `verifyId` передається у маршруті.
 - **Повертає:** `204`.
-- **Пов'язаний з:** `start-restore-password`, `password` історією.
-- **Реалізація:** `RestorePasswordOrchestrator` валідовує запит, перевіряє, що `IdentityCode` ще активний і код співпадає (через `IHasher.Verify`), деактивує старі паролі, обновлює `IdentityUser.PasswordHash`, створює новий запис в `IdentityPassword`.
+- **Пов'язаний з:** попереднім POST запитом, історією паролів.
+- **Реалізація:** `RestorePasswordOrchestrator` валідовує запит, перевіряє, що `IdentityCode` ще активний і код співпадає (через `IHasher.Verify`), деактивує старі паролі, оновлює `IdentityUser.PasswordHash`, створює новий запис в `IdentityPassword`.
 
 ### Зовнішні провайдери та SSO
 #### GET `/api/identity/signin-external`
@@ -300,7 +302,7 @@
 ## Взаємозв’язки
 - `Signin (mode password)` → `Signin (mode mfa)` → `RefreshToken` → `Sessions` → `Revoke/Signout`.
 - `Enable/DisableMfa` впливають на `signin (mode passwordless)` та на відповіді `signin/challenge`.
-- `Signup` + `SignupConfirm` + `Start/Restore password` спільно використовують `IdentityCode`.
+- `Signup` + `SignupConfirm` + `Restore password (POST/PATCH)` спільно використовують `IdentityCode`.
 - `External signin` і `Link external signin` дзеркалять один одного: перший створює або знаходить користувача, другий лише додає провайдера для існуючого.
 - `QR` сценарій використовує ті ж сервіси, що і класичний логін: створення сесії, токени, закриття старих сесій.
 - Адміністративні частини (`claims`, `roles`, `clients`) безпосередньо впливають на те, які клейми видає `ITokenService`, а отже й на авторизацію у всіх інших ендпоінтах.
