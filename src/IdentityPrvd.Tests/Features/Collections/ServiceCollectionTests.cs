@@ -17,7 +17,7 @@ using IdentityPrvd.Services.Notification;
 using IdentityPrvd.Services.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace IdentityPrvd.Tests.Features.Collections;
 

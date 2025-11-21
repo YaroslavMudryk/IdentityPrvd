@@ -1,11 +1,11 @@
-﻿using IdentityPrvd.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
+﻿using IdentityPrvd.Features.Security.Initialize.Dtos;
+using IdentityPrvd.Options;
+using IdentityPrvd.WebApi;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using StackExchange.Redis;
+using Xunit;
 
 namespace IdentityPrvd.Tests.IntegrationInfra;
 
@@ -20,11 +20,6 @@ public abstract class IntegrationTestWebApplicationFactory : WebApplicationFacto
     {
         builder.ConfigureTestServices(services => services
             .Replace<TimeProvider>(s => s.AddTransient<TimeProvider>(_ => FakeTimeProvider)));
-
-        builder.ConfigureTestServices(services =>
-        {
-            services.AddIdentityPrvd();
-        });
 
         TestDatabase.ConfigureTestServices(builder);
         TestRedis.ConfigureTestServices(builder);
@@ -48,6 +43,32 @@ public abstract class IntegrationTestWebApplicationFactory : WebApplicationFacto
     public TestIdentityPrvdContext CreateDbContext() => TestDatabase.CreateDbContext(Services.CreateScope());
 
     public Task ResetDbAsync() => TestDatabase.ResetDbAsync();
+
+    public virtual async Task InitializeSystemAsync()
+    {
+        // Override in derived classes if system initialization is needed
+        await Task.CompletedTask;
+    }
+
+    public void ConfigureOptions(Action<IdentityPrvdOptions> configure)
+    {
+        var options = GetOptionsFromDi();
+        configure(options);
+    }
+
+    private IdentityPrvdOptions GetOptionsFromDi()
+    {
+        try
+        {
+            using var scope = Services.CreateScope();
+            var options = scope.ServiceProvider.GetRequiredService<IdentityPrvdOptions>();            
+            return options;
+        }
+        catch
+        {
+            return new IdentityPrvdOptions();
+        }
+    }
 }
 
 public class PostgresTestWithRedisWebApplicationFactory : IntegrationTestWebApplicationFactory
@@ -60,6 +81,23 @@ public class PostgresTestWithRedisWebApplicationFactory : IntegrationTestWebAppl
 
         await Task.WhenAll(databaseInitTask, redisTask);
         await base.InitializeAsync();
+        
+        // Initialize system once after database is created
+        await InitializeSystemAsync();
+    }
+
+    public override async Task InitializeSystemAsync()
+    {
+        var request = new InitializeRequestDto { AppVersion = "1.0.0-test" };
+        var response = await TestApiRequest.Post("/api/system/initialize")
+            .WithPayload(request)
+            .SendAsync(Client);
+
+        if (response.StatusCode != 200)
+        {
+            throw new InvalidOperationException(
+                $"Failed to initialize system. Status: {response.StatusCode}, Body: {response.GetBodyAsString()}");
+        }
     }
 
     public new TestRedis TestRedis => base.TestRedis;

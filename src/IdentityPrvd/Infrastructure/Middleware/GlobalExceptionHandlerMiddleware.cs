@@ -71,7 +71,7 @@ public class GlobalExceptionHandlerMiddleware(
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             var language = identityContext.CurrentLanguage ?? "en";
             var message = localizationService.GetString("errors.server.error", language);
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(message), Settings.Json);
+            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(ex.StackTrace), Settings.Json);
         }
     }
 }

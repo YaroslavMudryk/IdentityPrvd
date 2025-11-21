@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using IdentityPrvd.Common.Exceptions;
 using IdentityPrvd.Data.Queries;
 
 namespace IdentityPrvd.Features.Authentication.Signup.Dtos.Validators;
@@ -13,22 +12,35 @@ public class SignupConfirmRequestDtoValidator : AbstractValidator<SignupConfirmR
         RuleFor(s => s.Code)
             .NotEmpty()
             .WithMessage("Code is required.")
-            .MustAsync(async(code, token) =>
+            .CustomAsync(async (code, context, token) =>
             {
-                var confirm = await confirmsQuery.GetConfirmWithUserByCodeAsync(code)
-                    ?? throw new NotFoundException("Confirm not found");
+                var confirm = await confirmsQuery.GetConfirmWithUserByCodeAsync(code);
+
+                if (confirm == null)
+                {
+                    context.AddFailure("Confirm not found");
+                    return;
+                }
 
                 if (confirm.User.IsConfirmed)
-                    throw new BadRequestException("User already confirmed");
+                {
+                    context.AddFailure("User already confirmed");
+                    return;
+                }
 
                 if (confirm.IsActivated)
-                    throw new BadRequestException("Confirm already activated");
+                {
+                    context.AddFailure("Confirm already activated");
+                    return;
+                }
 
-                var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+                var utcNow = timeProvider.GetUtcNow().DateTime;
+
                 if (confirm.ActiveFrom > utcNow || confirm.ActiveTo < utcNow)
-                    throw new BadRequestException("Verify out of time");
-
-                return true;
+                {
+                    context.AddFailure("Verify out of time");
+                    return;
+                }
             });
     }
 }

@@ -1,8 +1,6 @@
 ﻿using IdentityPrvd.Infrastructure.Database.Context;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -14,7 +12,7 @@ public sealed class TestDatabase : IAsyncDisposable
     private Respawner _respawner = default!;
     private NpgsqlConnection _npgsqlConnection = default!;
 
-    private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder().Build();
+    private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder().WithImage("postgres:18").Build();
 
     private async Task AddDbResetter()
     {

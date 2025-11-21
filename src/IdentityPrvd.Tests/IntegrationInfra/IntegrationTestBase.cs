@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace IdentityPrvd.Tests.IntegrationInfra;
@@ -30,11 +31,14 @@ public class IntegrationTestBase(ITestOutputHelper output, IntegrationTestWebApp
     {
         Factory.ResetTimeProvider();
         await Factory.ResetDbAsync();
+        
+        // Re-initialize system after database reset
+        await Factory.InitializeSystemAsync();
     }
 }
 
 [Collection(PostgresTestWithRedisIntegrationTestFixture.CollectionName)]
-public class OpenSearchWithRedisIntegrationTestBase(ITestOutputHelper output, PostgresTestWithRedisWebApplicationFactory factory)
+public class PostgresTestWithRedisIntegrationTestBase(ITestOutputHelper output, PostgresTestWithRedisWebApplicationFactory factory)
     : IntegrationTestBase(output, factory)
 {
     public override async Task InitializeAsync()

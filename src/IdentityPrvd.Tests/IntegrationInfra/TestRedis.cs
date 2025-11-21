@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.TestHost;
 using Redis.OM;
 using Redis.OM.Contracts;
 using StackExchange.Redis;
@@ -11,7 +8,7 @@ namespace IdentityPrvd.Tests.IntegrationInfra;
 
 public class TestRedis
 {
-    private readonly RedisContainer _redisContainer = new RedisBuilder().Build();
+    private readonly RedisContainer _redisContainer = new RedisBuilder().WithImage("redis:8.0").Build();
 
     public async Task InitializeAsync()
     {
@@ -34,7 +31,8 @@ public class TestRedis
 
                 serviceCollection.AddScoped<IRedisConnectionProvider>(provider =>
                 {
-                    return new RedisConnectionProvider(_redisContainer.GetConnectionString());
+                    var conn = _redisContainer.GetConnectionString();
+                    return new RedisConnectionProvider($"redis://{conn}");
                 });
             }
         });
