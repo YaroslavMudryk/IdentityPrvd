@@ -13,14 +13,10 @@ public static class DbContextOptionsBuilderExtensions
 
         if (databaseType == DatabaseType.Postgres)
             options.UseNpgsql(connectionString);
-        else if (databaseType == DatabaseType.MySql)
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         else if (databaseType == DatabaseType.SqlServer)
             options.UseSqlServer(connectionString);
         else if (databaseType == DatabaseType.Sqlite)
             options.UseSqlite(connectionString);
-        else if (databaseType == DatabaseType.Oracle)
-            options.UseOracle(connectionString);
         options.UseInMemoryDatabase("DefaultDb");
     }
 }
