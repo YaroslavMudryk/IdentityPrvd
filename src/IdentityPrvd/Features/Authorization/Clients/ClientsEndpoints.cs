@@ -60,14 +60,14 @@ public class UpdateClientEndpoints : IEndpoint
     }
 }
 
-public class UpdateClientClaimsEndpoints : IEndpoint
+public class UpdateClientPermissionsEndpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("/api/identity/clients/{clientId:guid}/claims",
-            async (Guid clientId, UpdateClientClaimsDto dto, UpdateClientClaimsOrchestrator orc) =>
+        app.MapPut("/api/identity/clients/{clientId:guid}/permissions",
+            async (Guid clientId, UpdateClientPermissionsDto dto, UpdateClientPermissionsOrchestrator orc) =>
             {
-                var client = await orc.UpdateClaimsAsync(clientId, dto);
+                var client = await orc.UpdatePermissionsAsync(clientId, dto);
                 return Results.Ok(client.MapToResponse());
             }).WithTags("Clients");
     }

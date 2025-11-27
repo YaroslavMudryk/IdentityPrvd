@@ -12,6 +12,7 @@ public interface IIdentityPrvdBuilder
     IConfiguration Configuration { get; }
     IdentityPrvdOptions Options { get; set; }
     AuthenticationBuilder AuthenticationBuilder { get; }
+    bool UseMemoryCache { get; set; }
 }
 
 public class IdentityPrvdBuilder : IIdentityPrvdBuilder
@@ -53,4 +54,5 @@ public class IdentityPrvdBuilder : IIdentityPrvdBuilder
     public IConfiguration Configuration => Services.BuildServiceProvider().GetRequiredService<IConfiguration>();
     public IdentityPrvdOptions Options { get; set; } = new IdentityPrvdOptions();
     public AuthenticationBuilder AuthenticationBuilder { get; }
+    public bool UseMemoryCache { get; set; } = false;
 }

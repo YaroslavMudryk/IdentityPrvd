@@ -92,22 +92,22 @@ DELETE /api/identity/roles/{roleId}
 
 ---
 
-## Claims
-### Get claims
+## Permissions
+### Get permissions
 ```
-GET /api/identity/claims
+GET /api/identity/permissions
 ```
-### Create claims
+### Create permissions
 ```
-POST /api/identity/claims
+POST /api/identity/permissions
 ```
-### Edit claims
+### Edit permissions
 ```
-PUT /api/identity/claims/{claimId}
+PUT /api/identity/permissions/{permissionId}
 ```
-### Delete claims
+### Delete permissions
 ```
-DELETE /api/identity/claims
+DELETE /api/identity/permissions
 ```
 
 ---

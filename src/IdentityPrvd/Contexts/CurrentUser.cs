@@ -21,33 +21,27 @@ public record ServiceUser(string System) : CurrentUser
     public static ServiceUser Instance { get; } = new("Api");
 }
 
-public record BasicAuthenticatedUser(string UserId, string SessionId, IEnumerable<Claim> Claims) : CurrentUser
+public record BasicAuthenticatedUser(string UserId, string SessionId, IEnumerable<Claim> Claims, IReadOnlyList<string> Permissions) : CurrentUser
 {
-    public void EnsureUserHasPermissions(string type, string value)
-    {
-        if (Claims.Any(s => s.Type == IdentityClaims.Types.Roles && s.Value.Contains(DefaultsRoles.SuperAdmin)))
-            return;
-
-        if (Claims.Where(s => s.Type == type).Where(s => s.Value == value).Any())
-            return;
-
-        throw new UnauthorizedException();
-    }
-
     public bool IsInRoles(string[] roles)
     {
         return Claims.Any(s => s.Type == IdentityClaims.Types.Roles && roles.Contains(s.Value));
     }
 
-    public void EnsureUserHasPermissionsOrRoles(string type, string value, string[] roles)
+    public void EnsureUserHasPermission(string permission)
     {
-        if (Claims.Any(s => s.Type == IdentityClaims.Types.Roles && s.Value.Contains(DefaultsRoles.SuperAdmin)))
+        if (Permissions.Any(s => s.Contains(permission)))
             return;
 
+        throw new UnauthorizedException();
+    }
+
+    public void EnsureUserHasPermissionOrRoles(string permission, string[] roles)
+    {
         if (Claims.Any(s => s.Type == IdentityClaims.Types.Roles && roles.Contains(s.Value)))
             return;
 
-        if (Claims.Where(s => s.Type == type).Where(s => s.Value == value).Any())
+        if (Permissions.Any(s => s.Contains(permission)))
             return;
 
         throw new UnauthorizedException();
@@ -56,7 +50,7 @@ public record BasicAuthenticatedUser(string UserId, string SessionId, IEnumerabl
 
 public static class CurrentUserHelper
 {
-    public static CurrentUser GetCurrentUser(this ClaimsPrincipal user, Dictionary<string, List<string>> permissions)
+    public static CurrentUser GetCurrentUser(this ClaimsPrincipal user, IReadOnlyList<string> permissions)
     {
         ArgumentNullException.ThrowIfNull(user);
 
@@ -69,20 +63,6 @@ public static class CurrentUserHelper
 
         return new BasicAuthenticatedUser(userIdClaim.Value,
             sessionIdClaim.Value,
-            GetClaims(otherClaims, permissions));
-    }
-
-    private static IEnumerable<Claim> GetClaims(IEnumerable<Claim> basicClaims, Dictionary<string, List<string>> permissions)
-    {
-        foreach (var permission in permissions)
-        {
-            foreach (var value in permission.Value)
-            {
-                if (!basicClaims.Any(s => s.Type == permission.Key && s.Value == value))
-                    basicClaims = basicClaims.Append(new Claim(permission.Key, value));
-            }
-        }
-
-        return basicClaims;
+            otherClaims, permissions);
     }
 }

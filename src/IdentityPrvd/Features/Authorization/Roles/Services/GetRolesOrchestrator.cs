@@ -12,9 +12,9 @@ public class GetRolesOrchestrator(
     public async Task<IReadOnlyList<RoleDto>> GetRolesAsync()
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-             IdentityClaims.Types.Role, IdentityClaims.Values.ViewAll,
-             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Roles.Read,
+             [DefaultsRoles.Admin]);
 
         return await query.GetRolesAsync();
     }

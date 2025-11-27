@@ -8,7 +8,7 @@ namespace IdentityPrvd.Features.Authorization.Roles.Dtos.Validators;
 public class UpdateRoleDtoValidator : AbstractValidator<UpdateRoleDto>
 {
     public UpdateRoleDtoValidator(
-        IClaimsQuery claimsQuery,
+        IPermissionsQuery permissionsQuery,
         IRolesQuery rolesQuery)
     {
         RuleFor(s => s)
@@ -22,11 +22,11 @@ public class UpdateRoleDtoValidator : AbstractValidator<UpdateRoleDto>
                 if (roleByName.Id != dto.Id)
                     throw new BadRequestException("Role with the same name is already exist");
 
-                if (dto.ClaimIds != null && dto.ClaimIds.Length != 0)
+                if (dto.PermissionIds != null && dto.PermissionIds.Length != 0)
                 {
-                    var allClaimsExists = await claimsQuery.GetClaimsByIdsAsync([.. dto.ClaimIds.Select(s=>s.GetIdAsGuid())]);
-                    if (allClaimsExists.Count != dto.ClaimIds.Length)
-                        throw new BadRequestException("Some claims do not exist or are invalid");
+                    var allPermissionsExists = await permissionsQuery.GetPermissionsByIdsAsync([.. dto.PermissionIds.Select(s=>s.GetIdAsGuid())]);
+                    if (allPermissionsExists.Count != dto.PermissionIds.Length)
+                        throw new BadRequestException("Some permissions do not exist or are invalid");
                 }
 
                 if (!dto.IsDefault)

@@ -13,7 +13,7 @@ public class DeleteDeviceOrchestrator(
     public async Task DeleteDeviceAsync(Guid deviceId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Contacts.Manage);
 
         var userId = currentUser.UserId;
 

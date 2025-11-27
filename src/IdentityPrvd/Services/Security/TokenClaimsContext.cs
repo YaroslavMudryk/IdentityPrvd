@@ -10,7 +10,7 @@ public class TokenClaimsContext(Guid userId, string sessionId, List<Claim> claim
     public List<Claim> Claims { get; } = claims;
 }
 
-public interface ITokenClaimsContributor
+public interface ITokenPermissionsContributor
 {
     Task ContributeAsync(TokenClaimsContext context, CancellationToken cancellationToken = default);
 }

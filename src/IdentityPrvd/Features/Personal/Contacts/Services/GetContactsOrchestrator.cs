@@ -13,7 +13,7 @@ public class GetContactsOrchestrator(
     public async Task<List<ContactDto>> GetContactsAsync()
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Contacts.Read);
 
         return await query.GetUserContactsAsync(currentUser.UserId.GetIdAsGuid());
     }

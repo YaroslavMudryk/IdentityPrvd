@@ -17,8 +17,7 @@ public class GetSessionOrchestrator(
     public async Task<SessionDetailDto> GetUserSessionAsync(Guid sessionId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Sessions.Read);
 
         var dbSession = await sessionsQuery.GetSessionAsync(sessionId);
 

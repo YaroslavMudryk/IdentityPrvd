@@ -11,18 +11,19 @@ namespace IdentityPrvd.Features.Authorization.Clients.Services;
 
 public class GetClientOrchestrator(
     IClientsQuery clientsQuery,
-    IClientClaimsQuery clientClaimsQuery,
+    IClientPermissionsQuery clientPermissionsQuery,
     IIdentityContext identityContext)
 {
     public async Task<ClientDto> GetClientAsync(Guid clientId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Clients, IdentityClaims.Values.View,
-            [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Clients.Read,
+             [DefaultsRoles.Admin]);
+
         var client = await clientsQuery.GetClientByIdNullableAsync(clientId.GetIdAsString()) ?? throw new NotFoundException($"Client with id:{clientId} not found");
 
-        if (!currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]) &&
+        if (!currentUser.IsInRoles([DefaultsRoles.Admin]) &&
             client.CreatedBy != currentUser.UserId)
             throw new UnauthorizedException("You do not have permission to access this client");
 
@@ -32,7 +33,7 @@ public class GetClientOrchestrator(
     private async Task<ClientDto> GetEnrichedClientAsync(IdentityClient client)
     {
         var clientDto = client.MapToDto();
-        clientDto.ClaimsIds = await clientClaimsQuery.GetClaimsIdsByClientIdAsync(client.Id);
+        clientDto.PermissionIds = await clientPermissionsQuery.GetPermissionsIdsByClientIdAsync(client.Id);
         return clientDto;
     }
 }

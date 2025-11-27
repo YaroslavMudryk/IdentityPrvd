@@ -65,19 +65,19 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return AddService<IHasher, THasher>(builder, lifetime);
     }
 
-    public static IIdentityPrvdBuilder AddTokenClaimsContributor<TContributor>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TContributor : class, ITokenClaimsContributor
+    public static IIdentityPrvdBuilder AddTokenPermissionsContributor<TContributor>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped) where TContributor : class, ITokenPermissionsContributor
     {
         if (lifetime == ServiceLifetime.Singleton)
         {
-            builder.Services.AddSingleton<ITokenClaimsContributor, TContributor>();
+            builder.Services.AddSingleton<ITokenPermissionsContributor, TContributor>();
         }
         else if (lifetime == ServiceLifetime.Transient)
         {
-            builder.Services.AddTransient<ITokenClaimsContributor, TContributor>();
+            builder.Services.AddTransient<ITokenPermissionsContributor, TContributor>();
         }
         else
         {
-            builder.Services.AddScoped<ITokenClaimsContributor, TContributor>();
+            builder.Services.AddScoped<ITokenPermissionsContributor, TContributor>();
         }
 
         return builder;
@@ -90,8 +90,8 @@ public static partial class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder UseStores<
         TBanStore,
-        TClaimStore,
-        TClientClaimStore,
+        TPermissionStore,
+        TClientPermissionStore,
         TClientSecretStore,
         TClientStore,
         TConfirmStore,
@@ -103,15 +103,15 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         TPasswordStore,
         TQrStore,
         TRefreshTokenStore,
-        TRoleClaimStore,
+        TRolePermissionStore,
         TRoleStore,
         TSessionStore,
         TUserLoginStore,
         TUserRoleStore,
         TUserStore>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     where TBanStore : class, IBanStore
-    where TClaimStore : class, IClaimStore
-    where TClientClaimStore : class, IClientClaimStore
+    where TPermissionStore : class, IPermissionStore
+    where TClientPermissionStore : class, IClientPermissionStore
     where TClientSecretStore : class, IClientSecretStore
     where TClientStore : class, IClientStore
     where TConfirmStore : class, IConfirmStore
@@ -123,7 +123,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
     where TPasswordStore : class, IPasswordStore
     where TQrStore : class, IQrStore
     where TRefreshTokenStore : class, IRefreshTokenStore
-    where TRoleClaimStore : class, IRoleClaimStore
+    where TRolePermissionStore : class, IRolePermissionStore
     where TRoleStore : class, IRoleStore
     where TSessionStore : class, ISessionStore
     where TUserLoginStore : class, IUserLoginStore
@@ -131,8 +131,8 @@ public static partial class IdentityPrvdBuilderExtensionsCore
     where TUserStore : class, IUserStore
     {
         AddService<IBanStore, TBanStore>(builder, lifetime);
-        AddService<IClaimStore, TClaimStore>(builder, lifetime);
-        AddService<IClientClaimStore, TClientClaimStore>(builder, lifetime);
+        AddService<IPermissionStore, TPermissionStore>(builder, lifetime);
+        AddService<IClientPermissionStore, TClientPermissionStore>(builder, lifetime);
         AddService<IClientSecretStore, TClientSecretStore>(builder, lifetime);
         AddService<IClientStore, TClientStore>(builder, lifetime);
         AddService<IConfirmStore, TConfirmStore>(builder, lifetime);
@@ -144,7 +144,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         AddService<IPasswordStore, TPasswordStore>(builder, lifetime);
         AddService<IQrStore, TQrStore>(builder, lifetime);
         AddService<IRefreshTokenStore, TRefreshTokenStore>(builder, lifetime);
-        AddService<IRoleClaimStore, TRoleClaimStore>(builder, lifetime);
+        AddService<IRolePermissionStore, TRolePermissionStore>(builder, lifetime);
         AddService<IRoleStore, TRoleStore>(builder, lifetime);
         AddService<ISessionStore, TSessionStore>(builder, lifetime);
         AddService<IUserLoginStore, TUserLoginStore>(builder, lifetime);
@@ -155,8 +155,8 @@ public static partial class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder UseQueries<
         TBansQuery,
-        TClaimsQuery,
-        TClientClaimsQuery,
+        TPermissionsQuery,
+        TClientPermissionsQuery,
         TClientSecretsQuery,
         TClientsQuery,
         TConfirmsQuery,
@@ -168,15 +168,15 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         TPasswordsQuery,
         TQrsQuery,
         TRefreshTokensQuery,
-        TRoleClaimsQuery,
+        TRolePermissionsQuery,
         TRolesQuery,
         TSessionsQuery,
         TUserLoginsQuery,
         TUserRolesQuery,
         TUsersQuery>(this IIdentityPrvdBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TBansQuery : class, IBansQuery
-        where TClaimsQuery : class, IClaimsQuery
-        where TClientClaimsQuery : class, IClientClaimsQuery
+        where TPermissionsQuery : class, IPermissionsQuery
+        where TClientPermissionsQuery : class, IClientPermissionsQuery
         where TClientSecretsQuery : class, IClientSecretsQuery
         where TClientsQuery : class, IClientsQuery
         where TConfirmsQuery : class, IConfirmsQuery
@@ -188,7 +188,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         where TPasswordsQuery : class, IPasswordsQuery
         where TQrsQuery : class, IQrsQuery
         where TRefreshTokensQuery : class, IRefreshTokensQuery
-        where TRoleClaimsQuery : class, IRoleClaimsQuery
+        where TRolePermissionsQuery : class, IRolePermissionsQuery
         where TRolesQuery : class, IRolesQuery
         where TSessionsQuery : class, ISessionsQuery
         where TUserLoginsQuery : class, IUserLoginsQuery
@@ -196,8 +196,8 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         where TUsersQuery : class, IUsersQuery
     {
         AddService<IBansQuery, TBansQuery>(builder, lifetime);
-        AddService<IClaimsQuery, TClaimsQuery>(builder, lifetime);
-        AddService<IClientClaimsQuery, TClientClaimsQuery>(builder, lifetime);
+        AddService<IPermissionsQuery, TPermissionsQuery>(builder, lifetime);
+        AddService<IClientPermissionsQuery, TClientPermissionsQuery>(builder, lifetime);
         AddService<IClientSecretsQuery, TClientSecretsQuery>(builder, lifetime);
         AddService<IClientsQuery, TClientsQuery>(builder, lifetime);
         AddService<IConfirmsQuery, TConfirmsQuery>(builder, lifetime);
@@ -209,12 +209,19 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         AddService<IPasswordsQuery, TPasswordsQuery>(builder, lifetime);
         AddService<IQrsQuery, TQrsQuery>(builder, lifetime);
         AddService<IRefreshTokensQuery, TRefreshTokensQuery>(builder, lifetime);
-        AddService<IRoleClaimsQuery, TRoleClaimsQuery>(builder, lifetime);
+        AddService<IRolePermissionsQuery, TRolePermissionsQuery>(builder, lifetime);
         AddService<IRolesQuery, TRolesQuery>(builder, lifetime);
         AddService<ISessionsQuery, TSessionsQuery>(builder, lifetime);
         AddService<IUserLoginsQuery, TUserLoginsQuery>(builder, lifetime);
         AddService<IUserRolesQuery, TUserRolesQuery>(builder, lifetime);
         AddService<IUsersQuery, TUsersQuery>(builder, lifetime);
+        
+        // Apply caching if enabled
+        if (builder.UseMemoryCache)
+        {
+            WrapQueriesWithCache(builder);
+        }
+        
         return builder;
     }
 

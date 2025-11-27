@@ -115,9 +115,9 @@
 
 #### GET `/api/identity/sso`
 - **Приймає:** (опціонально) `accessToken`.
-- **Повертає:** список claims поточного користувача.
+- **Повертає:** список permissions поточного користувача.
 - **Пов'язаний з:** редіректи зовнішніх провайдерів і SPA, дефолтне `returnUrl`.
-- **Реалізація:** `DefaultReturnUriEndpoint` якщо користувач не автентифікований, але передано токен — створює `ClaimsPrincipal` через `JwtPrincipalFactory`.
+- **Реалізація:** `DefaultReturnUriEndpoint` якщо користувач не автентифікований, але передано токен — створює `permissionsPrincipal` через `JwtPrincipalFactory`.
 
 ### QR-вхід
 #### GET `/auth/qr`
@@ -143,25 +143,25 @@
 ## Авторизація
 
 ### Керування клеймами
-> DTO: `ClaimDto`, `CreateClaimDto`, `UpdateClaimDto`.
+> DTO: `permissionDto`, `CreatepermissionDto`, `UpdatepermissionDto`.
 
-#### GET `/api/identity/claims`
+#### GET `/api/identity/permissions`
 - **Повертає:** перелік клеймів з метаданими (лічильники ролей/клієнтів).
-- **Реалізація:** `GetClaimsOrchestrator` читає з `IClaimsQuery`.
+- **Реалізація:** `GetpermissionsOrchestrator` читає з `IpermissionsQuery`.
 
-#### POST `/api/identity/claims`
+#### POST `/api/identity/permissions`
 - **Приймає:** тип, значення, issuer, displayName.
-- **Повертає:** створений `ClaimDto` (201).
-- **Реалізація:** `CreateClaimOrchestrator` додає через `IClaimStore`, відповідає JSON.
+- **Повертає:** створений `permissionDto` (201).
+- **Реалізація:** `CreatepermissionOrchestrator` додає через `IpermissionStore`, відповідає JSON.
 
-#### PUT `/api/identity/claims/{claimId}`
-- **Приймає:** `UpdateClaimDto`.
-- **Повертає:** оновлений `ClaimDto`.
-- **Реалізація:** `UpdateClaimOrchestrator` валідує наявність, дозволяє змінювати метадані.
+#### PUT `/api/identity/permissions/{permissionId}`
+- **Приймає:** `UpdatepermissionDto`.
+- **Повертає:** оновлений `permissionDto`.
+- **Реалізація:** `UpdatepermissionOrchestrator` валідує наявність, дозволяє змінювати метадані.
 
-#### DELETE `/api/identity/claims/{claimId}`
+#### DELETE `/api/identity/permissions/{permissionId}`
 - **Повертає:** `204`.
-- **Реалізація:** `DeleteClaimOrchestrator` видаляє клейм; при невдачі кине `NotFoundException`.
+- **Реалізація:** `DeletepermissionOrchestrator` видаляє клейм; при невдачі кине `NotFoundException`.
 
 ### Ролі
 > DTO: `RoleDto`, `CreateRoleDto`, `UpdateRoleDto`.
@@ -171,7 +171,7 @@
 - **Реалізація:** `GetRolesOrchestrator`.
 
 #### POST `/api/identity/roles`
-- **Приймає:** назву, прапорець `isDefault`, масив `claimIds`.
+- **Приймає:** назву, прапорець `isDefault`, масив `permissionIds`.
 - **Повертає:** створену роль (201).
 - **Реалізація:** `CreateRoleOrchestrator` створює роль та прив’язує клейми.
 
@@ -185,7 +185,7 @@
 - **Реалізація:** `DeleteRoleOrchestrator` перевіряє наявність та видаляє.
 
 ### Клієнти (OAuth apps / SPA)
-> DTO: `ClientDto`, `CreateClientDto`, `UpdateClientDto`, `UpdateClientClaimsDto`.
+> DTO: `ClientDto`, `CreateClientDto`, `UpdateClientDto`, `UpdateClientpermissionsDto`.
 
 #### GET `/api/identity/clients`
 - **Повертає:** список клієнтів з redirect URI, описом, активністю.
@@ -205,10 +205,10 @@
 - **Повертає:** оновлений клієнт.
 - **Реалізація:** `UpdateClientOrchestrator`.
 
-#### PUT `/api/identity/clients/{clientId}/claims`
-- **Приймає:** `UpdateClientClaimsDto` (список ID клейм).
+#### PUT `/api/identity/clients/{clientId}/permissions`
+- **Приймає:** `UpdateClientpermissionsDto` (список ID клейм).
 - **Повертає:** клієнт з актуальним набором клеймів.
-- **Реалізація:** `UpdateClientClaimsOrchestrator` оновлює зв’язки в `IClientClaimStore`.
+- **Реалізація:** `UpdateClientpermissionsOrchestrator` оновлює зв’язки в `IClientpermissionStore`.
 
 #### DELETE `/api/identity/clients/{clientId}`
 - **Повертає:** `204`.
@@ -299,7 +299,7 @@
 - `Signup` + `SignupConfirm` + `Restore password (POST/PATCH)` спільно використовують `IdentityCode`.
 - `External signin` з `purpose=login` створює або знаходить користувача та видає токени; з `purpose=link` лише додає провайдера до поточного користувача.
 - `QR` сценарій використовує ті ж сервіси, що і класичний логін: створення сесії, токени, закриття старих сесій.
-- Адміністративні частини (`claims`, `roles`, `clients`) безпосередньо впливають на те, які клейми видає `ITokenService`, а отже й на авторизацію у всіх інших ендпоінтах.
+- Адміністративні частини (`permissions`, `roles`, `clients`) безпосередньо впливають на те, які клейми видає `ITokenService`, а отже й на авторизацію у всіх інших ендпоінтах.
 
 ## Де шукати код
 - Ендпоінти: `src/IdentityPrvd/Features/**/...Endpoint.cs`.

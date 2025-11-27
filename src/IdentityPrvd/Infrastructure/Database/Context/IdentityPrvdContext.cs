@@ -14,10 +14,10 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
 {
     public DbSet<Audit> Audits { get; set; } = null!;
     public DbSet<IdentityBan> Bans { get; set; } = null!;
-    public DbSet<IdentityClaim> Claims { get; set; } = null!;
+    public DbSet<IdentityPermission> Permissions { get; set; } = null!;
     public DbSet<IdentityClient> Clients { get; set; } = null!;
     public DbSet<IdentityClientSecret> ClientSecrets { get; set; } = null!;
-    public DbSet<IdentityClientClaim> ClientClaims { get; set; } = null!;
+    public DbSet<IdentityClientPermission> ClientPermissions { get; set; } = null!;
     public DbSet<IdentityCode> Confirms { get; set; } = null!;
     public DbSet<IdentityContact> Contacts { get; set; } = null!;
     public DbSet<IdentityDevice> Devices { get; set; } = null!;
@@ -28,7 +28,7 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
     public DbSet<IdentityQr> Qrs { get; set; } = null!;
     public DbSet<IdentityRefreshToken> RefreshTokens { get; set; } = null!;
     public DbSet<IdentityRole> Roles { get; set; } = null!;
-    public DbSet<IdentityRoleClaim> RoleClaims { get; set; } = null!;
+    public DbSet<IdentityRolePermission> RolePermissions { get; set; } = null!;
     public DbSet<IdentitySession> Sessions { get; set; } = null!;
     public DbSet<IdentityUser> Users { get; set; } = null!;
     public DbSet<IdentityUserLogin> UserLogins { get; set; } = null!;
@@ -53,8 +53,8 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
             builder.HasQueryFilter(d => d.DeletedAt == null);
         });
 
-        // Configure IdentityClaim
-        modelBuilder.Entity<IdentityClaim>(builder =>
+        // Configure IdentityPermission
+        modelBuilder.Entity<IdentityPermission>(builder =>
         {
             builder.HasKey(c => c.Id);
             builder.HasQueryFilter(d => d.DeletedAt == null);
@@ -67,8 +67,8 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
             builder.HasQueryFilter(d => d.DeletedAt == null);
         });
 
-        // Configure IdentityClientClaim
-        modelBuilder.Entity<IdentityClientClaim>(builder =>
+        // Configure IdentityClientPermission
+        modelBuilder.Entity<IdentityClientPermission>(builder =>
         {
             builder.HasKey(cc => cc.Id);
             builder.HasQueryFilter(d => d.DeletedAt == null);
@@ -160,8 +160,8 @@ public class IdentityPrvdContext(DbContextOptions<IdentityPrvdContext> options)
             builder.HasQueryFilter(d => d.DeletedAt == null);
         });
 
-        // Configure IdentityRoleClaim
-        modelBuilder.Entity<IdentityRoleClaim>(builder =>
+        // Configure IdentityRolePermission
+        modelBuilder.Entity<IdentityRolePermission>(builder =>
         {
             builder.HasKey(rc => rc.Id);
             builder.HasQueryFilter(d => d.DeletedAt == null);

@@ -15,5 +15,5 @@ public class ClientDto
     public DateTime? ActiveTo { set; get; }
     public IReadOnlyList<string> RedirectUris { get; set; } = ["*"];
     public DateTime UpdatedAt { get; set; }
-    public IReadOnlyList<string> ClaimsIds { get; set; } = [];
+    public IReadOnlyList<string> PermissionIds { get; set; } = [];
 }

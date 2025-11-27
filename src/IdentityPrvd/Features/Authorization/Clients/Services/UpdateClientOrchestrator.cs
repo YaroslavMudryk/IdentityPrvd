@@ -17,9 +17,9 @@ public class UpdateClientOrchestrator(
     public async Task<ClientDto> UpdateAsync(Guid clientId, UpdateClientDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Clients, IdentityClaims.Values.Update,
-            [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Clients.Manage,
+             [DefaultsRoles.Admin]);
 
         await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 

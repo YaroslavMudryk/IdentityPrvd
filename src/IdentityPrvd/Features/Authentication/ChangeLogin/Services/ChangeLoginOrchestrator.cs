@@ -20,10 +20,9 @@ public class ChangeLoginOrchestrator(
     public async Task ChangeLoginAsync(ChangeLoginDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
-        var userId = currentUser.UserId.GetIdAsGuid();
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Credentials.Manage);
 
+        var userId = currentUser.UserId.GetIdAsGuid();
         var userFromDb = await userStore.GetUserAsync(userId);
 
         VerifyLoginType(dto.NewLogin, options);

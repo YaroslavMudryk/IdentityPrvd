@@ -14,7 +14,7 @@ public class SessionInfo
     public long CreatedAtUnix { get; set; }
     public long SessionExpireUnix { get; set; }
     public long? LastAccessedAtUnix { get; set; }
-    public Dictionary<string, List<string>> Permissions { get; set; } = [];
+    public IReadOnlyList<string> Permissions { get; set; } = [];
 
     [JsonIgnore]
     public DateTime? LastAccessedAt

@@ -4,6 +4,8 @@ using IdentityPrvd.Contexts;
 using IdentityPrvd.Data.Queries;
 using IdentityPrvd.Data.Stores;
 using IdentityPrvd.Endpoints;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using IdentityPrvd.Features.Authentication.ChangeLogin;
 using IdentityPrvd.Features.Authentication.ChangePassword;
 using IdentityPrvd.Features.Authentication.ExternalSignin;
@@ -13,8 +15,8 @@ using IdentityPrvd.Features.Authentication.RestorePassword;
 using IdentityPrvd.Features.Authentication.Signin;
 using IdentityPrvd.Features.Authentication.SigninOptions;
 using IdentityPrvd.Features.Authentication.Signup;
-using IdentityPrvd.Features.Authorization.Claims;
 using IdentityPrvd.Features.Authorization.Clients;
+using IdentityPrvd.Features.Authorization.Permissions;
 using IdentityPrvd.Features.Authorization.Roles;
 using IdentityPrvd.Features.Personal.Contacts;
 using IdentityPrvd.Features.Personal.Devices;
@@ -95,7 +97,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         builder.Services.AddEnableMfaDependencies();
         builder.Services.AddDisableMfaDependencies();
         builder.Services.AddRolesDependencies();
-        builder.Services.AddClaimsDependencies();
+        builder.Services.AddPermissionsDependencies();
         builder.Services.AddExternalSigninDependencies();
         builder.Services.AddLinkExternalProviderDependencies();
         builder.Services.AddChangeLoginDependencies();
@@ -112,6 +114,10 @@ public static partial class IdentityPrvdBuilderExtensionsCore
     internal static IIdentityPrvdBuilder AddRequiredServices(this IIdentityPrvdBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
+        if (builder.UseMemoryCache)
+        {
+            builder.Services.AddMemoryCache();
+        }
         builder.Services.AddScoped<UserHelper>();
         builder.Services.TryAddSingleton(TimeProvider.System);
         builder.Services.AddScoped<IAuthSchemes, DefaultAuthSchemes>();
@@ -178,6 +184,12 @@ public static partial class IdentityPrvdBuilderExtensionsCore
         return UseSessionManagerStore<InMemorySessionManagerStore>(builder);
     }
 
+    public static IIdentityPrvdBuilder UseMemoryCache(this IIdentityPrvdBuilder builder)
+    {
+        builder.UseMemoryCache = true;
+        return builder;
+    }
+
     public static IIdentityPrvdBuilder UseRedisSessionManagerStore(this IIdentityPrvdBuilder builder)
     {
         return UseRedisSessionManagerStore(builder, builder.Options.Connections.Redis);
@@ -227,8 +239,8 @@ public static partial class IdentityPrvdBuilderExtensionsCore
     {
         return UseStores<
             EfBanStore,
-            EfClaimStore,
-            EfClientClaimStore,
+            EfPermissionStore,
+            EfClientPermissionStore,
             EfClientSecretStore,
             EfClientStore,
             EfConfirmStore,
@@ -240,7 +252,7 @@ public static partial class IdentityPrvdBuilderExtensionsCore
             EfPasswordStore,
             EfQrStore,
             EfRefreshTokenStore,
-            EfRoleClaimStore,
+            EfRolePermissionStore,
             EfRoleStore,
             EfSessionStore,
             EfUserLoginStore,
@@ -250,9 +262,10 @@ public static partial class IdentityPrvdBuilderExtensionsCore
 
     public static IIdentityPrvdBuilder UseEfQueries(this IIdentityPrvdBuilder builder)
     {
-        return UseQueries<EfBansQuery,
-            EfClaimsQuery,
-            EfClientClaimsQuery,
+        // Register base EF queries
+        UseQueries<EfBansQuery,
+            EfPermissionsQuery,
+            EfClientPermissionsQuery,
             EfClientSecretsQuery,
             EfClientsQuery,
             EfConfirmsQuery,
@@ -264,11 +277,92 @@ public static partial class IdentityPrvdBuilderExtensionsCore
             EfPasswordsQuery,
             EfQrsQuery,
             EfRefreshTokensQuery,
-            EfRoleClaimsQuery,
+            EfRolePermissionsQuery,
             EfRolesQuery,
             EfSessionsQuery,
             EfUserLoginsQuery,
             EfUserRolesQuery,
             EfUsersQuery>(builder);
+
+        // Wrap frequently accessed queries with caching if enabled
+        if (builder.UseMemoryCache)
+        {
+            WrapQueriesWithCache(builder);
+        }
+        
+        return builder;
+    }
+
+    private static void WrapQueriesWithCache(IIdentityPrvdBuilder builder)
+    {
+        // Wrap IUserRolesQuery with cached version
+        WrapQueryWithCache<IUserRolesQuery, CachedUserRolesQuery>(builder, 
+            (inner, cache) => new CachedUserRolesQuery(inner, cache));
+
+        // Wrap IRolePermissionsQuery with cached version
+        WrapQueryWithCache<IRolePermissionsQuery, CachedRolePermissionsQuery>(builder,
+            (inner, cache) => new CachedRolePermissionsQuery(inner, cache));
+
+        // Wrap IClientPermissionsQuery with cached version
+        WrapQueryWithCache<IClientPermissionsQuery, CachedClientPermissionsQuery>(builder,
+            (inner, cache) => new CachedClientPermissionsQuery(inner, cache));
+
+        // Wrap IClientsQuery with cached version
+        WrapQueryWithCache<IClientsQuery, CachedClientsQuery>(builder,
+            (inner, cache) => new CachedClientsQuery(inner, cache));
+    }
+
+    private static void WrapQueryWithCache<TInterface, TCached>(
+        IIdentityPrvdBuilder builder,
+        Func<TInterface, IMemoryCache, TCached> factory)
+        where TInterface : class
+        where TCached : class, TInterface
+    {
+        var descriptor = builder.Services.FirstOrDefault(s => s.ServiceType == typeof(TInterface));
+        if (descriptor == null)
+            return;
+
+        // Save the original descriptor information before removing it
+        var originalFactory = descriptor.ImplementationFactory;
+        var originalInstance = descriptor.ImplementationInstance;
+        var originalType = descriptor.ImplementationType;
+        var lifetime = descriptor.Lifetime;
+
+        // Remove the original registration
+        builder.Services.Remove(descriptor);
+
+        // Register the cached wrapper
+        if (originalType != null)
+        {
+            // If registered by type, register the type separately and wrap it
+            builder.Services.Add(new ServiceDescriptor(originalType, originalType, lifetime));
+            
+            builder.Services.Add(new ServiceDescriptor(typeof(TInterface), provider =>
+            {
+                var inner = (TInterface)provider.GetRequiredService(originalType);
+                var cache = provider.GetRequiredService<IMemoryCache>();
+                return factory(inner, cache);
+            }, lifetime));
+        }
+        else if (originalFactory != null)
+        {
+            // If registered by factory, wrap the factory
+            builder.Services.Add(new ServiceDescriptor(typeof(TInterface), provider =>
+            {
+                var inner = (TInterface)originalFactory(provider);
+                var cache = provider.GetRequiredService<IMemoryCache>();
+                return factory(inner, cache);
+            }, lifetime));
+        }
+        else if (originalInstance != null)
+        {
+            // If registered by instance, wrap the instance
+            builder.Services.Add(new ServiceDescriptor(typeof(TInterface), provider =>
+            {
+                var inner = (TInterface)originalInstance;
+                var cache = provider.GetRequiredService<IMemoryCache>();
+                return factory(inner, cache);
+            }, lifetime));
+        }
     }
 }

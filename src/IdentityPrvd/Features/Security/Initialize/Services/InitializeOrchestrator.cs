@@ -12,13 +12,13 @@ using IdentityPrvd.Domain.Enums;
 using IdentityPrvd.Features.Security.Initialize.Dtos;
 using IdentityPrvd.Infrastructure.Caching;
 using IdentityPrvd.Infrastructure.Database.Context;
+using IdentityPrvd.Infrastructure.Database.Seeding;
 using IdentityPrvd.Mappers;
 using IdentityPrvd.Options;
 using IdentityPrvd.Services.Location;
 using IdentityPrvd.Services.Security;
 using IdentityPrvd.Services.ServerSideSessions;
 using IdentityPrvd.Services.SystemStatus;
-using Microsoft.EntityFrameworkCore;
 
 namespace IdentityPrvd.Features.Security.Initialize.Services;
 
@@ -50,7 +50,7 @@ public class InitializeOrchestrator(
         await dbContext.Database.EnsureCreatedAsync();
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
-        await InitDbAsync();
+        await IdentityPrvdSeedHelper.SeedDefaultsAsync(dbContext, hasher, sessionStore, identityOptions.Token.Audience);
         var adminPassword = Generator.GetPassword();
         var user = await InitUserAsync(adminPassword);
         (var refreshToken, var jwtToken) = await InitSessionAsync(dto, user);
@@ -117,12 +117,12 @@ public class InitializeOrchestrator(
         await userStore.AddAsync(user);
 
         var roles = await rolesQuery.GetRolesAsync(false);
-        var superAdminRole = roles.First(r => r.Name == DefaultsRoles.SuperAdmin);
+        var adminRole = roles.First(r => r.Name == DefaultsRoles.Admin);
 
         var userRole = new IdentityUserRole
         {
             UserId = user.Id,
-            RoleId = superAdminRole.Id
+            RoleId = adminRole.Id
         };
         await userRoleStore.AddAsync(userRole);
 
@@ -135,32 +135,6 @@ public class InitializeOrchestrator(
         };
         await passwordStore.AddAsync(password);
         return user;
-    }
-
-    private async Task InitDbAsync()
-    {
-        var itemsCountAdded = 0;
-        if (!await dbContext.Roles.AnyAsync())
-        {
-            await dbContext.Roles.AddRangeAsync(SeedConstants.GetRoles());
-            itemsCountAdded++;
-        }
-        if (!await dbContext.Claims.AnyAsync())
-        {
-            await dbContext.Claims.AddRangeAsync(SeedConstants.GetClaims());
-            itemsCountAdded++;
-        }
-        if (!await dbContext.Clients.AnyAsync())
-        {
-            await dbContext.Clients.AddRangeAsync(SeedConstants.GetClients(hasher, identityOptions.Token.Audience));
-            itemsCountAdded++;
-        }
-        if (itemsCountAdded > 0)
-        {
-            await dbContext.SaveChangesAsync();
-            await MapRolesAndClaimsAsync(dbContext);
-        }
-        await sessionStore.InitializeAsync();
     }
 
     private IdentityUser GetUser(string password)
@@ -194,20 +168,4 @@ public class InitializeOrchestrator(
         };
     }
 
-    private static async Task MapRolesAndClaimsAsync(IdentityPrvdContext dbContext)
-    {
-        var defaultRole = dbContext.Roles.Local.Where(r => r.IsDefault).FirstOrDefault();
-        var identityClaim = dbContext.Claims.Local.FirstOrDefault(c => c.Type == IdentityClaims.Types.Identity && c.Value == IdentityClaims.Values.All);
-
-        await dbContext.RoleClaims.AddAsync(new IdentityRoleClaim
-        {
-            Id = Guid.CreateVersion7(),
-            RoleId = defaultRole!.Id,
-            ClaimId = identityClaim!.Id,
-            ActiveFrom = DateTime.MinValue,
-            ActiveTo = DateTime.MaxValue,
-            IsActive = true
-        });
-        await dbContext.SaveChangesAsync();
-    }
 }

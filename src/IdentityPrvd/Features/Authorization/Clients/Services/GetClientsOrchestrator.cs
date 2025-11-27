@@ -13,11 +13,11 @@ public class GetClientsOrchestrator(
     public async Task<IReadOnlyList<ClientDto>> GetClientsAsync()
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Clients, IdentityClaims.Values.View,
-            [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Clients.Read,
+             [DefaultsRoles.Admin]);
 
-        if (currentUser.IsInRoles([DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]))
+        if (currentUser.IsInRoles([DefaultsRoles.Admin]))
             return await clientsQuery.GetAllClientsAsync();
         else
             return await clientsQuery.GetClientsByCreatorIdAsync(currentUser.UserId.GetIdAsGuid());

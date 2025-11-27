@@ -109,7 +109,7 @@ public class ExternalSigninOrchestrator(
         return session;
     }
 
-    private async Task AddSessionToManagerAsync(IdentitySession session, Dictionary<string, List<string>> userPermissions)
+    private async Task AddSessionToManagerAsync(IdentitySession session, IReadOnlyList<string> userPermissions)
     {
         await sessionManager.AddNewSessionAsync(new SessionInfo
         {

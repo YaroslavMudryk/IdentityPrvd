@@ -14,12 +14,12 @@ public static class ClientsDependencies
         services.AddScoped<DeleteClientOrchestrator>();
         services.AddScoped<UpdateClientOrchestrator>();
         services.AddScoped<GetClientsOrchestrator>();
-        services.AddScoped<UpdateClientClaimsOrchestrator>();
+        services.AddScoped<UpdateClientPermissionsOrchestrator>();
         services.AddScoped<GetClientOrchestrator>();
 
         services.AddScoped<IValidator<CreateClientDto>, CreateClientDtoValidator>();
         services.AddScoped<IValidator<UpdateClientDto>, UpdateClientDtoValidator>();
-        services.AddScoped<IValidator<UpdateClientClaimsDto>, UpdateClientClaimsDtoValidator>();
+        services.AddScoped<IValidator<UpdateClientPermissionsDto>, UpdateClientPermissionsDtoValidator>();
 
         return services;
     }

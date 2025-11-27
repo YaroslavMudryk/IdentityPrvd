@@ -6,5 +6,5 @@ public class IdentityRole : BaseModel
     public bool IsDefault { get; set; }
     public string NameNormalized { get; set; }
     public List<IdentityUserRole> UserRoles { get; set; } = [];
-    public List<IdentityRoleClaim> RoleClaims { get; set; } = [];
+    public List<IdentityRolePermission> RolePermissions { get; set; } = [];
 }

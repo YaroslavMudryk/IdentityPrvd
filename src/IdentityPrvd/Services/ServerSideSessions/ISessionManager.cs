@@ -7,7 +7,7 @@ namespace IdentityPrvd.Services.ServerSideSessions;
 public interface ISessionManager
 {
     Task<bool> IsActiveSessionAsync(string userId, string sessionId);
-    Task<Dictionary<string, List<string>>> GetSessionPermissionsAsync(string sessionId);
+    Task<IReadOnlyList<string>> GetSessionPermissionsAsync(string sessionId);
     Task<IList<SessionInfo>> GetUserSessionsAsync(string userId);
     Task<SessionInfo> GetUserSessionAsync(string sessionId);
     Task AddNewSessionAsync(SessionInfo sessionInfo);
@@ -102,7 +102,7 @@ public class SessionManager(
         await sessionStore.UpdateSessionAsync(session);
     }
 
-    public async Task<Dictionary<string, List<string>>> GetSessionPermissionsAsync(string sessionId)
+    public async Task<IReadOnlyList<string>> GetSessionPermissionsAsync(string sessionId)
     {
         var session = await sessionStore.GetSessionAsync(sessionId);
 

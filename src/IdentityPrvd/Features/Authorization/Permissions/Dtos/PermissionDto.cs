@@ -1,6 +1,6 @@
-﻿namespace IdentityPrvd.Features.Authorization.Claims.Dtos;
+﻿namespace IdentityPrvd.Features.Authorization.Permissions.Dtos;
 
-public class ClaimDto
+public class PermissionDto
 {
     public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }

@@ -1,7 +1,6 @@
 ﻿using IdentityPrvd.Domain.Entities;
 using IdentityPrvd.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 
 namespace IdentityPrvd.Data.Stores;
 

@@ -5,25 +5,107 @@ namespace IdentityPrvd.Common.Constants;
 
 public class SeedConstants
 {
-    public static IEnumerable<IdentityClaim> GetClaims()
+    public static IEnumerable<IdentityPermission> GetPermissions()
     {
-        yield return new IdentityClaim
+        yield return new IdentityPermission
         {
             Id = Guid.CreateVersion7(),
-            Type = IdentityClaims.Types.Identity,
-            Value = IdentityClaims.Values.All
+            Value = IdentityPermissions.Credentials.Manage
+        };
+
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Sessions.Read
+        };
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Sessions.Manage
+        };
+
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Mfas.Manage
+        };
+
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Contacts.Read
+        };
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Contacts.Manage
+        };
+
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Devices.Read
+        };
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Devices.Manage
+        };
+
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Clients.Read
+        };
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Clients.Manage
+        };
+
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Roles.Read
+        };
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Roles.Manage
+        };
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Permissions.Read
+        };
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Permissions.Manage
+        };
+
+
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Qrs.Read
+        };
+        yield return new IdentityPermission
+        {
+            Id = Guid.CreateVersion7(),
+            Value = IdentityPermissions.Qrs.Manage
         };
     }
 
     public static IEnumerable<IdentityRole> GetRoles()
     {
-        yield return new IdentityRole
-        {
-            Id = Guid.CreateVersion7(),
-            Name = DefaultsRoles.SuperAdmin,
-            NameNormalized = DefaultsRoles.SuperAdmin.ToUpper(),
-            IsDefault = false
-        };
         yield return new IdentityRole
         {
             Id = Guid.CreateVersion7(),
@@ -37,6 +119,13 @@ public class SeedConstants
             Name = DefaultsRoles.User,
             NameNormalized = DefaultsRoles.User.ToUpper(),
             IsDefault = true
+        };
+        yield return new IdentityRole
+        {
+            Id = Guid.CreateVersion7(),
+            Name = DefaultsRoles.Developer,
+            NameNormalized = DefaultsRoles.Developer.ToUpper(),
+            IsDefault = false
         };
     }
 

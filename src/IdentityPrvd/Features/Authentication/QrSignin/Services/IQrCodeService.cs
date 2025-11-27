@@ -49,7 +49,7 @@ public class QrCodeService(
     public async Task<ClientInfo> GetQrCodeDetailsAsync(string verificationId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Qrs.Read);
 
         var qrSocket = manager.GetVerification(verificationId);
         return await Task.FromResult(qrSocket.QrRequest.Client);
@@ -58,7 +58,7 @@ public class QrCodeService(
     public async Task<ConfirmQrDto> ConfirmQrCodeAsync(string verificationId)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Qrs.Manage);
 
         var qrSocket = manager.GetVerification(verificationId);
         var authResult = await GetAuthAsync(currentUser, qrSocket);

@@ -18,8 +18,7 @@ public class DisableMfaOrchestrator(
             throw new BadRequestException("Code must be a value");
 
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Mfas.Manage);
 
         var userId = currentUser.UserId.GetIdAsGuid();
 

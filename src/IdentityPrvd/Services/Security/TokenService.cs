@@ -15,9 +15,9 @@ public class TokenService(
     IdentityPrvdOptions identityOptions,
     TimeProvider timeProvider,
     IUserRolesQuery userRolesQuery,
-    IRoleClaimsQuery roleClaimsQuery,
-    IClientClaimsQuery clientClaimsQuery,
-    IEnumerable<ITokenClaimsContributor> claimsContributors) : ITokenService
+    IRolePermissionsQuery rolePermissionsQuery,
+    IClientPermissionsQuery clientPermissionsQuery,
+    IEnumerable<ITokenPermissionsContributor> permissionsContributors) : ITokenService
 {
     public async Task<JwtToken> GetUserTokenAsync(Guid userId, string sessionId, string audience = null)
     {
@@ -31,10 +31,10 @@ public class TokenService(
 
         claims.AddRange(roles.Select(role => new Claim(IdentityClaims.Types.Roles, role)));
 
-        if (claimsContributors.Any())
+        if (permissionsContributors.Any())
         {
             var context = new TokenClaimsContext(userId, sessionId, claims);
-            foreach (var contributor in claimsContributors)
+            foreach (var contributor in permissionsContributors)
             {
                 await contributor.ContributeAsync(context);
             }
@@ -56,10 +56,10 @@ public class TokenService(
 
         claims.AddRange(roles.Select(role => new Claim(IdentityClaims.Types.Roles, role)));
 
-        if (claimsContributors.Any())
+        if (permissionsContributors.Any())
         {
             var context = new TokenClaimsContext(userId, sessionId, claims, provider);
-            foreach (var contributor in claimsContributors)
+            foreach (var contributor in permissionsContributors)
             {
                 await contributor.ContributeAsync(context);
             }
@@ -68,12 +68,12 @@ public class TokenService(
         return GenerateJwtToken(claims, audience);
     }
 
-    public async Task<Dictionary<string, List<string>>> GetUserPermissionsAsync(Guid userId, string clientId)
+    public async Task<IReadOnlyList<string>> GetUserPermissionsAsync(Guid userId, string clientId)
     {
-        var roleClaims = await roleClaimsQuery.GetClaimsByUserIdAsync(userId);
-        var clientClaims = await clientClaimsQuery.GetClaimsByClientIdAsync(clientId);
+        var rolePermissions = await rolePermissionsQuery.GetPermissionsByUserIdAsync(userId);
+        var clientPermissions = await clientPermissionsQuery.GetPermissionsByClientIdAsync(clientId);
 
-        return roleClaims.GroupUnionCollectionBy(clientClaims, c => c.Id, c => c.Type, c => c.Value);
+        return rolePermissions.GroupUnionCollectionBy(clientPermissions, c => c.Id, c => c.Value);
     }
 
     private JwtToken GenerateJwtToken(List<Claim> claims, string audience)

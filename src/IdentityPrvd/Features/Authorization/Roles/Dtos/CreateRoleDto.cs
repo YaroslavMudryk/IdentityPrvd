@@ -4,5 +4,5 @@ public class CreateRoleDto
 {
     public string Name { get; set; }
     public bool IsDefault { get; set; }
-    public string[] ClaimIds { get; set; } = [];
+    public string[] PermissionIds { get; set; } = [];
 }

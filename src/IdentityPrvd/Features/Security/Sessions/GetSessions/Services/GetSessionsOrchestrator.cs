@@ -15,8 +15,7 @@ public class GetSessionsOrchestrator(
     public async Task<IReadOnlyList<SessionDto>> GetUserSessionsAsync()
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Sessions.Read);
 
         var dbSessions = await sessionsQuery.GetActiveUserSessionsAsync(Guid.Parse(currentUser.UserId));
         var cacheSessions = await sessionManager.GetUserSessionsAsync(currentUser.UserId);

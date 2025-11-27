@@ -16,7 +16,7 @@ public interface IRolesQuery
     Task<IdentityRole> GetRoleByNameAsync(string name);
     Task<IdentityRole> GetRoleByIdAsync(Guid roleId);
     Task<int> GetUsersCountByRoleIdAsync(Guid roleId);
-    Task<int> GetClaimsCountByRoleIdAsync(Guid roleId);
+    Task<int> GetPermissionsCountByRoleIdAsync(Guid roleId);
     Task<bool> IsExistsRoleAsync();
 }
 
@@ -45,7 +45,7 @@ public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
             foreach (var role in roles)
             {
                 role.UsersCount = await GetUsersCountByRoleIdAsync(role.Id);
-                role.ClaimsCount = await GetClaimsCountByRoleIdAsync(role.Id);
+                role.PermissionsCount = await GetPermissionsCountByRoleIdAsync(role.Id);
             }
 
         return roles;
@@ -59,7 +59,7 @@ public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
             .FirstOrDefaultAsync() ?? throw new NotFoundException($"Role with id:{roleId} not found");
 
         role.UsersCount = await GetUsersCountByRoleIdAsync(roleId);
-        role.ClaimsCount = await GetClaimsCountByRoleIdAsync(roleId);
+        role.PermissionsCount = await GetPermissionsCountByRoleIdAsync(roleId);
 
         return role;
     }
@@ -67,8 +67,8 @@ public class EfRolesQuery(IdentityPrvdContext dbContext) : IRolesQuery
     public async Task<int> GetUsersCountByRoleIdAsync(Guid roleId) =>
         await dbContext.UserRoles.Where(s => s.RoleId == roleId).CountAsync();
 
-    public async Task<int> GetClaimsCountByRoleIdAsync(Guid roleId) =>
-        await dbContext.RoleClaims.Where(s => s.RoleId == roleId).CountAsync();
+    public async Task<int> GetPermissionsCountByRoleIdAsync(Guid roleId) =>
+        await dbContext.RolePermissions.Where(s => s.RoleId == roleId).CountAsync();
 
     public async Task<IdentityRole> GetRoleByIdAsync(Guid roleId) =>
         await dbContext.Roles.Where(s => s.Id == roleId).FirstOrDefaultAsync();

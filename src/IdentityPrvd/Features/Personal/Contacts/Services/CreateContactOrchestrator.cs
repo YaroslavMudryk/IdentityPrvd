@@ -18,7 +18,7 @@ public class CreateContactOrchestrator(
     public async Task<ContactDto> CreateContactAsync(CreateContactDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Contacts.Manage);
 
         var userId = currentUser.UserId.GetIdAsGuid();
 

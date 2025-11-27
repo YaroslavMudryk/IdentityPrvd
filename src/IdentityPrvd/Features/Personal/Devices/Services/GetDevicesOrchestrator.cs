@@ -13,7 +13,7 @@ public class GetDevicesOrchestrator(
     public async Task<List<DeviceDto>> GetDevicesAsync()
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Contacts.Read);
 
         return await devicesQuery.GetUserDevicesAsync(currentUser.UserId.GetIdAsGuid());
     }

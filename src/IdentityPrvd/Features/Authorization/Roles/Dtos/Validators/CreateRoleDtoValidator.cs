@@ -8,7 +8,7 @@ namespace IdentityPrvd.Features.Authorization.Roles.Dtos.Validators;
 public class CreateRoleDtoValidator : AbstractValidator<CreateRoleDto>
 {
     public CreateRoleDtoValidator(
-        IClaimsQuery claimsQuery,
+        IPermissionsQuery permissionsQuery,
         IRolesQuery rolesQuery)
     {
         RuleFor(s => s.Name)
@@ -22,14 +22,14 @@ public class CreateRoleDtoValidator : AbstractValidator<CreateRoleDto>
                 return true;
             });
 
-        RuleFor(s => s.ClaimIds)
-            .MustAsync(async (claimIds, token) =>
+        RuleFor(s => s.PermissionIds)
+            .MustAsync(async (permissionIds, token) =>
             {
-                if (claimIds != null && claimIds.Length != 0)
+                if (permissionIds != null && permissionIds.Length != 0)
                 {
-                    var allClaimsExists = await claimsQuery.GetClaimsByIdsAsync([.. claimIds.Select(s => s.GetIdAsGuid())]);
-                    if (allClaimsExists.Count != claimIds.Length)
-                        throw new BadRequestException("Some claims do not exist or are invalid");
+                    var allPermissionsExists = await permissionsQuery.GetPermissionsByIdsAsync([.. permissionIds.Select(s => s.GetIdAsGuid())]);
+                    if (allPermissionsExists.Count != permissionIds.Length)
+                        throw new BadRequestException("Some permissions do not exist or are invalid");
                 }
 
                 return true;

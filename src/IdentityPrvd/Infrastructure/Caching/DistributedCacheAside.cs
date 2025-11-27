@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace IdentityPrvd.Infrastructure.Caching;
 
-public static class CacheAside
+public static class DistributedCacheAside
 {
     private static readonly DistributedCacheEntryOptions Default = new()
     {

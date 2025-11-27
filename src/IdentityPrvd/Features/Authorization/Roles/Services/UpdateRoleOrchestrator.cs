@@ -18,14 +18,14 @@ public class UpdateRoleOrchestrator(
     IRoleStore roleStore,
     ITransactionManager transactionManager,
     DefaultRoleService defaultRoleService,
-    IRoleClaimStore roleClaimStore)
+    IRolePermissionStore rolePermissionStore)
 {
     public async Task<RoleDto> UpdateRoleAsync(Guid roleId, UpdateRoleDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-             IdentityClaims.Types.Role, IdentityClaims.Values.Update,
-             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Roles.Manage,
+             [DefaultsRoles.Admin]);
 
         dto.Id = roleId;
         await ValidationHelper.ValidateAndThrowAsync(validator, dto);
@@ -41,29 +41,29 @@ public class UpdateRoleOrchestrator(
         if (dto.IsDefault)
             await defaultRoleService.MakeRoleAsDefaultAsync(roleId);
 
-        await UpdateRoleClaimsAsync(roleId, [.. dto.ClaimIds.Select(s => s.GetIdAsGuid())]);
+        await UpdateRolePermissionsAsync(roleId, [.. dto.PermissionIds.Select(s => s.GetIdAsGuid())]);
 
         await transaction.CommitAsync();
 
         return await query.GetRoleAsync(roleId);
     }
 
-    private async Task UpdateRoleClaimsAsync(Guid roleId, Guid[] newClaimIds)
+    private async Task UpdateRolePermissionsAsync(Guid roleId, Guid[] newPermissionIds)
     {
-        var roleClaimsToDelete = await roleClaimStore.GetRoleClaimsByRoleIdAsync(roleId);
-        await roleClaimStore.DeleteRangeAsync(roleClaimsToDelete);
+        var rolePermissionsToDelete = await rolePermissionStore.GetRolePermissionsByRoleIdAsync(roleId);
+        await rolePermissionStore.DeleteRangeAsync(rolePermissionsToDelete);
 
-        if (newClaimIds != null && newClaimIds.Any())
+        if (newPermissionIds != null && newPermissionIds.Length != 0)
         {
-            var roleClaims = newClaimIds.Select(roleClaimId => new IdentityRoleClaim
+            var rolePermissions = newPermissionIds.Select(rolePermissionId => new IdentityRolePermission
             {
                 RoleId = roleId,
-                ClaimId = roleClaimId,
+                PermissionId = rolePermissionId,
                 ActiveFrom = DateTime.MinValue,
                 ActiveTo = DateTime.MaxValue,
                 IsActive = true
             });
-            await roleClaimStore.AddRangeAsync(roleClaims);
+            await rolePermissionStore.AddRangeAsync(rolePermissions);
         }
     }
 }

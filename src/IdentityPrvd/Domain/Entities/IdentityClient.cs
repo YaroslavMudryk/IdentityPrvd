@@ -12,6 +12,6 @@ public class IdentityClient : BaseModel
     public DateTime ActiveFrom { set; get; }
     public DateTime? ActiveTo { set; get; }
     public string[] RedirectUris { get; set; } = ["*"];
-    public List<IdentityClientClaim> ClientClaims { get; set; } = [];
+    public List<IdentityClientPermission> ClientPermissions { get; set; } = [];
     public List<IdentityClientSecret> ClientSecrets { get; set; } = [];
 }

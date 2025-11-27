@@ -12,19 +12,19 @@ using IdentityPrvd.Mappers;
 
 namespace IdentityPrvd.Features.Authorization.Clients.Services;
 
-public class UpdateClientClaimsOrchestrator(
-    IValidator<UpdateClientClaimsDto> validator,
+public class UpdateClientPermissionsOrchestrator(
+    IValidator<UpdateClientPermissionsDto> validator,
     ITransactionManager transactionManager,
-    IClientClaimStore clientClaimStore,
+    IClientPermissionStore clientPermissionStore,
     IClientStore clientStore,
     IIdentityContext identityContext)
 {
-    public async Task<ClientDto> UpdateClaimsAsync(Guid clientId, UpdateClientClaimsDto dto)
+    public async Task<ClientDto> UpdatePermissionsAsync(Guid clientId, UpdateClientPermissionsDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Clients, IdentityClaims.Values.Update,
-            [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Clients.Manage,
+             [DefaultsRoles.Admin]);
 
         await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 
@@ -32,16 +32,16 @@ public class UpdateClientClaimsOrchestrator(
 
         var client = await clientStore.GetAsync(clientId) ?? throw new NotFoundException($"Client with id:{clientId} not found");
 
-        await clientClaimStore.DeleteByClientIdAsync(clientId);
+        await clientPermissionStore.DeleteByClientIdAsync(clientId);
 
-        var newClaims = dto.ClaimsIds.Select(claimId => new IdentityClientClaim
+        var newPermissions = dto.PermissionsIds.Select(permissionId => new IdentityClientPermission
         {
             ClientId = clientId,
-            ClaimId = claimId.GetIdAsGuid()
+            PermissionId = permissionId.GetIdAsGuid()
         }).ToList();
-        if (newClaims.Count != 0)
+        if (newPermissions.Count != 0)
         {
-            await clientClaimStore.CreateAsync(newClaims);
+            await clientPermissionStore.CreateAsync(newPermissions);
         }
 
         await transaction.CommitAsync();

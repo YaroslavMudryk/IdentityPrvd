@@ -46,10 +46,10 @@ Use the checkboxes to mark progress.
 | Personal (Devices) | POST | `/api/identity/devices/verify` | [✅] | [✅] | [❌] |
 | Personal (Devices) | POST | `/api/identity/devices/unverify/{deviceId}` | [✅] | [✅] | [❌] |
 | Personal (Devices) | DELETE | `/api/identity/devices/{deviceId}` | [✅] | [✅] | [❌] |
-| Authorization (Claims) | GET | `/api/identity/claims` | [✅] | [✅] | [❌] |
-| Authorization (Claims) | POST | `/api/identity/claims` | [✅] | [✅] | [❌] |
-| Authorization (Claims) | PUT | `/api/identity/claims/{claimId}` | [✅] | [✅] | [❌] |
-| Authorization (Claims) | DELETE | `/api/identity/claims/{claimId}` | [✅] | [✅] | [❌] |
+| Authorization (Permissions) | GET | `/api/identity/permissions` | [✅] | [✅] | [❌] |
+| Authorization (Permissions) | POST | `/api/identity/permissions` | [✅] | [✅] | [❌] |
+| Authorization (Permissions) | PUT | `/api/identity/permissions/{permissionId}` | [✅] | [✅] | [❌] |
+| Authorization (Permissions) | DELETE | `/api/identity/permissions/{permissionId}` | [✅] | [✅] | [❌] |
 | Authorization (Clients) | GET | `/api/identity/clients` | [✅] | [❌] | [❌] |
 | Authorization (Clients) | GET | `/api/identity/clients/{clientId}` | [✅] | [❌] | [❌] |
 | Authorization (Clients) | POST | `/api/identity/clients` | [✅] | [❌] | [❌] |

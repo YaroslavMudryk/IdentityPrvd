@@ -17,8 +17,7 @@ public class RevokeSessionsOrchestrator(
     public async Task<int> RevokeSessionsAsync(Guid[] sessionIds)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Sessions.Manage);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
 
@@ -35,8 +34,7 @@ public class RevokeSessionsOrchestrator(
     public async Task RevokeCurrentSessionAsync()
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(
-            IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Sessions.Manage);
 
         await using var transaction = await transactionManager.BeginTransactionAsync();
         await sessionControlService.CloseSessionByIdAsync(currentUser.SessionId.GetIdAsGuid());

@@ -6,15 +6,12 @@ namespace IdentityPrvd.Data.Queries;
 
 public interface IBansQuery
 {
-    /// <summary>
-    /// Gets the active ban for a user at the specified time
-    /// </summary>
-    Task<IdentityBan?> GetActiveBanByUserIdAsync(Guid userId, DateTime utcNow);
+    Task<IdentityBan> GetActiveBanByUserIdAsync(Guid userId, DateTime utcNow);
 }
 
 public class EfBansQuery(IdentityPrvdContext dbContext) : IBansQuery
 {
-    public async Task<IdentityBan?> GetActiveBanByUserIdAsync(Guid userId, DateTime utcNow)
+    public async Task<IdentityBan> GetActiveBanByUserIdAsync(Guid userId, DateTime utcNow)
     {
         return await dbContext.Bans
             .AsNoTracking()

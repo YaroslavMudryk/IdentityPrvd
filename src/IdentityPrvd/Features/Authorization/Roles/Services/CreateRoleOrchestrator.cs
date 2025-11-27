@@ -17,15 +17,15 @@ public class CreateRoleOrchestrator(
     IRoleStore roleRepo,
     ITransactionManager transactionManager,
     DefaultRoleService defaultRoleService,
-    IRoleClaimStore roleClaimRepo,
+    IRolePermissionStore rolePermissionRepo,
     IValidator<CreateRoleDto> validator)
 {
     public async Task<RoleDto> CreateRoleAsync(CreateRoleDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-             IdentityClaims.Types.Role, IdentityClaims.Values.Create,
-             [DefaultsRoles.SuperAdmin, DefaultsRoles.Admin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Roles.Manage,
+             [DefaultsRoles.Admin]);
 
         await ValidationHelper.ValidateAndThrowAsync(validator, dto);
         await using var transaction = await transactionManager.BeginTransactionAsync();
@@ -40,16 +40,16 @@ public class CreateRoleOrchestrator(
         if (dto.IsDefault)
             await defaultRoleService.MakeRoleAsDefaultAsync(newRole.Id);
 
-        var newRoleClaims = dto.ClaimIds.Select(claimId => new IdentityRoleClaim
+        var newRolePermissions = dto.PermissionIds.Select(permissionId => new IdentityRolePermission
         {
             Id = Guid.CreateVersion7(),
             RoleId = newRole.Id,
-            ClaimId = claimId.GetIdAsGuid(),
+            PermissionId = permissionId.GetIdAsGuid(),
             ActiveFrom = DateTime.MinValue,
             ActiveTo = DateTime.MaxValue,
             IsActive = true
         });
-        await roleClaimRepo.AddRangeAsync(newRoleClaims);
+        await rolePermissionRepo.AddRangeAsync(newRolePermissions);
         await transaction.CommitAsync();
 
         return await query.GetRoleAsync(newRole.Id);

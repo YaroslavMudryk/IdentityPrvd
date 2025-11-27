@@ -8,6 +8,6 @@ public class RoleDto
     public bool IsDefault { get; set; }
     public string NameNormalized { get; set; }
     public int UsersCount { get; set; }
-    public int ClaimsCount { get; set; }
+    public int PermissionsCount { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

@@ -21,9 +21,9 @@ public class CreateClientOrchestrator(
     public async Task<ClientDto> CreateAsync(CreateClientDto dto)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissionsOrRoles(
-            IdentityClaims.Types.Clients, IdentityClaims.Values.Create,
-            [DefaultsRoles.Admin, DefaultsRoles.SuperAdmin]);
+        currentUser.EnsureUserHasPermissionOrRoles(
+             IdentityPermissions.Clients.Manage,
+             [DefaultsRoles.Admin]);
 
         await ValidationHelper.ValidateAndThrowAsync(validator, dto);
 

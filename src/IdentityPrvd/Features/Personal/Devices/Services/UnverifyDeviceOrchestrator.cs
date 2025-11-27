@@ -14,7 +14,7 @@ public class UnverifyDeviceOrchestrator(
     public async Task UnverifyDeviceAsync(Guid deviceId, bool deleteDevice = false)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Contacts.Manage);
 
         var userId = currentUser.UserId;
 

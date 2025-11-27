@@ -11,17 +11,15 @@ public static class CollectionExtensions
             .Where(d => d is not null)
             .ToList()!;
 
-    public static Dictionary<string, List<string>> GroupUnionCollectionBy<T>(
+    public static IReadOnlyList<string> GroupUnionCollectionBy<T>(
         this IReadOnlyCollection<T> firstCollection,
         IReadOnlyCollection<T> secondCollection,
         Func<T, Guid> distinctBy,
-        Func<T, string> groupBy,
         Func<T, string> select)
-        => firstCollection
+        => [.. firstCollection
             .Concat(secondCollection)
             .DistinctBy(distinctBy)
-            .GroupBy(groupBy)
-            .ToDictionary(g => g.Key, g => g.Select(select).Distinct().ToList());
+            .Select(select)];
 
     public static Dictionary<string, string> MapToSessionData(this string[] data)
     {

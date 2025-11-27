@@ -13,7 +13,7 @@ public class DeleteContactOrchestrator(
     public async Task DeleteContactAsync(Guid id)
     {
         var currentUser = identityContext.AssumeAuthenticated<BasicAuthenticatedUser>();
-        currentUser.EnsureUserHasPermissions(IdentityClaims.Types.Identity, IdentityClaims.Values.All);
+        currentUser.EnsureUserHasPermission(IdentityPermissions.Contacts.Manage);
 
         var contactToDelete = await contactStore.GetAsync(id);
         if (contactToDelete.UserId != currentUser.UserId.GetIdAsGuid())
