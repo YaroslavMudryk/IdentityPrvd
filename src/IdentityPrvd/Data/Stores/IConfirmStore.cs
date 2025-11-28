@@ -8,7 +8,7 @@ public interface IConfirmStore
 {
     Task<IdentityCode> AddAsync(IdentityCode confirm);
     Task<IdentityCode> UpdateAsync(IdentityCode confirm);
-    Task<IdentityCode> GetConfirmByCodeAsync(string verifyId);
+    Task<IdentityCode> GetConfirmByCodeAsync(string code);
 }
 
 public class EfConfirmStore(IdentityPrvdContext dbContext) : IConfirmStore
@@ -31,6 +31,6 @@ public class EfConfirmStore(IdentityPrvdContext dbContext) : IConfirmStore
         throw new ArgumentException("Entities must be in modified state or unchanged state to be updated.");
     }
 
-    public async Task<IdentityCode> GetConfirmByCodeAsync(string verifyId)
-        => await dbContext.Confirms.FirstOrDefaultAsync(s => s.VerifyId == verifyId);
+    public async Task<IdentityCode> GetConfirmByCodeAsync(string code)
+        => await dbContext.Confirms.FirstOrDefaultAsync(s => s.Code == code);
 }

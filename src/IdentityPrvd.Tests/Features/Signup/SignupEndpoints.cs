@@ -7,4 +7,7 @@ public class SignupEndpoints(HttpClient httpClient)
 {
     public async Task<TestApiResponse> Signup(SignupRequestDto dto)
         => await TestApiRequest.Post("/api/identity/signup").WithPayload(dto).SendAsync(httpClient);
+
+    public async Task<TestApiResponse> SignupConfirm(SignupConfirmRequestDto dto)
+        => await TestApiRequest.Post("/api/identity/signup/confirm").WithPayload(dto).SendAsync(httpClient);
 }
